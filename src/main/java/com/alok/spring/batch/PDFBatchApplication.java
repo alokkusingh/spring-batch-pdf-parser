@@ -19,7 +19,7 @@ public class PDFBatchApplication {
 	JobLauncher jobLauncher;
 
 	@Autowired
-	@Qualifier("CitiBankJob")
+	@Qualifier("CitiBankJob1")
 	Job citiBankJob;
 
 	public static void main(String[] args) {

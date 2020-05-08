@@ -1,7 +1,9 @@
 package com.alok.spring.batch.config;
 
+import com.alok.spring.batch.model.RawTransaction;
+import com.alok.spring.batch.model.Transaction;
 import com.alok.spring.batch.processor.FileArchiveTasklet;
-import com.alok.spring.batch.processor.PDFReader;
+import com.alok.spring.batch.utils.PDFReader;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -23,26 +25,23 @@ import org.springframework.core.io.Resource;
 
 @Configuration
 @EnableBatchProcessing
-public class CitiAccountStatementBatchConfig {
-    @Value("file:${file.path.citi_account}")
+public class CitiAccountStatementBatchConfig2 {
+    @Value("file:${file.path.citi_account.password2}")
     private Resource[] resources;
 
-    @Value("${fields.name.student:#{null}}")
-    private String[] fieldNames;
-
-    @Value("${file.password.citi}")
+    @Value("${file.password.citi.password2}")
     private String filePassword;
 
-    @Bean("CitiBankJob")
-    public Job citiBankJob(JobBuilderFactory jobBuilderFactory,
+    @Bean("CitiBankJob2")
+    public Job citiBankJob1(JobBuilderFactory jobBuilderFactory,
                            StepBuilderFactory stepBuilderFactory,
-                           ItemReader<String> citiItemsReader,
-                           ItemProcessor<String, String> citItemProcessor,
-                           ItemWriter<String> itemWriter
+                           ItemReader<RawTransaction> citiItemsReader2,
+                           ItemProcessor<RawTransaction, Transaction> citItemProcessor,
+                           ItemWriter<Transaction> itemWriter
     ) {
         Step step1 = stepBuilderFactory.get("CitiAccount-ETL-file-load")
-                .<String,String>chunk(100)
-                .reader(citiItemsReader)
+                .<RawTransaction,Transaction>chunk(1000)
+                .reader(citiItemsReader2)
                 .processor(citItemProcessor)
                 .writer(itemWriter)
                 .build();
@@ -64,44 +63,31 @@ public class CitiAccountStatementBatchConfig {
 
 
     @Bean
-    public MultiResourceItemReader<String> citiItemsReader() {
+    public MultiResourceItemReader<RawTransaction> citiItemsReader2() {
 
-        MultiResourceItemReader<String> reader = new MultiResourceItemReader<>();
+        MultiResourceItemReader<RawTransaction> reader = new MultiResourceItemReader<>();
         reader.setResources(resources);
         reader.setStrict(false);
-        reader.setDelegate(citiItemReader());
+        reader.setDelegate(citiItemReader2());
         return reader;
     }
 
     @Bean
-    public PDFReader<String> citiItemReader() {
+    public PDFReader citiItemReader2() {
 
-        PDFReader<String> flatFileItemReader = new PDFReader<String>();
-        flatFileItemReader.setName("CitiBank-CSV-Reader");
+        PDFReader flatFileItemReader = new PDFReader();
+        flatFileItemReader.setName("CitiBank-CSV-Reader2");
         flatFileItemReader.setFilePassword(filePassword);
-        //flatFileItemReader.setLinesToSkip(1);
-        //flatFileItemReader.setLineMapper(lineMapper());
-        //flatFileItemReader.setStrict(false);
+        flatFileItemReader.setStartReadingText("Date Transaction.*");
+        flatFileItemReader.setEndReadingText("CLOSING  BALANCE.*");
+        flatFileItemReader.setLinesToSkip(
+            new String[] {
+                   "^Your  Citibank  Account.*",
+                   "^Statement  Period.*",
+                    "^Page .*"
+            }
+        );
 
         return flatFileItemReader;
-    }
-
-    @Bean
-    public LineMapper<String> citLineMapper() {
-        DefaultLineMapper<String> defaultLineMapper = new DefaultLineMapper<>();
-
-        DelimitedLineTokenizer lineTokenizer = new DelimitedLineTokenizer();
-        lineTokenizer.setDelimiter(",");
-        lineTokenizer.setStrict(false);
-        //lineTokenizer.setNames(new String[]{"id", "name", "department", "marks"});
-        lineTokenizer.setNames(fieldNames);
-
-        BeanWrapperFieldSetMapper<String> fieldSetMapper = new BeanWrapperFieldSetMapper<>();
-        fieldSetMapper.setTargetType(String.class);
-
-        defaultLineMapper.setLineTokenizer(lineTokenizer);
-        defaultLineMapper.setFieldSetMapper(fieldSetMapper);
-
-        return defaultLineMapper;
     }
 }

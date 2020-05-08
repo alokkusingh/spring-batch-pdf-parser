@@ -24,7 +24,7 @@ public class CitiBankController {
     JobLauncher jobLauncher;
 
     @Autowired
-    @Qualifier("CitiBankJob")
+    @Qualifier("CitiBankJob1")
     Job job;
 
     @GetMapping("/load")
