@@ -13,6 +13,7 @@ import java.util.List;
 @Builder
 public class RawTransaction {
     private List<String> lines;
+    private String file;
 
     public RawTransaction() {
         lines = new LinkedList<>();
@@ -20,8 +21,8 @@ public class RawTransaction {
 
     public String getMergedLines() {
         String str = String.join(", ", lines);
-        int length = str.length()>255?255:str.length();
+        int length = str.length()>252?252:str.length();
 
-        return str.substring(0,length);
+        return "=\"" + str.substring(0,length) + "\"" ;
     }
 }

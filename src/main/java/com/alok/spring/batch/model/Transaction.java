@@ -14,13 +14,14 @@ import java.util.Date;
 public class Transaction implements Comparable<Transaction> {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    Integer id;
-    Date date;
-    String debit;
-    String credit;
-    String head;
-    String description;
-    boolean isSalary;
+    private Integer id;
+    private Date date;
+    private Integer debit;
+    private Integer credit;
+    private String head;
+    private String description;
+    private boolean isSalary;
+    private String file;
 
     @Transient
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd MMM yyyy");

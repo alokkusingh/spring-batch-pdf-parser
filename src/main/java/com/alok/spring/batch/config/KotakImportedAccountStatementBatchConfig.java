@@ -1,11 +1,8 @@
 package com.alok.spring.batch.config;
 
-import com.alok.spring.batch.model.RawTransaction;
 import com.alok.spring.batch.model.Transaction;
 import com.alok.spring.batch.processor.FileArchiveTasklet;
-import com.alok.spring.batch.utils.DefaultLineExtractor;
-import com.alok.spring.batch.utils.LineExtractor;
-import com.alok.spring.batch.reader.PDFReader;
+import com.alok.spring.batch.utils.KotakImportedFieldSetMapper;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -15,10 +12,12 @@ import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.LineMapper;
 import org.springframework.batch.item.file.MultiResourceItemReader;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
+import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -27,90 +26,76 @@ import org.springframework.core.io.Resource;
 
 @Configuration
 @EnableBatchProcessing
-public class CitiAccountStatementBatchConfig1 {
-    @Value("file:${file.path.citi_account.password1}")
+public class KotakImportedAccountStatementBatchConfig {
+    @Value("file:${file.path.kotak_account.imported}")
     private Resource[] resources;
 
-    @Value("${file.password.citi.password1}")
-    private String filePassword;
+    @Value("${fields.name.kotak_account.imported:#{null}}")
+    private String[] fieldNames;
 
-    @Bean("CitiBankJob1")
-    public Job citiBankJob1(JobBuilderFactory jobBuilderFactory,
+    @Bean("KotakImportedAccountJob")
+    public Job kotakImportedAccountJob(JobBuilderFactory jobBuilderFactory,
                            StepBuilderFactory stepBuilderFactory,
-                           ItemReader<RawTransaction> citiItemsReader1,
-                           ItemProcessor<RawTransaction, Transaction> citiBankAccountProcessor,
+                           ItemReader<Transaction> kotakImportedItemsReader,
+                           ItemProcessor<Transaction, Transaction> defaultAccountProcessor,
                            ItemWriter<Transaction> itemWriter
     ) {
-        Step step1 = stepBuilderFactory.get("CitiAccount-ETL-file-load")
-                .<RawTransaction,Transaction>chunk(1000)
-                .reader(citiItemsReader1)
-                .processor(citiBankAccountProcessor)
+        Step step1 = stepBuilderFactory.get("KotakImportedAccount-ETL-file-load")
+                .<Transaction,Transaction>chunk(1000)
+                .reader(kotakImportedItemsReader)
+                .processor(defaultAccountProcessor)
                 .writer(itemWriter)
                 .build();
 
 
         FileArchiveTasklet archiveTask = new FileArchiveTasklet();
         archiveTask.setResources(resources);
-        Step step2 = stepBuilderFactory.get("CitiAccount-ETL-file-archive")
+        Step step2 = stepBuilderFactory.get("KotakImportedAccount-ETL-file-archive")
                 .tasklet(archiveTask)
                 .build();
 
-        return jobBuilderFactory.get("Student-ETL-Load")
+        return jobBuilderFactory.get("KotakImportedAccount-ETL-Load")
                 .incrementer(new RunIdIncrementer())
                 .start(step1)
                 .next(step2)
                 .build();
     }
 
-
-
     @Bean
-    public MultiResourceItemReader<RawTransaction> citiItemsReader1() {
+    public MultiResourceItemReader<Transaction> kotakImportedItemsReader() {
 
-        MultiResourceItemReader<RawTransaction> reader = new MultiResourceItemReader<>();
+        MultiResourceItemReader<Transaction> reader = new MultiResourceItemReader<>();
         reader.setResources(resources);
         reader.setStrict(false);
-        reader.setDelegate(citiItemReader1());
+        reader.setDelegate(kotakImportedItemReader());
         return reader;
     }
 
     @Bean
-    public PDFReader citiItemReader1() {
+    public FlatFileItemReader<Transaction> kotakImportedItemReader() {
 
-        PDFReader flatFileItemReader = new PDFReader();
-        flatFileItemReader.setName("CitiBank-CSV-Reader1");
-        flatFileItemReader.setFilePassword(filePassword);
-
-        LineExtractor defaultLineExtractor = new DefaultLineExtractor();
-        defaultLineExtractor.setStartReadingText("Date Transaction.*");
-        defaultLineExtractor.setEndReadingText("Banking Reward Points.*");
-        defaultLineExtractor.setLinesToSkip(
-            new String[] {
-                   "^Your  Citibank  Account.*",
-                   "^Statement  Period.*",
-                    "^Page .*"
-            }
-        );
-
-        flatFileItemReader.setLineExtractor(defaultLineExtractor);
-
-        //flatFileItemReader.setLinesToSkip(1);
-        //flatFileItemReader.setLineMapper(lineMapper());
-        //flatFileItemReader.setStrict(false);
+        FlatFileItemReader<Transaction> flatFileItemReader = new FlatFileItemReader<>();
+        flatFileItemReader.setName("KotakImportedAccount-CSV-Reader");
+        flatFileItemReader.setLineMapper(kotakImportedAccountLineMapper());
+        flatFileItemReader.setStrict(false);
+        flatFileItemReader.setComments(new String[] {",", "\"", "#",
+                "ALOK", "Bangalore", "KARNATAKA", "INDIA", "Opening", "Closing", "You"
+        });
+        flatFileItemReader.setLinesToSkip(1);
 
         return flatFileItemReader;
     }
 
     @Bean
-    public LineMapper<String> citLineMapper() {
-        DefaultLineMapper<String> defaultLineMapper = new DefaultLineMapper<>();
+    public LineMapper<Transaction> kotakImportedAccountLineMapper() {
+        DefaultLineMapper<Transaction> defaultLineMapper = new DefaultLineMapper<>();
 
         DelimitedLineTokenizer lineTokenizer = new DelimitedLineTokenizer();
         lineTokenizer.setDelimiter(",");
         lineTokenizer.setStrict(false);
+        lineTokenizer.setNames(fieldNames);
 
-        BeanWrapperFieldSetMapper<String> fieldSetMapper = new BeanWrapperFieldSetMapper<>();
-        fieldSetMapper.setTargetType(String.class);
+        FieldSetMapper<Transaction> fieldSetMapper = new KotakImportedFieldSetMapper();
 
         defaultLineMapper.setLineTokenizer(lineTokenizer);
         defaultLineMapper.setFieldSetMapper(fieldSetMapper);

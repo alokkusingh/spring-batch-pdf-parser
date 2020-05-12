@@ -31,28 +31,25 @@
     </appender>
     <!-- LOG everything at warn level -->
     <logger name="org.springframework.boot.StartupInfoLogger"
-            level="trace" additivity="false">
+            level="info" additivity="false">
         <appender-ref ref="RollingFile"/>
         <appender-ref ref="Console"/>
     </logger>
     <root level="warn">
         <appender-ref ref="RollingFile"/>
     </root>
-    <logger name="org.hibernate" level="error" additivity="false">
+    <logger name="com.alok" level="info" additivity="false">
         <appender-ref ref="RollingFile"/>
     </logger>
     <logger name="org.hibernate" level="error" additivity="false">
         <appender-ref ref="RollingFile"/>
     </logger>
-    <logger name="org.springframework.security" level="debug"
+    <logger name="org.springframework.security" level="error"
             additivity="false">
         <appender-ref ref="RollingFile"/>
     </logger>
-    <logger name="org.springframework.security.oauth2" level="debug"
+    <logger name="org.springframework.batch" level="info"
             additivity="false">
-        <appender-ref ref="RollingFile"/>
-    </logger>
-    <logger name="com.alok" level="debug" additivity="false">
         <appender-ref ref="RollingFile"/>
     </logger>
 </configuration>

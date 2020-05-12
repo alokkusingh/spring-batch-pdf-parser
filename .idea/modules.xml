@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/spring-batch.iml" filepath="$PROJECT_DIR$/spring-batch.iml" />
+      <module fileurl="file://$PROJECT_DIR$/spring-batch-pdf-parser.iml" filepath="$PROJECT_DIR$/spring-batch-pdf-parser.iml" />
     </modules>
   </component>
 </project>

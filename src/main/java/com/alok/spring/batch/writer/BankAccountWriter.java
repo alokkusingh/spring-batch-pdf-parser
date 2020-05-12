@@ -1,4 +1,4 @@
-package com.alok.spring.batch.processor;
+package com.alok.spring.batch.writer;
 
 import com.alok.spring.batch.model.Transaction;
 import com.alok.spring.batch.repository.TransactionRepository;
@@ -11,19 +11,19 @@ import java.util.List;
 
 @Component
 @Slf4j
-public class CitiBankAccountWriter implements ItemWriter<Transaction> {
+public class BankAccountWriter implements ItemWriter<Transaction> {
 
     @Autowired
     TransactionRepository transactionRepository;
 
     @Override
     public void write(List<? extends Transaction> records) throws Exception {
-        records.stream()
+       /* records.stream()
                 .sorted()
                 .filter(Transaction::isSalary)
                 .forEach(
                 record -> log.debug("Parsed record: {}", record )
-        );
+        );*/
 
         transactionRepository.saveAll(records);
 

@@ -20,7 +20,7 @@ public class FileArchiveTasklet implements Tasklet, InitializingBean {
 
         for(Resource r: resources) {
             File file = r.getFile();
-            log.debug("FIle {} will be archived after processing", file);
+            log.info("FIle {} will be archived after processing", file);
            // boolean deleted = file.delete();
             //if (!deleted) {
              //   throw new UnexpectedJobExecutionException("Could not delete file " + file.getPath());

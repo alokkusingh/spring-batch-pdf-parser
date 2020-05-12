@@ -7,16 +7,18 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="spring-batch" />
+        <module name="spring-batch-pdf-parser" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="spring-batch" target="1.8" />
+      <module name="spring-batch-pdf-parser" target="1.8" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="spring-batch" options="-parameters" />
+      <module name="spring-batch-pdf-parser" options="-parameters" />
     </option>
   </component>
 </project>

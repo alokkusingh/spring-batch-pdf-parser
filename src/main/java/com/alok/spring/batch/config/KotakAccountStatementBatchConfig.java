@@ -2,8 +2,9 @@ package com.alok.spring.batch.config;
 
 import com.alok.spring.batch.model.RawTransaction;
 import com.alok.spring.batch.model.Transaction;
+import com.alok.spring.batch.processor.BankAccountProcessor;
 import com.alok.spring.batch.processor.FileArchiveTasklet;
-import com.alok.spring.batch.utils.DefaultLineExtractor;
+import com.alok.spring.batch.utils.KotakLineExtractor;
 import com.alok.spring.batch.utils.LineExtractor;
 import com.alok.spring.batch.reader.PDFReader;
 import org.springframework.batch.core.Job;
@@ -21,37 +22,39 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 
+import java.text.SimpleDateFormat;
+
 @Configuration
 @EnableBatchProcessing
-public class CitiAccountStatementBatchConfig2 {
-    @Value("file:${file.path.citi_account.password2}")
+public class KotakAccountStatementBatchConfig {
+    @Value("file:${file.path.kotak_account}")
     private Resource[] resources;
 
-    @Value("${file.password.citi.password2}")
+    @Value("${file.password.kotak}")
     private String filePassword;
 
-    @Bean("CitiBankJob2")
-    public Job citiBankJob1(JobBuilderFactory jobBuilderFactory,
+    @Bean("KotakBankJob")
+    public Job kotakBankJob(JobBuilderFactory jobBuilderFactory,
                            StepBuilderFactory stepBuilderFactory,
-                           ItemReader<RawTransaction> citiItemsReader2,
-                           ItemProcessor<RawTransaction, Transaction> citiBankAccountProcessor,
+                           ItemReader<RawTransaction> kotakItemsReader,
+                           ItemProcessor<RawTransaction, Transaction> kotakAccountProcessor,
                            ItemWriter<Transaction> itemWriter
     ) {
         Step step1 = stepBuilderFactory.get("CitiAccount-ETL-file-load")
                 .<RawTransaction,Transaction>chunk(1000)
-                .reader(citiItemsReader2)
-                .processor(citiBankAccountProcessor)
+                .reader(kotakItemsReader)
+                .processor(kotakAccountProcessor)
                 .writer(itemWriter)
                 .build();
 
 
         FileArchiveTasklet archiveTask = new FileArchiveTasklet();
         archiveTask.setResources(resources);
-        Step step2 = stepBuilderFactory.get("CitiAccount-ETL-file-archive")
+        Step step2 = stepBuilderFactory.get("KotakAccount-ETL-file-archive")
                 .tasklet(archiveTask)
                 .build();
 
-        return jobBuilderFactory.get("Student-ETL-Load")
+        return jobBuilderFactory.get("Kotak-ETL-Load")
                 .incrementer(new RunIdIncrementer())
                 .start(step1)
                 .next(step2)
@@ -61,35 +64,45 @@ public class CitiAccountStatementBatchConfig2 {
 
 
     @Bean
-    public MultiResourceItemReader<RawTransaction> citiItemsReader2() {
+    public MultiResourceItemReader<RawTransaction> kotakItemsReader() {
 
         MultiResourceItemReader<RawTransaction> reader = new MultiResourceItemReader<>();
         reader.setResources(resources);
         reader.setStrict(false);
-        reader.setDelegate(citiItemReader2());
+        reader.setDelegate(kotakItemReader());
         return reader;
     }
 
     @Bean
-    public PDFReader citiItemReader2() {
+    public PDFReader kotakItemReader() {
 
         PDFReader flatFileItemReader = new PDFReader();
-        flatFileItemReader.setName("CitiBank-CSV-Reader2");
+        flatFileItemReader.setName("KotakBank-CSV-Reader3");
         flatFileItemReader.setFilePassword(filePassword);
 
-        LineExtractor defaultLineExtractor = new DefaultLineExtractor();
-        defaultLineExtractor.setStartReadingText("Date Transaction.*");
-        defaultLineExtractor.setEndReadingText("Banking Reward Points.*");
-        defaultLineExtractor.setLinesToSkip(
+        LineExtractor kotakLineExtractor = new KotakLineExtractor();
+        kotakLineExtractor.setStartReadingText("Date.*Narration.*");
+        kotakLineExtractor.setEndReadingText(".*Statement.*Summary.*");
+        kotakLineExtractor.setLinesToSkip(
             new String[] {
-                   "^Your  Citibank  Account.*",
+                   ".*OPENING BALANCE.*",
                    "^Statement  Period.*",
                     "^Page .*"
             }
         );
+        kotakLineExtractor.setDateRegex("^[0-9]{2}-[a-zA-Z]{3}-[0-9]{2}.*");
 
-        flatFileItemReader.setLineExtractor(defaultLineExtractor);
+        flatFileItemReader.setLineExtractor(kotakLineExtractor);
 
         return flatFileItemReader;
+    }
+
+    @Bean
+    public BankAccountProcessor kotakAccountProcessor() {
+        BankAccountProcessor kotakAccountPrsr = new BankAccountProcessor();
+        kotakAccountPrsr.setDateFiledLength(9);
+        kotakAccountPrsr.setSimpleDateFormat(new SimpleDateFormat("dd-MMM-yy"));
+
+        return kotakAccountPrsr;
     }
 }

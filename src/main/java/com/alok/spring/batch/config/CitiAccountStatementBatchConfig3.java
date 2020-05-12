@@ -3,7 +3,9 @@ package com.alok.spring.batch.config;
 import com.alok.spring.batch.model.RawTransaction;
 import com.alok.spring.batch.model.Transaction;
 import com.alok.spring.batch.processor.FileArchiveTasklet;
-import com.alok.spring.batch.utils.PDFReader;
+import com.alok.spring.batch.utils.DefaultLineExtractor;
+import com.alok.spring.batch.utils.LineExtractor;
+import com.alok.spring.batch.reader.PDFReader;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -32,13 +34,13 @@ public class CitiAccountStatementBatchConfig3 {
     public Job citiBankJob1(JobBuilderFactory jobBuilderFactory,
                            StepBuilderFactory stepBuilderFactory,
                            ItemReader<RawTransaction> citiItemsReader3,
-                           ItemProcessor<RawTransaction, Transaction> citItemProcessor,
+                           ItemProcessor<RawTransaction, Transaction> citiBankAccountProcessor,
                            ItemWriter<Transaction> itemWriter
     ) {
         Step step1 = stepBuilderFactory.get("CitiAccount-ETL-file-load")
                 .<RawTransaction,Transaction>chunk(1000)
                 .reader(citiItemsReader3)
-                .processor(citItemProcessor)
+                .processor(citiBankAccountProcessor)
                 .writer(itemWriter)
                 .build();
 
@@ -74,15 +76,19 @@ public class CitiAccountStatementBatchConfig3 {
         PDFReader flatFileItemReader = new PDFReader();
         flatFileItemReader.setName("CitiBank-CSV-Reader3");
         flatFileItemReader.setFilePassword(filePassword);
-        flatFileItemReader.setStartReadingText("Date Transaction.*");
-        flatFileItemReader.setEndReadingText("CLOSING  BALANCE.*");
-        flatFileItemReader.setLinesToSkip(
+
+        LineExtractor defaultLineExtractor = new DefaultLineExtractor();
+        defaultLineExtractor.setStartReadingText("Date Transaction.*");
+        defaultLineExtractor.setEndReadingText("Banking Reward Points.*");
+        defaultLineExtractor.setLinesToSkip(
             new String[] {
                    "^Your  Citibank  Account.*",
                    "^Statement  Period.*",
                     "^Page .*"
             }
         );
+
+        flatFileItemReader.setLineExtractor(defaultLineExtractor);
 
         return flatFileItemReader;
     }
