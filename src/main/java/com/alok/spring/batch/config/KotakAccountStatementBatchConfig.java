@@ -38,13 +38,13 @@ public class KotakAccountStatementBatchConfig {
                            StepBuilderFactory stepBuilderFactory,
                            ItemReader<RawTransaction> kotakItemsReader,
                            ItemProcessor<RawTransaction, Transaction> kotakAccountProcessor,
-                           ItemWriter<Transaction> itemWriter
+                           ItemWriter<Transaction> bankAccountDbWriter
     ) {
         Step step1 = stepBuilderFactory.get("CitiAccount-ETL-file-load")
                 .<RawTransaction,Transaction>chunk(1000)
                 .reader(kotakItemsReader)
                 .processor(kotakAccountProcessor)
-                .writer(itemWriter)
+                .writer(bankAccountDbWriter)
                 .build();
 
 

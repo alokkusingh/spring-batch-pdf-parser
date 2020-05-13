@@ -36,13 +36,13 @@ public class MissingAccountStatementBatchConfig {
                           StepBuilderFactory stepBuilderFactory,
                           ItemReader<Transaction> itemsReader,
                           ItemProcessor<Transaction, Transaction> defaultAccountProcessor,
-                          ItemWriter<Transaction> itemWriter
+                          ItemWriter<Transaction> bankAccountDbWriter
     ) {
         Step step1 = stepBuilderFactory.get("MissingAccount-ETL-file-load")
                 .<Transaction,Transaction>chunk(100)
                 .reader(itemsReader)
                 .processor(defaultAccountProcessor)
-                .writer(itemWriter)
+                .writer(bankAccountDbWriter)
                 .build();
 
 

@@ -39,13 +39,13 @@ public class CitiAccountStatementBatchConfig1 {
                            StepBuilderFactory stepBuilderFactory,
                            ItemReader<RawTransaction> citiItemsReader1,
                            ItemProcessor<RawTransaction, Transaction> citiBankAccountProcessor,
-                           ItemWriter<Transaction> itemWriter
+                           ItemWriter<Transaction> bankAccountDbWriter
     ) {
         Step step1 = stepBuilderFactory.get("CitiAccount-ETL-file-load")
                 .<RawTransaction,Transaction>chunk(1000)
                 .reader(citiItemsReader1)
                 .processor(citiBankAccountProcessor)
-                .writer(itemWriter)
+                .writer(bankAccountDbWriter)
                 .build();
 
 

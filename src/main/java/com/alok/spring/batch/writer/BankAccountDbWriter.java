@@ -11,7 +11,7 @@ import java.util.List;
 
 @Component
 @Slf4j
-public class BankAccountWriter implements ItemWriter<Transaction> {
+public class BankAccountDbWriter implements ItemWriter<Transaction> {
 
     @Autowired
     TransactionRepository transactionRepository;
