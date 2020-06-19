@@ -13,7 +13,7 @@ public class Utility {
 
     static public boolean isFamilyTransaction(String transation) {
         if (transation.toLowerCase().matches(".*ramawatar.*|.*avinash.*|.*gopal.*|.*papa.*|.*31987667084.*|.*3209010000019.*|.*kharagpur.*|.*mb hr.*")) {
-            if (!transation.toLowerCase().matches(".*rachna.*|.*withdrawal.*"
+            if (!transation.toLowerCase().matches(".*rachna.*|.*withdrawal.*|.*9916661247@.*"
             )) {
                 return true;
             }
