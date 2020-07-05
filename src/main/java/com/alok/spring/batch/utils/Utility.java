@@ -2,7 +2,7 @@ package com.alok.spring.batch.utils;
 
 public class Utility {
     static public boolean isSalaryTransaction(String transation) {
-        if (transation.toLowerCase().matches(".*salary.*|.*evolving.*|.*wipro.*|.*yodlee.*")) {
+        if (transation.toLowerCase().matches(".*salary.*|.*evolving.*|.*wipro.*|.*yodlee.*|.*bosch.*")) {
             if (!transation.toLowerCase().matches(".*reimbursement.*|.*withdrawal.*" +
                     "|.*corp.trf.*|.*trip.*|.*hotel.*|.*ref: .*|.*imps.*")) {
                 return true;
