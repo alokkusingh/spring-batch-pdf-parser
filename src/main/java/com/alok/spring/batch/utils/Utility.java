@@ -22,7 +22,7 @@ public class Utility {
     }
 
     static public boolean isReversalTransaction(String transation) {
-        if (transation.toLowerCase().matches(".*outward  rev.*")) {
+        if (transation.toLowerCase().matches(".*outward  rev.*") || transation.toLowerCase().matches(".*rev:imps.*")) {
             if (!transation.toLowerCase().matches(".*withdrawal.*"
             )) {
                 return true;
