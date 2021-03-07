@@ -3,6 +3,7 @@ package com.alok.spring.batch.config;
 import com.alok.spring.batch.model.RawTransaction;
 import com.alok.spring.batch.model.Transaction;
 import com.alok.spring.batch.processor.FileArchiveTasklet;
+import com.alok.spring.batch.utils.CitiUtils;
 import com.alok.spring.batch.utils.DefaultLineExtractor;
 import com.alok.spring.batch.utils.LineExtractor;
 import com.alok.spring.batch.reader.PDFReader;
@@ -76,29 +77,7 @@ public class CitiAccountStatementBatchConfig1 {
 
     @Bean
     public PDFReader citiItemReader1() {
-
-        PDFReader flatFileItemReader = new PDFReader();
-        flatFileItemReader.setName("CitiBank-CSV-Reader1");
-        flatFileItemReader.setFilePassword(filePassword);
-
-        LineExtractor defaultLineExtractor = new DefaultLineExtractor();
-        defaultLineExtractor.setStartReadingText("Date Transaction.*");
-        defaultLineExtractor.setEndReadingText("Banking Reward Points.*");
-        defaultLineExtractor.setLinesToSkip(
-            new String[] {
-                   "^Your  Citibank  Account.*",
-                   "^Statement  Period.*",
-                    "^Page .*"
-            }
-        );
-
-        flatFileItemReader.setLineExtractor(defaultLineExtractor);
-
-        //flatFileItemReader.setLinesToSkip(1);
-        //flatFileItemReader.setLineMapper(lineMapper());
-        //flatFileItemReader.setStrict(false);
-
-        return flatFileItemReader;
+        return CitiUtils.getCitiItemReader(filePassword);
     }
 
     @Bean
