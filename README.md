@@ -11,3 +11,6 @@ Spring Boot Batch Processor
 ### Supported Bank Statemetnts
 1. Citi Bank Saving Account 
 2. Kotak Mahindra Bank Saving Account 
+
+### How to run
+java -jar target/spring-batch-pdf-parser-0.0.2-SNAPSHOT.jar --file.path.base.dir=/home/alok/data/git/BankStatements
