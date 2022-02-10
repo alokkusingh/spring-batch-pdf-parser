@@ -23,10 +23,12 @@ public class Utility {
         return false;
     }
 
-    static public boolean isReversalTransaction(String transation) {
-        if (transation.toLowerCase().matches(".*outward  rev.*") || transation.toLowerCase().matches(".*rev:imps.*")) {
-            if (!transation.toLowerCase().matches(".*withdrawal.*"
-            )) {
+    static public boolean isReversalTransaction(String transaction) {
+        if (transaction.toLowerCase().matches(".*outward  rev.*") ||
+                transaction.toLowerCase().matches(".*rev:imps.*") ||
+                transaction.toLowerCase().matches(".*received from.*")
+        ) {
+            if (!transaction.toLowerCase().matches(".*withdrawal.*")) {
                 return true;
             }
         }
