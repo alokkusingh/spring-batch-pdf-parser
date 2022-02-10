@@ -101,7 +101,7 @@ public class PDFBatchApplication implements ApplicationRunner {
 				setDelimiter(",");
 				setFieldExtractor(new BeanWrapperFieldExtractor<Transaction>() {
 					{
-						setNames(new String[] { "id", "date", "head", "debit", "credit", "description" });
+						setNames(new String[] { "date", "date", "head", "debit", "credit", "description" });
 					}
 				});
 			}
