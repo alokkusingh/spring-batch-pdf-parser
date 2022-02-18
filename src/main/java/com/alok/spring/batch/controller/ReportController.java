@@ -35,7 +35,6 @@ public class ReportController {
         Path path = Paths.get(file.getAbsolutePath());
         ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(path));
 
-
         HttpHeaders headers = new HttpHeaders();
         headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Pragma", "no-cache");
@@ -44,7 +43,7 @@ public class ReportController {
 
         return ResponseEntity.ok()
                 .headers(headers)
-                .contentLength(googleCsvFile.length())
+                .contentLength(googleCsvFile.length() + 100)
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(resource);
     }
