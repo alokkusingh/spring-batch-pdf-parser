@@ -1,6 +1,8 @@
 package com.alok.spring.batch.controller;
 
+import com.alok.spring.batch.model.Transaction;
 import com.alok.spring.batch.response.UploadFileResponse;
+import com.alok.spring.batch.service.BankService;
 import com.alok.spring.batch.service.FileStorageService;
 import com.alok.spring.batch.service.JobExecutorService;
 import lombok.extern.slf4j.Slf4j;
@@ -11,15 +13,14 @@ import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/bank/statement")
+@RequestMapping("/bank")
 public class BankStatementController {
 
     @Autowired
@@ -28,8 +29,11 @@ public class BankStatementController {
     @Autowired
     private JobExecutorService jobExecutorService;
 
+    @Autowired
+    private BankService bankService;
 
-    @PostMapping(value = "/upload", produces = MediaType.APPLICATION_JSON_VALUE)
+
+    @PostMapping(value = "/statement/upload", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UploadFileResponse> uploadStatement(
             @RequestParam MultipartFile file
     ) {
@@ -65,5 +69,10 @@ public class BankStatementController {
                                 .fileDownloadUri("/report/download")
                                 .build()
                 );
+    }
+
+    @GetMapping(value = "/transactions", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<Transaction> getAllTransactions() {
+        return bankService.getAllTransactions();
     }
 }
