@@ -30,6 +30,7 @@ public class ReportController {
 
     @GetMapping("/download")
     public ResponseEntity<Resource> downloadReport() throws IOException {
+        log.info("Downloading report request!");
         File file = new File(googleCsvFile);
         Path path = Paths.get(file.getAbsolutePath());
         ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(path));
@@ -40,6 +41,7 @@ public class ReportController {
         headers.add("Expires", "0");
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=for_google_sheet.csv");
 
+        log.info("Report content length {}", file.length());
         return ResponseEntity.ok()
                 .headers(headers)
                 .contentLength(file.length())
