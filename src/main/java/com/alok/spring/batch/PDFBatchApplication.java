@@ -24,6 +24,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.List;
 
@@ -90,6 +92,9 @@ public class PDFBatchApplication implements ApplicationRunner {
 	public FlatFileItemWriter<Transaction> csvWriterForGoogleSheet(
 
 			) {
+
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+
 		Resource csvFile = new FileSystemResource(outputFileName);
 		FlatFileItemWriter csvWriter = new FlatFileItemWriter();
 		csvWriter.setResource(csvFile);
@@ -101,7 +106,7 @@ public class PDFBatchApplication implements ApplicationRunner {
 				setDelimiter(",");
 				setFieldExtractor(new BeanWrapperFieldExtractor<Transaction>() {
 					{
-						setNames(new String[] { "date", "date", "head", "debit", "credit", "description" });
+						setNames(new String[] { "dateFormat.format(date)", "date", "head", "debit", "credit", "description" });
 					}
 				});
 			}
