@@ -3,6 +3,7 @@ package com.alok.spring.batch.model;
 import lombok.*;
 
 import javax.persistence.*;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -25,11 +26,19 @@ public class Transaction implements Comparable<Transaction> {
     private String file;
 
     @Transient
+    private String strDate;
+
+    @Transient
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd MMM yyyy");
 
     @Override
     public int compareTo(Transaction o) {
         return this.date.compareTo(o.date);
+    }
+
+    public String getStrDate() {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
+        return dateFormat.format(date);
     }
 
     @Override

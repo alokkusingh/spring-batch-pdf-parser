@@ -93,8 +93,6 @@ public class PDFBatchApplication implements ApplicationRunner {
 
 			) {
 
-		DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
-
 		Resource csvFile = new FileSystemResource(outputFileName);
 		FlatFileItemWriter csvWriter = new FlatFileItemWriter();
 		csvWriter.setResource(csvFile);
@@ -106,7 +104,7 @@ public class PDFBatchApplication implements ApplicationRunner {
 				setDelimiter(",");
 				setFieldExtractor(new BeanWrapperFieldExtractor<Transaction>() {
 					{
-						setNames(new String[] { "dateFormat.format(date)", "date", "head", "debit", "credit", "description" });
+						setNames(new String[] { "strDate", "strDate", "head", "debit", "credit", "description" });
 					}
 				});
 			}
