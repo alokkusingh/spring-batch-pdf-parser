@@ -10,6 +10,27 @@ var multipleFileUploadInput = document.querySelector('#multipleFileUploadInput')
 var multipleFileUploadError = document.querySelector('#multipleFileUploadError');
 var multipleFileUploadSuccess = document.querySelector('#multipleFileUploadSuccess');
 
+function downloadReport() {
+    var formData = new FormData();
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/report/download");
+
+    xhr.onload = function() {
+        console.log(xhr.responseText);
+        var response = JSON.parse(xhr.responseText);
+        if(xhr.status == 200) {
+            singleFileUploadError.style.display = "none";
+            singleFileUploadSuccess.style.display = "block";
+        } else {
+            singleFileUploadSuccess.style.display = "none";
+            singleFileUploadError.innerHTML = (response && response.message) || "Some Error Occurred";
+        }
+    }
+
+    xhr.send(formData);
+}
+
 function uploadSingleFile(file) {
     var formData = new FormData();
     formData.append("file", file);

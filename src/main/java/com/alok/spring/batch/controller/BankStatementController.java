@@ -2,7 +2,12 @@ package com.alok.spring.batch.controller;
 
 import com.alok.spring.batch.response.UploadFileResponse;
 import com.alok.spring.batch.service.FileStorageService;
+import com.alok.spring.batch.service.JobExecutorService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.batch.core.JobParametersInvalidException;
+import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +25,9 @@ public class BankStatementController {
     @Autowired
     private FileStorageService fileStorageService;
 
+    @Autowired
+    private JobExecutorService jobExecutorService;
+
 
     @PostMapping(value = "/upload", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UploadFileResponse> uploadStatement(
@@ -31,6 +39,19 @@ public class BankStatementController {
 
         String fineName = fileStorageService.storeFile(file);
 
+
+        // brute force way
+        try {
+            jobExecutorService.executeAllJobs();
+        } catch (JobParametersInvalidException e) {
+            e.printStackTrace();
+        } catch (JobExecutionAlreadyRunningException e) {
+            e.printStackTrace();
+        } catch (JobRestartException e) {
+            e.printStackTrace();
+        } catch (JobInstanceAlreadyCompleteException e) {
+            e.printStackTrace();
+        }
 
         return ResponseEntity.ok()
                 .body(
