@@ -15,6 +15,7 @@ public class Transaction implements Comparable<Transaction> {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
+    @Temporal(TemporalType.DATE)
     private Date date;
     private Integer debit;
     private Integer credit;
