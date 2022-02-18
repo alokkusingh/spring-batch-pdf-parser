@@ -20,7 +20,8 @@ public class BankStatementController {
             @RequestParam String name
     ) {
 
-        log.info("Uploaded file: {}", file.getName());
+        log.info("Uploaded file: {}", file.getOriginalFilename());
+        log.info("File type: {}", file.getContentType());
         log.info("File size: {}", file.getSize());
 
 
