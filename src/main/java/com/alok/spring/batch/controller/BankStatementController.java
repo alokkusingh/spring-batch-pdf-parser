@@ -1,8 +1,11 @@
 package com.alok.spring.batch.controller;
 
+import com.alok.spring.batch.response.UploadFileResponse;
 import com.alok.spring.batch.service.FileStorageService;
+import com.sun.xml.internal.ws.api.pipe.ContentType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,17 +22,25 @@ public class BankStatementController {
     private FileStorageService fileStorageService;
 
 
-    @PostMapping("/upload")
-    public ResponseEntity<String> uploadStatement(
+    @PostMapping(value = "/upload", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UploadFileResponse> uploadStatement(
             @RequestParam MultipartFile file
     ) {
 
         log.info("Uploaded file: {}, type: {}, size: {}", file.getOriginalFilename(),
                 file.getContentType(), file.getSize());
 
-        fileStorageService.storeFile(file);
+        String fineName = fileStorageService.storeFile(file);
+
 
         return ResponseEntity.ok()
-                .body("File uploaded with job id: " + "tbd");
+                .body(
+                        UploadFileResponse.builder()
+                                .fileName(fineName)
+                                .size(file.getSize())
+                                .fileType(file.getContentType())
+                                .message("File submitted for processing")
+                                .build()
+                );
     }
 }
