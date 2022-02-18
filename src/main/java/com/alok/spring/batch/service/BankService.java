@@ -32,6 +32,9 @@ public class BankService {
                         .build())
                 .collect(Collectors.toList());
 
-        return GetTransactionsResponse.builder().transactions(transactionsList).build();
+        return GetTransactionsResponse.builder()
+                .transactions(transactionsList)
+                .count(transactionsList.size())
+                .build();
     }
 }

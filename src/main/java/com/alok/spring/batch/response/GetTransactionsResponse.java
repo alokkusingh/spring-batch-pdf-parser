@@ -3,6 +3,7 @@ package com.alok.spring.batch.response;
 import lombok.Builder;
 import lombok.Data;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.Date;
 import java.util.List;
 
@@ -11,6 +12,7 @@ import java.util.List;
 public class GetTransactionsResponse {
 
     private List<Transaction> transactions;
+    private Integer count;
 
     @Data
     @Builder
