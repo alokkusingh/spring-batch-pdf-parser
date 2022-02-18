@@ -24,6 +24,7 @@ public class BankService {
 
         List<GetTransactionsResponse.Transaction> transactionsList = transactions.stream()
                 .map(transaction -> GetTransactionsResponse.Transaction.builder()
+                        .id(transaction.getId())
                         .date(transaction.getDate())
                         .head(transaction.getHead())
                         .credit(transaction.getCredit())

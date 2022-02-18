@@ -15,6 +15,7 @@ public class GetTransactionsResponse {
     @Data
     @Builder
     public static class Transaction {
+        private Integer id;
         private Date date;
         private Integer debit;
         private Integer credit;
