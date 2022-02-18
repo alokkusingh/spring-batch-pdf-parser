@@ -1,6 +1,6 @@
 package com.alok.spring.batch.controller;
 
-import com.alok.spring.batch.model.Transaction;
+import com.alok.spring.batch.response.GetTransactionsResponse;
 import com.alok.spring.batch.response.UploadFileResponse;
 import com.alok.spring.batch.service.BankService;
 import com.alok.spring.batch.service.FileStorageService;
@@ -15,8 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -72,7 +70,7 @@ public class BankStatementController {
     }
 
     @GetMapping(value = "/transactions", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<Transaction> getAllTransactions() {
+    public GetTransactionsResponse getAllTransactions() {
         return bankService.getAllTransactions();
     }
 }
