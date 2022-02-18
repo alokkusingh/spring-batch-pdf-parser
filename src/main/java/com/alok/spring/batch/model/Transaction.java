@@ -37,7 +37,7 @@ public class Transaction implements Comparable<Transaction> {
     }
 
     public String getStrDate() {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         return dateFormat.format(date);
     }
 
