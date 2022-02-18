@@ -30,6 +30,7 @@ public class ReportController {
         headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=for_google_sheet.csv");
 
         return ResponseEntity.ok()
                 .headers(headers)
