@@ -39,6 +39,7 @@ public class BankStatementController {
                                 .size(file.getSize())
                                 .fileType(file.getContentType())
                                 .message("File submitted for processing")
+                                .fileDownloadUri("/report/download")
                                 .build()
                 );
     }
