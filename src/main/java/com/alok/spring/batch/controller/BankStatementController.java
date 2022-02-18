@@ -31,6 +31,7 @@ public class BankStatementController {
     private BankService bankService;
 
 
+    @CrossOrigin
     @PostMapping(value = "/statement/upload", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UploadFileResponse> uploadStatement(
             @RequestParam MultipartFile file
