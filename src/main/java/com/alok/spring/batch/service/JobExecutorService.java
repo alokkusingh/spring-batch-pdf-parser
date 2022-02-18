@@ -1,5 +1,7 @@
 package com.alok.spring.batch.service;
 
+import com.alok.spring.batch.model.Transaction;
+import com.alok.spring.batch.repository.TransactionRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -8,9 +10,15 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -51,7 +59,27 @@ public class JobExecutorService {
     @Qualifier("MissingAccountJob")
     private Job missingAccountJob;
 
-    public void executeAllJobs() throws JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
+    @Autowired
+    FlatFileItemWriter<Transaction> csvWriterForGoogleSheet;
+
+    @Autowired
+    private TransactionRepository transactionRepository;
+
+    private String outputFileName;
+
+    @Autowired
+    public JobExecutorService(
+            @Value("${file.export.google.sheet}")
+                    String outputFileName
+    ) {
+        // outputFileName was required injection via constructor otherwise it was coming null
+        // during csvWriterForGoogleSheet bean creation
+        this.outputFileName = outputFileName;
+    }
+
+    public void executeAllJobs() throws Exception {
+
+        log.debug("Starting job execution");
 
         jobLauncher.run(citiBankJob1, new JobParametersBuilder()
                 .addString("JobID", String.valueOf(System.currentTimeMillis()))
@@ -84,5 +112,19 @@ public class JobExecutorService {
         jobLauncher.run(missingAccountJob, new JobParametersBuilder()
                 .addString("JobID", String.valueOf(System.currentTimeMillis()))
                 .toJobParameters());
+
+        log.debug("Completed job execution");
+        log.debug("Started writing csv report");
+
+        // generate csv file now for Google Sheet
+        List<Transaction> records = transactionRepository.findAll();
+        Collections.sort(records, (t1, t2) -> t2.getDate().compareTo(t1.getDate()));
+        csvWriterForGoogleSheet.open(new ExecutionContext());
+        log.info("Writing to file for Google Sheets, file {}", outputFileName);
+        csvWriterForGoogleSheet.write(records);
+        log.info("Write Completed!");
+        csvWriterForGoogleSheet.close();
+
+        log.debug("Completed writing csv report");
     }
 }

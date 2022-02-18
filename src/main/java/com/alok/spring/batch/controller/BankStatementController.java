@@ -51,6 +51,8 @@ public class BankStatementController {
             e.printStackTrace();
         } catch (JobInstanceAlreadyCompleteException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         return ResponseEntity.ok()
