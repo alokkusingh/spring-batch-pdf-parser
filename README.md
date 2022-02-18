@@ -14,3 +14,21 @@ Spring Boot Batch Processor
 
 ### How to run
 java -jar target/spring-batch-pdf-parser-0.0.2-SNAPSHOT.jar --file.path.base.dir=/home/alok/data/git/BankStatements
+
+### Enhancements - 18 Feb 2022
+#### Current Status - as on 18 Feb 2022
+1. Parses all files on startup
+2. File polling?
+3. Manual pulling statements from private GitHub repo
+4. Manual pushing generated report to private GitHub repo
+#### Phases
+1. Stop automatic file polling - if any
+2. Expose API to upload file to be parsed
+3. Expose API to download CSV report
+4. Implement ReactJS UI 
+   
+   4.1 To upload the bank statement
+   
+   4.2 To download CSV report
+   
+   4.3 Tp see the detailed reports
