@@ -79,7 +79,9 @@ public class JobExecutorService {
 
     public void executeAllJobs() throws Exception {
 
-        log.debug("Starting job execution");
+        log.info("Delete all the transactions first");
+        log.info("Starting job execution");
+        transactionRepository.deleteAll();
 
         jobLauncher.run(citiBankJob1, new JobParametersBuilder()
                 .addString("JobID", String.valueOf(System.currentTimeMillis()))
@@ -125,6 +127,6 @@ public class JobExecutorService {
         log.info("Write Completed!");
         csvWriterForGoogleSheet.close();
 
-        log.debug("Completed writing csv report");
+        log.info("Completed writing csv report");
     }
 }
