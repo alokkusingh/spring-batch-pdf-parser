@@ -30,7 +30,6 @@ public class ReportController {
 
     @GetMapping("/download")
     public ResponseEntity<Resource> downloadReport() throws IOException {
-        //InputStreamResource resource = new InputStreamResource(new FileInputStream(googleCsvFile));
         File file = new File(googleCsvFile);
         Path path = Paths.get(file.getAbsolutePath());
         ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(path));
@@ -43,7 +42,7 @@ public class ReportController {
 
         return ResponseEntity.ok()
                 .headers(headers)
-                .contentLength(googleCsvFile.length() + 100)
+                .contentLength(file.length())
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(resource);
     }
