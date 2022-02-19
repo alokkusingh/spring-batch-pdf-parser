@@ -1,5 +1,6 @@
 package com.alok.spring.batch.controller;
 
+import com.alok.spring.batch.response.GetTransactionResponse;
 import com.alok.spring.batch.response.GetTransactionsResponse;
 import com.alok.spring.batch.response.UploadFileResponse;
 import com.alok.spring.batch.service.BankService;
@@ -73,5 +74,10 @@ public class BankStatementController {
     @GetMapping(value = "/transactions", produces = MediaType.APPLICATION_JSON_VALUE)
     public GetTransactionsResponse getAllTransactions() {
         return bankService.getAllTransactions();
+    }
+
+    @GetMapping(value = "/transactions/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GetTransactionResponse getTransaction(@PathVariable(value = "id") Integer id) {
+        return bankService.getTransaction(id);
     }
 }
