@@ -76,6 +76,7 @@ public class BankStatementController {
         return bankService.getAllTransactions();
     }
 
+    @CrossOrigin
     @GetMapping(value = "/transactions/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public GetTransactionResponse getTransaction(@PathVariable(value = "id") Integer id) {
         return bankService.getTransaction(id);
