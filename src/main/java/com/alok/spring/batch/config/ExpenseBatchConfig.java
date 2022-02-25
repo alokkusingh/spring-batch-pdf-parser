@@ -76,7 +76,7 @@ public class ExpenseBatchConfig {
 
         FlatFileItemReader<Expense> flatFileItemReader = new FlatFileItemReader<>();
         flatFileItemReader.setName("Expense-CSV-Reader");
-        //flatFileItemReader.setLinesToSkip(1);
+        flatFileItemReader.setLinesToSkip(1);
         flatFileItemReader.setLineMapper(expenseLineMapper());
         flatFileItemReader.setStrict(false);
 

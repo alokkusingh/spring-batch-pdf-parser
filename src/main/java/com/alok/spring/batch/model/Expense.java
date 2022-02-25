@@ -25,6 +25,8 @@ public class Expense implements Comparable<Expense> {
     private Integer amount;
     private String comment;
     private String category;
+    private Integer month;
+    private Integer year;
 
     @Override
     public int compareTo(Expense o) {
