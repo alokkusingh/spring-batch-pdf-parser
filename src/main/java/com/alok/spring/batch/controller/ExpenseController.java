@@ -3,6 +3,7 @@ package com.alok.spring.batch.controller;
 import com.alok.spring.batch.response.GetExpensesResponse;
 import com.alok.spring.batch.response.UploadFileResponse;
 import com.alok.spring.batch.service.BankJobExecutorService;
+import com.alok.spring.batch.service.ExpenseJobExecutorService;
 import com.alok.spring.batch.service.ExpenseService;
 import com.alok.spring.batch.service.FileStorageService;
 import com.alok.spring.batch.utils.UploadType;
@@ -26,7 +27,7 @@ public class ExpenseController {
     private FileStorageService fileStorageService;
 
     @Autowired
-    private BankJobExecutorService bankJobExecutorService;
+    private ExpenseJobExecutorService expenseJobExecutorService;
 
     @Autowired
     private ExpenseService expenseService;
@@ -46,7 +47,7 @@ public class ExpenseController {
 
         // brute force way
         try {
-            bankJobExecutorService.executeAllJobs();
+            expenseJobExecutorService.executeAllJobs();
         } catch (JobParametersInvalidException e) {
             e.printStackTrace();
         } catch (JobExecutionAlreadyRunningException e) {
