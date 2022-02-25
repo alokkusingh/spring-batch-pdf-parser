@@ -20,8 +20,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @RestController
-@RequestMapping("/bank")
-public class BankStatementController {
+@RequestMapping("/expense")
+public class ExpenseController {
 
     @Autowired
     private FileStorageService fileStorageService;
@@ -34,7 +34,7 @@ public class BankStatementController {
 
 
     @CrossOrigin
-    @PostMapping(value = "/statement/upload", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/upload", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UploadFileResponse> uploadStatement(
             @RequestParam MultipartFile file
     ) {
@@ -42,7 +42,7 @@ public class BankStatementController {
         log.info("Uploaded file: {}, type: {}, size: {}", file.getOriginalFilename(),
                 file.getContentType(), file.getSize());
 
-        String fineName = fileStorageService.storeFile(file, UploadType.KotakExportedStatement);
+        String fineName = fileStorageService.storeFile(file, UploadType.ExpenseGoogleSheet);
 
 
         // brute force way
@@ -67,7 +67,6 @@ public class BankStatementController {
                                 .size(file.getSize())
                                 .fileType(file.getContentType())
                                 .message("File submitted for processing")
-                                .fileDownloadUri("/report/download")
                                 .build()
                 );
     }

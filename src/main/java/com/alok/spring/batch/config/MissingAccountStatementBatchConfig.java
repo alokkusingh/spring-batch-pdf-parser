@@ -32,7 +32,7 @@ public class MissingAccountStatementBatchConfig {
     private String[] fieldNames;
 
     @Bean("MissingAccountJob")
-    public Job studentJob(JobBuilderFactory jobBuilderFactory,
+    public Job missingAccountJob(JobBuilderFactory jobBuilderFactory,
                           StepBuilderFactory stepBuilderFactory,
                           ItemReader<Transaction> itemsReader,
                           ItemProcessor<Transaction, Transaction> defaultAccountProcessor,

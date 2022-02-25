@@ -60,6 +60,10 @@ public class JobExecutorService {
     private Job missingAccountJob;
 
     @Autowired
+    @Qualifier("ExpenseJob")
+    private Job expenseJob;
+
+    @Autowired
     FlatFileItemWriter<Transaction> csvWriterForGoogleSheet;
 
     @Autowired
@@ -112,6 +116,10 @@ public class JobExecutorService {
                 .toJobParameters());
 
         jobLauncher.run(missingAccountJob, new JobParametersBuilder()
+                .addString("JobID", String.valueOf(System.currentTimeMillis()))
+                .toJobParameters());
+
+        jobLauncher.run(expenseJob, new JobParametersBuilder()
                 .addString("JobID", String.valueOf(System.currentTimeMillis()))
                 .toJobParameters());
 

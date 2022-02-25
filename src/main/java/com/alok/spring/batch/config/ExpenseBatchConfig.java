@@ -31,8 +31,8 @@ public class ExpenseBatchConfig {
     @Value("${fields.name.expense:#{null}}")
     private String[] fieldNames;
 
-    @Bean("ExpenseBatchConfig")
-    public Job studentJob(JobBuilderFactory jobBuilderFactory,
+    @Bean("ExpenseJob")
+    public Job expenseJob(JobBuilderFactory jobBuilderFactory,
                           StepBuilderFactory stepBuilderFactory,
                           ItemReader<Expense> expenseItemsReader,
                           ItemProcessor<Expense, Expense> defaultExpenseProcessor,

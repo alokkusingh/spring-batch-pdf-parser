@@ -1,6 +1,7 @@
 package com.alok.spring.batch.service;
 
 import com.alok.spring.batch.exception.FileStorageException;
+import com.alok.spring.batch.utils.UploadType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -18,7 +19,20 @@ public class FileStorageService {
     @Value("${dir.path.kotak_account.imported}")
     private String kotakImportedLocation;
 
-    public String storeFile(MultipartFile file) {
+    @Value("${dir.path.expense}")
+    private String expenseDirLocation;
+
+    private Path getStoragePath(UploadType uploadType) {
+        if (uploadType.equals(UploadType.KotakExportedStatement))
+            return Paths.get(kotakImportedLocation).toAbsolutePath().normalize();
+
+        if (uploadType.equals(UploadType.ExpenseGoogleSheet))
+            return Paths.get(expenseDirLocation).toAbsolutePath().normalize();
+
+        throw new RuntimeException("Invalid Upload Type");
+    }
+
+    public String storeFile(MultipartFile file, UploadType uploadType) {
         // Normalize file name
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 
@@ -28,7 +42,8 @@ public class FileStorageService {
                 throw new FileStorageException("Sorry! Filename contains invalid path sequence " + fileName);
             }
 
-            Path storageLocationPath = Paths.get(kotakImportedLocation).toAbsolutePath().normalize();
+            Path storageLocationPath = getStoragePath(uploadType);
+
             // Copy file to the target location (Replacing existing file with the same name)
             Path targetLocation = storageLocationPath.resolve(fileName);
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
