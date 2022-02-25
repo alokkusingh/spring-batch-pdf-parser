@@ -34,13 +34,13 @@ public class ExpenseBatchConfig {
     @Bean("ExpenseBatchConfig")
     public Job studentJob(JobBuilderFactory jobBuilderFactory,
                           StepBuilderFactory stepBuilderFactory,
-                          ItemReader<Expense> itemsReader,
+                          ItemReader<Expense> expenseItemsReader,
                           ItemProcessor<Expense, Expense> defaultExpenseProcessor,
                           ItemWriter<Expense> bankAccountDbWriter
     ) {
         Step step1 = stepBuilderFactory.get("Expense-ETL-file-load")
                 .<Expense,Expense>chunk(100)
-                .reader(itemsReader)
+                .reader(expenseItemsReader)
                 .processor(defaultExpenseProcessor)
                 .writer(bankAccountDbWriter)
                 .build();
@@ -62,29 +62,29 @@ public class ExpenseBatchConfig {
 
 
     @Bean
-    public MultiResourceItemReader<Expense> itemsReader() {
+    public MultiResourceItemReader<Expense> expenseItemsReader() {
 
         MultiResourceItemReader<Expense> reader = new MultiResourceItemReader<>();
         reader.setResources(resources);
         reader.setStrict(false);
-        reader.setDelegate(itemReader());
+        reader.setDelegate(expenseItemReader());
         return reader;
     }
 
     @Bean
-    public FlatFileItemReader<Expense> itemReader() {
+    public FlatFileItemReader<Expense> expenseItemReader() {
 
         FlatFileItemReader<Expense> flatFileItemReader = new FlatFileItemReader<>();
         flatFileItemReader.setName("Expense-CSV-Reader");
         //flatFileItemReader.setLinesToSkip(1);
-        flatFileItemReader.setLineMapper(lineMapper());
+        flatFileItemReader.setLineMapper(expenseLineMapper());
         flatFileItemReader.setStrict(false);
 
         return flatFileItemReader;
     }
 
     @Bean
-    public LineMapper<Expense> lineMapper() {
+    public LineMapper<Expense> expenseLineMapper() {
         DefaultLineMapper<Expense> defaultLineMapper = new DefaultLineMapper<>();
 
         DelimitedLineTokenizer lineTokenizer = new DelimitedLineTokenizer();
