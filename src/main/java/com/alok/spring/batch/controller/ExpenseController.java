@@ -1,11 +1,10 @@
 package com.alok.spring.batch.controller;
 
-import com.alok.spring.batch.response.GetTransactionResponse;
-import com.alok.spring.batch.response.GetTransactionsResponse;
+import com.alok.spring.batch.response.GetExpensesResponse;
 import com.alok.spring.batch.response.UploadFileResponse;
-import com.alok.spring.batch.service.BankService;
+import com.alok.spring.batch.service.BankJobExecutorService;
+import com.alok.spring.batch.service.ExpenseService;
 import com.alok.spring.batch.service.FileStorageService;
-import com.alok.spring.batch.service.JobExecutorService;
 import com.alok.spring.batch.utils.UploadType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.JobParametersInvalidException;
@@ -27,10 +26,10 @@ public class ExpenseController {
     private FileStorageService fileStorageService;
 
     @Autowired
-    private JobExecutorService jobExecutorService;
+    private BankJobExecutorService bankJobExecutorService;
 
     @Autowired
-    private BankService bankService;
+    private ExpenseService expenseService;
 
 
     @CrossOrigin
@@ -47,7 +46,7 @@ public class ExpenseController {
 
         // brute force way
         try {
-            jobExecutorService.executeAllJobs();
+            bankJobExecutorService.executeAllJobs();
         } catch (JobParametersInvalidException e) {
             e.printStackTrace();
         } catch (JobExecutionAlreadyRunningException e) {
@@ -71,14 +70,8 @@ public class ExpenseController {
                 );
     }
 
-    @GetMapping(value = "/transactions", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GetTransactionsResponse getAllTransactions() {
-        return bankService.getAllTransactions();
-    }
-
-    @CrossOrigin
-    @GetMapping(value = "/transactions/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GetTransactionResponse getTransaction(@PathVariable(value = "id") Integer id) {
-        return bankService.getTransaction(id);
+    @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GetExpensesResponse getAllExpenses() {
+        return expenseService.getAllExpenses();
     }
 }

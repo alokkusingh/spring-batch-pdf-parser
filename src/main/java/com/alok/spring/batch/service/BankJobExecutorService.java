@@ -5,11 +5,7 @@ import com.alok.spring.batch.repository.TransactionRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
-import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +18,7 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class JobExecutorService {
+public class BankJobExecutorService {
 
     @Autowired
     private JobLauncher jobLauncher;
@@ -60,10 +56,6 @@ public class JobExecutorService {
     private Job missingAccountJob;
 
     @Autowired
-    @Qualifier("ExpenseJob")
-    private Job expenseJob;
-
-    @Autowired
     FlatFileItemWriter<Transaction> csvWriterForGoogleSheet;
 
     @Autowired
@@ -72,7 +64,7 @@ public class JobExecutorService {
     private String outputFileName;
 
     @Autowired
-    public JobExecutorService(
+    public BankJobExecutorService(
             @Value("${file.export.google.sheet}")
                     String outputFileName
     ) {
@@ -116,10 +108,6 @@ public class JobExecutorService {
                 .toJobParameters());
 
         jobLauncher.run(missingAccountJob, new JobParametersBuilder()
-                .addString("JobID", String.valueOf(System.currentTimeMillis()))
-                .toJobParameters());
-
-        jobLauncher.run(expenseJob, new JobParametersBuilder()
                 .addString("JobID", String.valueOf(System.currentTimeMillis()))
                 .toJobParameters());
 
