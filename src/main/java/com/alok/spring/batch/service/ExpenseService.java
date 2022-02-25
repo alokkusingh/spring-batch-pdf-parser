@@ -28,7 +28,7 @@ public class ExpenseService {
                         .date(expense.getDate())
                         .head(expense.getHead())
                         .amount(expense.getAmount())
-                        .category(expense.getComment())
+                        .category(expense.getCategory())
                         .comment(expense.getComment())
                         .build())
                 .collect(Collectors.toList());
