@@ -25,7 +25,7 @@ import org.springframework.core.io.Resource;
 @Configuration
 @EnableBatchProcessing
 public class ExpenseBatchConfig {
-    @Value("file:${ile.path.expense}")
+    @Value("file:${file.path.expense}")
     private Resource[] resources;
 
     @Value("${fields.name.expense:#{null}}")
