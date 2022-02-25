@@ -22,7 +22,7 @@ public class Expense implements Comparable<Expense> {
     @Temporal(TemporalType.DATE)
     private Date date;
     private String head;
-    private Integer amount;
+    private Double amount;
     private String comment;
     private String category;
     private Integer month;
