@@ -1,10 +1,12 @@
 package com.alok.spring.batch.service;
 
 import com.alok.spring.batch.model.Expense;
-import com.alok.spring.batch.model.IExpenseCategorySum;
+import com.alok.spring.batch.model.IExpenseCategoryMonthSum;
+import com.alok.spring.batch.model.IExpenseMonthSum;
 import com.alok.spring.batch.repository.ExpenseRepository;
+import com.alok.spring.batch.response.GetExpensesMonthSumResponse;
 import com.alok.spring.batch.response.GetExpensesResponse;
-import com.alok.spring.batch.response.GetExpensesSumByCategoryResponse;
+import com.alok.spring.batch.response.GetExpensesMonthSumByCategoryResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -58,13 +60,23 @@ public class ExpenseService {
                 .build();
     }
 
-    public GetExpensesSumByCategoryResponse getMonthWiseExpenseCategorySum() {
+    public GetExpensesMonthSumByCategoryResponse getMonthWiseExpenseCategorySum() {
 
-        List<IExpenseCategorySum> expenseCategorySums = expenseRepository.findSumGroupByMonth();
+        List<IExpenseCategoryMonthSum> expenseCategorySums = expenseRepository.findCategorySumGroupByMonth();
 
-        return GetExpensesSumByCategoryResponse.builder()
+        return GetExpensesMonthSumByCategoryResponse.builder()
                 .expenseCategorySums(expenseCategorySums)
                 .count(expenseCategorySums.size())
+                .build();
+    }
+
+    public GetExpensesMonthSumResponse getMonthWiseExpenseSum() {
+
+        List<IExpenseMonthSum> expenseSums = expenseRepository.findSumGroupByMonth();
+
+        return GetExpensesMonthSumResponse.builder()
+                .expenseCategorySums(expenseSums)
+                .count(expenseSums.size())
                 .build();
     }
 }
