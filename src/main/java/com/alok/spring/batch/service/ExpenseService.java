@@ -18,24 +18,41 @@ public class ExpenseService {
 
     public GetExpensesResponse getAllExpenses() {
 
-
         List<Expense> expenses = expenseRepository.findAll();
         Collections.sort(expenses, (t1, t2) -> t2.getDate().compareTo(t1.getDate()));
 
-        List<GetExpensesResponse.Expense> transactionsList = expenses.stream()
-                .map(expense -> GetExpensesResponse.Expense.builder()
-                        .id(expense.getId())
-                        .date(expense.getDate())
-                        .head(expense.getHead())
-                        .amount(expense.getAmount())
-                        .category(expense.getCategory())
-                        .comment(expense.getComment())
-                        .build())
-                .collect(Collectors.toList());
+        return GetExpensesResponse.builder()
+                .expenses(expenses.stream()
+                        .map(expense -> GetExpensesResponse.Expense.builder()
+                                .id(expense.getId())
+                                .date(expense.getDate())
+                                .head(expense.getHead())
+                                .amount(expense.getAmount())
+                                .category(expense.getCategory())
+                                .comment(expense.getComment())
+                                .build())
+                        .collect(Collectors.toList()))
+                .count(expenses.size())
+                .build();
+    }
+
+    public GetExpensesResponse getCurrentMonthExpenses() {
+
+        List<Expense> expenses = expenseRepository.findAllForCurrentMonth();
+        Collections.sort(expenses, (t1, t2) -> t2.getDate().compareTo(t1.getDate()));
 
         return GetExpensesResponse.builder()
-                .expenses(transactionsList)
-                .count(transactionsList.size())
+                .expenses(expenses.stream()
+                        .map(expense -> GetExpensesResponse.Expense.builder()
+                                .id(expense.getId())
+                                .date(expense.getDate())
+                                .head(expense.getHead())
+                                .amount(expense.getAmount())
+                                .category(expense.getCategory())
+                                .comment(expense.getComment())
+                                .build())
+                        .collect(Collectors.toList()))
+                .count(expenses.size())
                 .build();
     }
 }

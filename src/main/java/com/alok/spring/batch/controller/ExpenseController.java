@@ -75,4 +75,9 @@ public class ExpenseController {
     public GetExpensesResponse getAllExpenses() {
         return expenseService.getAllExpenses();
     }
+
+    @GetMapping(value = "/current_month", produces = MediaType.APPLICATION_JSON_VALUE)
+    public GetExpensesResponse getCurrentMonthExpenses() {
+        return expenseService.getAllExpenses();
+    }
 }
