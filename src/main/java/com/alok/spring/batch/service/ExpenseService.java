@@ -2,6 +2,7 @@ package com.alok.spring.batch.service;
 
 import com.alok.spring.batch.model.Expense;
 import com.alok.spring.batch.model.ExpenseCategorySum;
+import com.alok.spring.batch.model.IExpenseCategorySum;
 import com.alok.spring.batch.repository.ExpenseRepository;
 import com.alok.spring.batch.response.GetExpensesResponse;
 import com.alok.spring.batch.response.GetExpensesSumByCategoryResponse;
@@ -60,7 +61,7 @@ public class ExpenseService {
 
     public GetExpensesSumByCategoryResponse getMonthWiseExpenseCategorySum() {
 
-        List<ExpenseCategorySum> expenseCategorySums = expenseRepository.findSumGroupByMonth();
+        List<IExpenseCategorySum> expenseCategorySums = expenseRepository.findSumGroupByMonth();
 
         return GetExpensesSumByCategoryResponse.builder()
                 .expenseCategorySums(expenseCategorySums)
