@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ExpenseCategorySum {
 
-    private Integer month;
+    private String month;
     private String category;
     private Double sum;
 }
