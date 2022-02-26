@@ -1,7 +1,6 @@
 package com.alok.spring.batch.repository;
 
 import com.alok.spring.batch.model.Expense;
-import com.alok.spring.batch.model.ExpenseCategorySum;
 import com.alok.spring.batch.model.IExpenseCategorySum;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
