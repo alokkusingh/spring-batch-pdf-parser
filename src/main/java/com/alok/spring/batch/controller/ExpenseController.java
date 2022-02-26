@@ -78,6 +78,6 @@ public class ExpenseController {
 
     @GetMapping(value = "/current_month", produces = MediaType.APPLICATION_JSON_VALUE)
     public GetExpensesResponse getCurrentMonthExpenses() {
-        return expenseService.getAllExpenses();
+        return expenseService.getCurrentMonthExpenses();
     }
 }
