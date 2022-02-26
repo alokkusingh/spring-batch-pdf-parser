@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 
-    @Query("SELECT * FROM expense WHERE MONTH(`date`) = MONTH(CURRENT_DATE()) " +
-            "and YEAR(`date`) = YEAR(CURRENT_DATE())")
-    List<Expense> findAllForCurrentMonth();
+  //  @Query("SELECT * FROM expense WHERE MONTH(`date`) = MONTH(CURRENT_DATE()) " +
+   //         "and YEAR(`date`) = YEAR(CURRENT_DATE())")
+   // List<Expense> findAllForCurrentMonth();
 }
