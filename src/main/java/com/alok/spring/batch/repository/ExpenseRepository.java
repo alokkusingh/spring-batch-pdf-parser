@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 
-    @Query("SELECT e FROM expense e WHERE to_char(e.DATE, 'YYYYMM') = to_char(sysdate, 'YYYYMM')")
+    @Query("SELECT e FROM Expense e WHERE to_char(e.DATE, 'YYYYMM') = to_char(sysdate, 'YYYYMM')")
     List<Expense> findAllForCurrentMonth();
 }
