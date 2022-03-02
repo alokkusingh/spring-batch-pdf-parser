@@ -32,3 +32,10 @@ java -jar target/spring-batch-pdf-parser-0.0.2-SNAPSHOT.jar --file.path.base.dir
    4.2 To download CSV report
    
    4.3 Tp see the detailed reports
+
+#### Build
+1. Maven Package - mvn clean package
+2. Docker Build & Deploy
+2.1 Build - docker build -t alokkusingh/statement-parser:latest -t alokkusingh/statement-parser:1.0.0 --build-arg JAR_FILE=target/spring-batch-pdf-parser-0.0.2-SNAPSHOT.jar .
+2.3 Docker push -
+2.4 Docker Run - docker run --rm --name statement-parser alokkusingh/statement-parser -p 8081:8081 -v /home/alok/data/git/BankStatements:/Users/aloksingh/BankStatements -v /home/alok/log:/log
