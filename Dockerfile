@@ -8,8 +8,8 @@ COPY ${JAR_FILE} /opt/app.jar
 RUN chown -R alok:singh /Users
 RUN chown -R alok:singh /opt
 RUN chown -R alok:singh /opt/logs
-#USER alok:singh
+USER alok:singh
 EXPOSE 8081
 WORKDIR /opt
 #ENTRYPOINT ["java","-Djava.security.egd=file:/dev/urandom","-jar","/opt/app.jar"]
-ENTRYPOINT ["tail"]
+ENTRYPOINT ["tail "]
