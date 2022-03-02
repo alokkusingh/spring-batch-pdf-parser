@@ -3,6 +3,7 @@ MAINTAINER Alok Singh (alok.ku.singh@gmail.com)
 RUN groupadd -r singh && useradd --no-log-init -r -g singh alok
 USER alok:singh
 VOLUME /Users/aloksingh/BankStatements
+VOLUME /log
 EXPOSE 8081
 ARG JAR_FILE
 COPY ${JAR_FILE} /app.jar
