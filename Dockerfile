@@ -1,6 +1,6 @@
 FROM arm64v8/openjdk:8u322-jre
 MAINTAINER Alok Singh (alok.ku.singh@gmail.com)
-VOLUME /tmp
+VOLUME /Users/aloksingh/BankStatements
 EXPOSE 8081
 ARG JAR_FILE
 COPY ${JAR_FILE} /app.jar
