@@ -5,10 +5,9 @@ VOLUME /Users/aloksingh/BankStatements
 VOLUME /opt/logs
 RUN chown -R alok:singh /Users
 RUN chown -R alok:singh /opt
-USER alok:singh
+#USER alok:singh
 EXPOSE 8081
 ARG JAR_FILE
 COPY ${JAR_FILE} /opt/app.jar
 WORKDIR /opt
-RUN id
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/urandom","-jar","/opt/app.jar"]
