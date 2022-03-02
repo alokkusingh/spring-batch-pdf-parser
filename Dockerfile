@@ -4,6 +4,8 @@ RUN groupadd -r singh && useradd --no-log-init -r -g singh alok
 USER alok:singh
 VOLUME /Users/aloksingh/BankStatements
 VOLUME /opt/logs
+RUN chown -R alok:singh /Users
+RUN chown -R alok:singh /opt
 EXPOSE 8081
 ARG JAR_FILE
 COPY ${JAR_FILE} /opt/app.jar
