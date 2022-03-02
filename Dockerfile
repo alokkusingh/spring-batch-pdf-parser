@@ -10,7 +10,7 @@ RUN chown -R alok:singh /Users
 RUN chown -R alok:singh /opt
 RUN chown -R alok:singh /opt/logs
 RUN chown -R alok:singh /home/alok
-#USER alok:singh
+USER alok:singh
 EXPOSE 8081
 WORKDIR /opt
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/urandom","-jar","/opt/app.jar"]
