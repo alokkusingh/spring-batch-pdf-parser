@@ -3,10 +3,13 @@ MAINTAINER Alok Singh (alok.ku.singh@gmail.com)
 RUN groupadd -r singh && useradd --no-log-init -r -g singh alok
 ARG JAR_FILE
 COPY ${JAR_FILE} /opt/app.jar
-#RUN chown -R alok:singh /Users
-#RUN chown -R alok:singh /opt
-#RUN chown -R alok:singh /opt/logs
-#RUN chown -R alok:singh /home/alok
+RUN mkdir -p /opt/logs
+RUN mkdir -p /home/alok
+RUN mkdir -p /Users/aloksingh/BankStatements
+RUN chown -R alok:singh /Users
+RUN chown -R alok:singh /opt
+RUN chown -R alok:singh /opt/logs
+RUN chown -R alok:singh /home/alok
 USER alok:singh
 VOLUME /opt/logs
 VOLUME /home/alok
