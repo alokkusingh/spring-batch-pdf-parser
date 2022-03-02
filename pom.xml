@@ -22,6 +22,7 @@
 	<description>PDF Batch parser project for Spring Boot</description>
 
 	<properties>
+		<maven.test.skip>true</maven.test.skip>
 	</properties>
 
 	<dependencies>
@@ -91,5 +92,16 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<!--
+Note: "github" repository definition is present in setting.xml
+-->
+	<distributionManagement>
+		<repository>
+			<id>github-pdf</id>
+			<name>GitHub Packages</name>
+			<url>https://maven.pkg.github.com/alokkusingh/spring-batch-pdf-parser</url>
+		</repository>
+	</distributionManagement>
 
 </project>
