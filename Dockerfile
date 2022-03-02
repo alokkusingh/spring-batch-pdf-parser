@@ -7,4 +7,5 @@ VOLUME /Users/aloksingh/logs
 EXPOSE 8081
 ARG JAR_FILE
 COPY ${JAR_FILE} /app.jar
+RUN "echo \$LOGNAME"
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/urandom","-jar","/app.jar"]
