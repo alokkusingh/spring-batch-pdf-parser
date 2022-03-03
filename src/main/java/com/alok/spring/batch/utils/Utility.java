@@ -1,7 +1,10 @@
 package com.alok.spring.batch.utils;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.*;
 
+@Slf4j
 public class Utility {
 
     static Map<String, List<String>> categoryStringMap = new HashMap<>();
@@ -144,5 +147,16 @@ public class Utility {
         }
 
         return "Other";
+    }
+
+    static public String getDateFormat(String dateString) {
+
+        log.info("Alok getDateFormat: ", dateString);
+        if (dateString.trim().matches("....\\/...\\/..")) {
+            log.info("Alok getDateFormat: ", "yyyy/MMM/dd");
+            return "yyyy/MMM/dd";
+        }
+        log.info("Alok getDateFormat: ", "yyyy/MMM/dd");
+        return "dd/MM/yyyy";
     }
 }

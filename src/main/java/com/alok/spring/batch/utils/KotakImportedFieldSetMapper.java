@@ -12,7 +12,8 @@ public class KotakImportedFieldSetMapper implements FieldSetMapper<Transaction> 
     public Transaction mapFieldSet(FieldSet fieldSet) {
         log.debug("Mapping fieldSet to Transaction, SrlNo: {}", fieldSet.readString("slNo"));
         Transaction transaction = new Transaction();
-        transaction.setDate(fieldSet.readDate("date", "dd/MM/yyyy"));
+        String strDate = fieldSet.readString("date");
+        transaction.setDate(fieldSet.readDate("date", Utility.getDateFormat(strDate)));
         transaction.setDescription(fieldSet.readString("description"));
         String drCr = fieldSet.readString("drCr");
         if ("DR".equals(drCr)) {
