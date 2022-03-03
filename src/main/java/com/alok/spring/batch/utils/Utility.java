@@ -151,12 +151,9 @@ public class Utility {
 
     static public String getDateFormat(String dateString) {
 
-        log.info("Alok getDateFormat: ", dateString);
         if (dateString.trim().matches("....\\/...\\/..")) {
-            log.info("Alok getDateFormat: ", "yyyy/MMM/dd");
             return "yyyy/MMM/dd";
         }
-        log.info("Alok getDateFormat: ", "yyyy/MMM/dd");
         return "dd/MM/yyyy";
     }
 }

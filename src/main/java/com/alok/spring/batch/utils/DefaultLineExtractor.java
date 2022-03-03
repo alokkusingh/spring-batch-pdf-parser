@@ -46,12 +46,12 @@ public class DefaultLineExtractor implements LineExtractor {
 
             if (!start) {
                 if (line.matches(startReadingText)) {
-                    log.info("Starting line processing after this line: {}", line);
+                    log.debug("Starting line processing after this line: {}", line);
                     start = true;
                 }
             } else {
                 if (endReadingText != null && line.matches(endReadingText)) {
-                    log.info("Stopping line processing from this line: {}", line);
+                    log.debug("Stopping line processing from this line: {}", line);
                     return false;
                 }
 
