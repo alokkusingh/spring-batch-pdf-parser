@@ -1,16 +1,17 @@
 FROM arm64v8/openjdk:8u322-jre
 MAINTAINER Alok Singh (alok.ku.singh@gmail.com)
-RUN groupadd -r singh && useradd --no-log-init -r -g singh alok
+#RUN groupadd -r singh && useradd --no-log-init -r -g singh alok
+RUN useradd -u $UID -ms /bin/bash $USER
 ARG JAR_FILE
 COPY ${JAR_FILE} /opt/app.jar
 RUN mkdir -p /opt/logs
 RUN mkdir -p /home/alok
 RUN mkdir -p /Users/aloksingh/BankStatements
-RUN chown -R alok:singh /Users
-RUN chown -R alok:singh /opt
-RUN chown -R alok:singh /opt/logs
-RUN chown -R alok:singh /home/alok
-USER alok:singh
+RUN chown -R alok /Users
+RUN chown -R alok /opt
+RUN chown -R alok /opt/logs
+RUN chown -R alok /home/alok
+USER alok
 VOLUME /opt/logs
 VOLUME /home/alok
 VOLUME /Users/aloksingh/BankStatements
