@@ -1,7 +1,7 @@
 FROM arm64v8/openjdk:8u322-jre
 MAINTAINER Alok Singh (alok.ku.singh@gmail.com)
 #RUN groupadd -r singh && useradd --no-log-init -r -g singh alok
-RUN useradd -u $UID -ms /bin/bash $USER
+RUN groupadd -g 600 singh && useradd -u 601 -g 600 alok
 ARG JAR_FILE
 COPY ${JAR_FILE} /opt/app.jar
 RUN mkdir -p /opt/logs
