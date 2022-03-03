@@ -22,5 +22,6 @@ public class GetExpensesResponse {
         private Double amount;
         private String category;
         private String comment;
+        private Date lastTransactionDate;
     }
 }

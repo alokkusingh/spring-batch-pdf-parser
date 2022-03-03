@@ -10,7 +10,9 @@ import com.alok.spring.batch.response.GetExpensesMonthSumByCategoryResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,6 +25,8 @@ public class ExpenseService {
     public GetExpensesResponse getAllExpenses() {
 
         List<Expense> expenses = expenseRepository.findAll();
+        Date lastExpenseDate = expenseRepository.findLastTransactionDate()
+                .orElse(new Date());
         Collections.sort(expenses, (t1, t2) -> t2.getDate().compareTo(t1.getDate()));
 
         return GetExpensesResponse.builder()
@@ -34,6 +38,7 @@ public class ExpenseService {
                                 .amount(expense.getAmount())
                                 .category(expense.getCategory())
                                 .comment(expense.getComment())
+                                .lastTransactionDate(lastExpenseDate)
                                 .build())
                         .collect(Collectors.toList()))
                 .count(expenses.size())

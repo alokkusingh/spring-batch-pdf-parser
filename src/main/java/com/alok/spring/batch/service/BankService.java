@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,6 +23,8 @@ public class BankService {
 
 
         List<Transaction> transactions = transactionRepository.findAll();
+        Date lastTransactionDate = transactionRepository.findLastTransactionDate()
+                .orElse(new Date());
         Collections.sort(transactions, (t1, t2) -> t2.getDate().compareTo(t1.getDate()));
 
         List<GetTransactionsResponse.Transaction> transactionsList = transactions.stream()
@@ -31,6 +34,7 @@ public class BankService {
                         .head(transaction.getHead())
                         .credit(transaction.getCredit())
                         .debit(transaction.getDebit())
+                        .lastTransactionDate(lastTransactionDate)
                         .build())
                 .collect(Collectors.toList());
 
