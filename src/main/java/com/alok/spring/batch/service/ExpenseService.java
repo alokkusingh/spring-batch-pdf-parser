@@ -38,10 +38,10 @@ public class ExpenseService {
                                 .amount(expense.getAmount())
                                 .category(expense.getCategory())
                                 .comment(expense.getComment())
-                                .lastTransactionDate(lastExpenseDate)
                                 .build())
                         .collect(Collectors.toList()))
                 .count(expenses.size())
+                .lastTransactionDate(lastExpenseDate)
                 .build();
     }
 

@@ -13,6 +13,7 @@ public class GetTransactionsResponse {
 
     private List<Transaction> transactions;
     private Integer count;
+    private Date lastTransactionDate;
 
     @Data
     @Builder
@@ -22,6 +23,5 @@ public class GetTransactionsResponse {
         private Integer debit;
         private Integer credit;
         private String head;
-        private Date lastTransactionDate;
     }
 }

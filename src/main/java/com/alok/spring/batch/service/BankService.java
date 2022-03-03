@@ -34,13 +34,13 @@ public class BankService {
                         .head(transaction.getHead())
                         .credit(transaction.getCredit())
                         .debit(transaction.getDebit())
-                        .lastTransactionDate(lastTransactionDate)
                         .build())
                 .collect(Collectors.toList());
 
         return GetTransactionsResponse.builder()
                 .transactions(transactionsList)
                 .count(transactionsList.size())
+                .lastTransactionDate(lastTransactionDate)
                 .build();
     }
 

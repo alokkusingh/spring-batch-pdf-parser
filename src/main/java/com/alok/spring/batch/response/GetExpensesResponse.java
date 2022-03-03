@@ -12,6 +12,7 @@ public class GetExpensesResponse {
 
     private List<Expense> expenses;
     private Integer count;
+    private Date lastTransactionDate;
 
     @Data
     @Builder
@@ -22,6 +23,5 @@ public class GetExpensesResponse {
         private Double amount;
         private String category;
         private String comment;
-        private Date lastTransactionDate;
     }
 }
