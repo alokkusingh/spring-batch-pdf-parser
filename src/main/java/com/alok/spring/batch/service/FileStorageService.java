@@ -34,7 +34,9 @@ public class FileStorageService {
 
     public String storeFile(MultipartFile file, UploadType uploadType) {
         // Normalize file name
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        //String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        // Hard coding so that any file name uplaod will replace the same file
+        String fileName = StringUtils.cleanPath("Expense Sheet - Form Responses 1.csv");
 
         try {
             // Check if the file's name contains invalid characters

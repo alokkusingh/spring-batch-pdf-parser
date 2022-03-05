@@ -45,7 +45,6 @@ public class ExpenseController {
 
         String fineName = fileStorageService.storeFile(file, UploadType.ExpenseGoogleSheet);
 
-
         // brute force way
         try {
             expenseJobExecutorService.executeAllJobs();
