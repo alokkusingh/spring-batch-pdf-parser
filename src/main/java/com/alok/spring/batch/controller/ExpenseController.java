@@ -14,10 +14,13 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @RestController
@@ -72,8 +75,11 @@ public class ExpenseController {
     }
 
     @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GetExpensesResponse getAllExpenses() {
-        return expenseService.getAllExpenses();
+    public ResponseEntity<GetExpensesResponse> getAllExpenses() {
+
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(300, TimeUnit.SECONDS))
+                .body(expenseService.getAllExpenses());
     }
 
     @GetMapping(value = "/current_month", produces = MediaType.APPLICATION_JSON_VALUE)
