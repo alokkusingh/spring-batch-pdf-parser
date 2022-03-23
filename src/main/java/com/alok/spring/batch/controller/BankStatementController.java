@@ -13,10 +13,13 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @RestController
@@ -73,13 +76,17 @@ public class BankStatementController {
     }
 
     @GetMapping(value = "/transactions", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GetTransactionsResponse getAllTransactions() {
-        return bankService.getAllTransactions();
+    public ResponseEntity<GetTransactionsResponse> getAllTransactions() {
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(300, TimeUnit.SECONDS).noTransform().mustRevalidate())
+                .body(bankService.getAllTransactions());
     }
 
     @CrossOrigin
     @GetMapping(value = "/transactions/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GetTransactionResponse getTransaction(@PathVariable(value = "id") Integer id) {
-        return bankService.getTransaction(id);
+    public ResponseEntity<GetTransactionResponse> getTransaction(@PathVariable(value = "id") Integer id) {
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.noCache())
+                .body(bankService.getTransaction(id));
     }
 }
