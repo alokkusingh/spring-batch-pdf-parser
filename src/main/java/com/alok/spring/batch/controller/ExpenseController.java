@@ -83,17 +83,23 @@ public class ExpenseController {
     }
 
     @GetMapping(value = "/current_month", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GetExpensesResponse getCurrentMonthExpenses() {
-        return expenseService.getCurrentMonthExpenses();
+    public ResponseEntity<GetExpensesResponse> getCurrentMonthExpenses() {
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(300, TimeUnit.SECONDS).noTransform().mustRevalidate())
+                .body(expenseService.getCurrentMonthExpenses());
     }
 
     @GetMapping(value = "/sum_by_category_month", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GetExpensesMonthSumByCategoryResponse getMonthWiseExpenseCategorySum() {
-        return expenseService.getMonthWiseExpenseCategorySum();
+    public ResponseEntity<GetExpensesMonthSumByCategoryResponse> getMonthWiseExpenseCategorySum() {
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(300, TimeUnit.SECONDS).noTransform().mustRevalidate())
+                .body(expenseService.getMonthWiseExpenseCategorySum());
     }
 
     @GetMapping(value = "/sum_by_month", produces = MediaType.APPLICATION_JSON_VALUE)
-    public GetExpensesMonthSumResponse getMonthWiseExpenseSum() {
-        return expenseService.getMonthWiseExpenseSum();
+    public ResponseEntity<GetExpensesMonthSumResponse> getMonthWiseExpenseSum() {
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(300, TimeUnit.SECONDS).noTransform().mustRevalidate())
+                .body(expenseService.getMonthWiseExpenseSum());
     }
 }
