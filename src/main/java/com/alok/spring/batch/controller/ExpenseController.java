@@ -78,7 +78,7 @@ public class ExpenseController {
     public ResponseEntity<GetExpensesResponse> getAllExpenses() {
 
         return ResponseEntity.ok()
-                .cacheControl(CacheControl.maxAge(300, TimeUnit.SECONDS))
+                .cacheControl(CacheControl.maxAge(300, TimeUnit.SECONDS).noTransform().mustRevalidate())
                 .body(expenseService.getAllExpenses());
     }
 
