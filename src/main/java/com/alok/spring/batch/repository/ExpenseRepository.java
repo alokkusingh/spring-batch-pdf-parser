@@ -19,7 +19,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     //@Query(value = "select new com.alok.spring.batch.model.ExpenseCategorySum(to_char(e.date, 'YYYYMM') month, e.category, SUM(e.amount) sum) from " +
     //        "Expense e group by month, e.category order by month desc, sum desc")
     @Query(value = "select year, month, e.category, SUM(e.amount) sum from " +
-            "expense e group by month, e.category order by year desc, month desc, sum desc", nativeQuery = true)
+            "expense e group by year, month, e.category order by year desc, month desc, sum desc", nativeQuery = true)
     List<IExpenseCategoryMonthSum> findCategorySumGroupByMonth();
 
     @Query(value = "select year, month, SUM(e.amount) sum from " +
