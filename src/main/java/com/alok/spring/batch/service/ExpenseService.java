@@ -78,6 +78,9 @@ public class ExpenseService {
     public GetExpensesMonthSumResponse getMonthWiseExpenseSum() {
 
         List<IExpenseMonthSum> expenseSums = expenseRepository.findSumGroupByMonth();
+        for (IExpenseMonthSum expenseSum: expenseSums) {
+            System.out.println(expenseSum.getYear() + ":" + expenseSum.getMonth() + ":" + expenseSum.getSum());
+        }
 
         return GetExpensesMonthSumResponse.builder()
                 .expenseCategorySums(expenseSums)
