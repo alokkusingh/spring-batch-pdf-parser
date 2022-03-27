@@ -47,7 +47,8 @@ public class ExpenseService {
 
     public GetExpensesResponse getCurrentMonthExpenses() {
 
-        List<Expense> expenses = expenseRepository.findAllForCurrentMonth();
+        LocalDate currentDate = LocalDate.now();
+        List<Expense> expenses = expenseRepository.findAllForCurrentMonth(currentDate.getYear(), currentDate.getMonthValue());
         Collections.sort(expenses, (t1, t2) -> t2.getDate().compareTo(t1.getDate()));
 
         return GetExpensesResponse.builder()

@@ -2,7 +2,8 @@ package com.alok.spring.batch.model;
 
 public interface IExpenseCategoryMonthSum {
 
-    String getMonth();
+    Integer getYear();
+    Integer getMonth();
     String getCategory();
     Double getSum();
 }
