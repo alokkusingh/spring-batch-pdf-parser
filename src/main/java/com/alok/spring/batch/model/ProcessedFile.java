@@ -22,7 +22,9 @@ public class ProcessedFile implements Comparable<ProcessedFile> {
     @Temporal(TemporalType.DATE)
     private Date date;
     private Integer records;
+    private String type;
 
+    @Transient
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd MMM yyyy");
 
     @Override
