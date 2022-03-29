@@ -35,13 +35,18 @@ public class KotakAccountStatementBatchConfig {
     @Value("${file.password.kotak}")
     private String filePassword;
 
+    private ProcessedFileRepository processedFileRepository;
+
     @Bean("KotakBankJob")
     public Job kotakBankJob(JobBuilderFactory jobBuilderFactory,
                            StepBuilderFactory stepBuilderFactory,
                            ItemReader<RawTransaction> kotakItemsReader,
                            ItemProcessor<RawTransaction, Transaction> kotakAccountProcessor,
-                           ItemWriter<Transaction> bankAccountDbWriter
+                           ItemWriter<Transaction> bankAccountDbWriter,
+                            ProcessedFileRepository processedFileRepository
     ) {
+        this.processedFileRepository = processedFileRepository;
+
         Step step1 = stepBuilderFactory.get("CitiAccount-ETL-file-load")
                 .<RawTransaction,Transaction>chunk(1000)
                 .reader(kotakItemsReader)
