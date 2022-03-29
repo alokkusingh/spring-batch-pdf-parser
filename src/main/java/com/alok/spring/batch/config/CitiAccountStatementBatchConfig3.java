@@ -6,8 +6,6 @@ import com.alok.spring.batch.processor.FileArchiveTasklet;
 import com.alok.spring.batch.reader.PDFReader;
 import com.alok.spring.batch.repository.ProcessedFileRepository;
 import com.alok.spring.batch.utils.CitiUtils;
-import com.alok.spring.batch.utils.DefaultLineExtractor;
-import com.alok.spring.batch.utils.LineExtractor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -18,7 +16,6 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.MultiResourceItemReader;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -69,34 +66,17 @@ public class CitiAccountStatementBatchConfig3 {
 
 
     @Bean
-    public MultiResourceItemReader<RawTransaction> citiItemsReader3(PDFReader citiItemReader3) {
+    public MultiResourceItemReader<RawTransaction> citiItemsReader3() {
 
         MultiResourceItemReader<RawTransaction> reader = new MultiResourceItemReader<>();
         reader.setResources(resources);
         reader.setStrict(false);
-        reader.setDelegate(citiItemReader3);
+        reader.setDelegate(citiItemReader3());
         return reader;
     }
 
     @Bean
-    public PDFReader citiItemReader3(@Qualifier("PDFReader") PDFReader flatFileItemReader) {
-        //return CitiUtils.getCitiItemReader(filePassword, processedFileRepository);
-        flatFileItemReader.setName("CitiBank-CSV-Reader3");
-        flatFileItemReader.setFilePassword(filePassword);
-
-        LineExtractor defaultLineExtractor = new DefaultLineExtractor();
-        defaultLineExtractor.setStartReadingText("Date Transaction.*");
-        defaultLineExtractor.setEndReadingText("Banking Reward Points.*");
-        defaultLineExtractor.setLinesToSkip(
-                new String[] {
-                        "^Your  Citibank  Account.*",
-                        "^Statement  Period.*",
-                        "^Page .*"
-                }
-        );
-
-        flatFileItemReader.setLineExtractor(defaultLineExtractor);
-
-        return flatFileItemReader;
+    public PDFReader citiItemReader3() {
+        return CitiUtils.getCitiItemReader(filePassword, processedFileRepository);
     }
 }
