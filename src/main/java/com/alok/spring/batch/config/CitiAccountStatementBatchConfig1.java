@@ -23,6 +23,7 @@ import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.io.Resource;
 
 @Configuration
@@ -79,6 +80,7 @@ public class CitiAccountStatementBatchConfig1 {
     }
 
     @Bean
+    @DependsOn({"processedFileRepository"})
     public PDFReader citiItemReader1() {
         return CitiUtils.getCitiItemReader(filePassword, processedFileRepository);
     }

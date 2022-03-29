@@ -20,6 +20,7 @@ import org.springframework.batch.item.file.MultiResourceItemReader;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.io.Resource;
 
 @Configuration
@@ -74,6 +75,7 @@ public class KotakAccountStatementBatchConfigNoPwd {
     }
 
     @Bean
+    @DependsOn({"processedFileRepository"})
     public PDFReader kotakItemReaderNoPwd() {
 
         PDFReader flatFileItemReader = new PDFReader(processedFileRepository);
