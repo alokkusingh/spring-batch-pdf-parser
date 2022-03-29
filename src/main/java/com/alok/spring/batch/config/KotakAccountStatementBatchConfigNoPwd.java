@@ -17,6 +17,7 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.MultiResourceItemReader;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,17 +30,13 @@ public class KotakAccountStatementBatchConfigNoPwd {
     private Resource[] resources;
 
 
-    private ProcessedFileRepository processedFileRepository;
-
     @Bean("KotakBankNoPwdJob")
     public Job kotakBankNoPwdJob(JobBuilderFactory jobBuilderFactory,
                            StepBuilderFactory stepBuilderFactory,
                            ItemReader<RawTransaction> kotakItemsReaderNoPwd,
                            ItemProcessor<RawTransaction, Transaction> kotakAccountProcessor,
-                           ItemWriter<Transaction> bankAccountDbWriter,
-                                 ProcessedFileRepository processedFileRepository
+                           ItemWriter<Transaction> bankAccountDbWriter
     ) {
-        this.processedFileRepository = processedFileRepository;
         Step step1 = stepBuilderFactory.get("KotakAccount-ETL-file-load")
                 .<RawTransaction,Transaction>chunk(1000)
                 .reader(kotakItemsReaderNoPwd)
@@ -64,19 +61,19 @@ public class KotakAccountStatementBatchConfigNoPwd {
 
 
     @Bean
-    public MultiResourceItemReader<RawTransaction> kotakItemsReaderNoPwd() {
+    public MultiResourceItemReader<RawTransaction> kotakItemsReaderNoPwd(PDFReader kotakItemReaderNoPwd) {
 
         MultiResourceItemReader<RawTransaction> reader = new MultiResourceItemReader<>();
         reader.setResources(resources);
         reader.setStrict(false);
-        reader.setDelegate(kotakItemReaderNoPwd());
+        reader.setDelegate(kotakItemReaderNoPwd);
         return reader;
     }
 
     @Bean
-    public PDFReader kotakItemReaderNoPwd() {
+    public PDFReader kotakItemReaderNoPwd(@Qualifier("PDFReader") PDFReader flatFileItemReader) {
 
-        PDFReader flatFileItemReader = new PDFReader(processedFileRepository);
+        //PDFReader flatFileItemReader = new PDFReader(processedFileRepository);
         flatFileItemReader.setName("KotakBank-CSV-Reader3");
         //flatFileItemReader.setFilePassword(filePassword);
 
