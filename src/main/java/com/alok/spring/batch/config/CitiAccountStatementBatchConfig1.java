@@ -59,7 +59,7 @@ public class CitiAccountStatementBatchConfig1 {
                 .tasklet(archiveTask)
                 .build();
 
-        return jobBuilderFactory.get("Student-ETL-Load")
+        return jobBuilderFactory.get("CitiAccount-ETL-Load")
                 .incrementer(new RunIdIncrementer())
                 .start(step1)
                 .next(step2)

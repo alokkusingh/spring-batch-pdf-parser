@@ -70,19 +70,19 @@ public class KotakAccountStatementBatchConfig {
 
 
     @Bean
-    public MultiResourceItemReader<RawTransaction> kotakItemsReader() {
+    public MultiResourceItemReader<RawTransaction> kotakItemsReader(PDFReader kotakItemReader) {
 
         MultiResourceItemReader<RawTransaction> reader = new MultiResourceItemReader<>();
         reader.setResources(resources);
         reader.setStrict(false);
-        reader.setDelegate(kotakItemReader());
+        reader.setDelegate(kotakItemReader);
         return reader;
     }
 
     @Bean
-    public PDFReader kotakItemReader() {
+    public PDFReader kotakItemReader(PDFReader flatFileItemReader) {
 
-        PDFReader flatFileItemReader = new PDFReader(processedFileRepository);
+        //PDFReader flatFileItemReader = new PDFReader(processedFileRepository);
         flatFileItemReader.setName("KotakBank-CSV-Reader3");
         flatFileItemReader.setFilePassword(filePassword);
 
