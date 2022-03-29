@@ -18,6 +18,7 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.MultiResourceItemReader;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -80,7 +81,7 @@ public class KotakAccountStatementBatchConfig {
     }
 
     @Bean
-    public PDFReader kotakItemReader(PDFReader flatFileItemReader) {
+    public PDFReader kotakItemReader(@Qualifier("PDFReader") PDFReader flatFileItemReader) {
 
         //PDFReader flatFileItemReader = new PDFReader(processedFileRepository);
         flatFileItemReader.setName("KotakBank-CSV-Reader3");
