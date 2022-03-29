@@ -1,6 +1,8 @@
 package com.alok.spring.batch.reader;
 
+import com.alok.spring.batch.model.ProcessedFile;
 import com.alok.spring.batch.model.RawTransaction;
+import com.alok.spring.batch.repository.ProcessedFileRepository;
 import com.alok.spring.batch.utils.DefaultLineExtractor;
 import com.alok.spring.batch.utils.LineExtractor;
 import com.lowagie.text.pdf.PdfReader;
@@ -13,8 +15,10 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -24,7 +28,13 @@ public class PDFReader implements ResourceAwareItemReaderItemStream {
     private PdfReader pdfreader;
     List<RawTransaction> items;
     private int currentIndex = 0;
+    private ProcessedFileRepository processedFileRepository;
+
     private LineExtractor lineExtractor = new DefaultLineExtractor();
+
+    public PDFReader(ProcessedFileRepository processedFileRepository) {
+        this.processedFileRepository = processedFileRepository;
+    }
 
     public void setLineExtractor(LineExtractor lineExtractor) {
         this.lineExtractor = lineExtractor;
@@ -48,6 +58,14 @@ public class PDFReader implements ResourceAwareItemReaderItemStream {
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
         log.info("Started Processing File: {}",String.valueOf(resource));
+        // TODO - skip file if already processed
+        Optional<ProcessedFile> processedFile = processedFileRepository.findAllByName(String.valueOf(resource));
+
+        if (processedFile.isPresent()) {
+            log.info("File already processed - skipping!");
+            return;
+        }
+
         if (executionContext.containsKey("current.index")) {
             currentIndex = executionContext.getInt("current.index");
         } else {
@@ -88,6 +106,13 @@ public class PDFReader implements ResourceAwareItemReaderItemStream {
         log.info("Finished Processing File: {}",String.valueOf(resource));
         if(pdfreader != null) {
             pdfreader.close();
+            processedFileRepository.save(
+                    ProcessedFile.builder()
+                            .name(String.valueOf(resource))
+                            .date(new Date())
+                            .records(items.size())
+                            .build()
+            );
         }
     }
 

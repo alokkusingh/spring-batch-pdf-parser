@@ -1,11 +1,12 @@
 package com.alok.spring.batch.utils;
 
 import com.alok.spring.batch.reader.PDFReader;
+import com.alok.spring.batch.repository.ProcessedFileRepository;
 
 public class CitiUtils {
-    public static PDFReader getCitiItemReader(String filePassword) {
+    public static PDFReader getCitiItemReader(String filePassword, ProcessedFileRepository processedFileRepository) {
 
-        PDFReader flatFileItemReader = new PDFReader();
+        PDFReader flatFileItemReader = new PDFReader(processedFileRepository);
         flatFileItemReader.setName("CitiBank-CSV-Reader2");
         flatFileItemReader.setFilePassword(filePassword);
 

@@ -4,6 +4,7 @@ import com.alok.spring.batch.model.RawTransaction;
 import com.alok.spring.batch.model.Transaction;
 import com.alok.spring.batch.processor.FileArchiveTasklet;
 import com.alok.spring.batch.reader.PDFReader;
+import com.alok.spring.batch.repository.ProcessedFileRepository;
 import com.alok.spring.batch.utils.CitiUtils;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -29,13 +30,17 @@ public class CitiAccountStatementBatchConfig2 {
     @Value("${file.password.citi.password2}")
     private String filePassword;
 
+    private ProcessedFileRepository processedFileRepository;
+
     @Bean("CitiBankJob2")
     public Job citiBankJob1(JobBuilderFactory jobBuilderFactory,
                            StepBuilderFactory stepBuilderFactory,
                            ItemReader<RawTransaction> citiItemsReader2,
                            ItemProcessor<RawTransaction, Transaction> citiBankAccountProcessor,
-                           ItemWriter<Transaction> bankAccountDbWriter
+                           ItemWriter<Transaction> bankAccountDbWriter,
+                            ProcessedFileRepository processedFileRepository
     ) {
+        this.processedFileRepository = processedFileRepository;
         Step step1 = stepBuilderFactory.get("CitiAccount-ETL-file-load")
                 .<RawTransaction,Transaction>chunk(1000)
                 .reader(citiItemsReader2)
@@ -71,6 +76,6 @@ public class CitiAccountStatementBatchConfig2 {
 
     @Bean
     public PDFReader citiItemReader2() {
-        return CitiUtils.getCitiItemReader(filePassword);
+        return CitiUtils.getCitiItemReader(filePassword, processedFileRepository);
     }
 }

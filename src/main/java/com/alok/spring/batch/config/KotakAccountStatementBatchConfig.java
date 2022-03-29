@@ -4,6 +4,7 @@ import com.alok.spring.batch.model.RawTransaction;
 import com.alok.spring.batch.model.Transaction;
 import com.alok.spring.batch.processor.BankAccountProcessor;
 import com.alok.spring.batch.processor.FileArchiveTasklet;
+import com.alok.spring.batch.repository.ProcessedFileRepository;
 import com.alok.spring.batch.utils.KotakLineExtractor;
 import com.alok.spring.batch.utils.LineExtractor;
 import com.alok.spring.batch.reader.PDFReader;
@@ -33,13 +34,18 @@ public class KotakAccountStatementBatchConfig {
     @Value("${file.password.kotak}")
     private String filePassword;
 
+    private ProcessedFileRepository processedFileRepository;
+
     @Bean("KotakBankJob")
     public Job kotakBankJob(JobBuilderFactory jobBuilderFactory,
                            StepBuilderFactory stepBuilderFactory,
                            ItemReader<RawTransaction> kotakItemsReader,
                            ItemProcessor<RawTransaction, Transaction> kotakAccountProcessor,
-                           ItemWriter<Transaction> bankAccountDbWriter
+                           ItemWriter<Transaction> bankAccountDbWriter,
+                            ProcessedFileRepository processedFileRepository
     ) {
+        this.processedFileRepository = processedFileRepository;
+
         Step step1 = stepBuilderFactory.get("CitiAccount-ETL-file-load")
                 .<RawTransaction,Transaction>chunk(1000)
                 .reader(kotakItemsReader)
@@ -76,7 +82,7 @@ public class KotakAccountStatementBatchConfig {
     @Bean
     public PDFReader kotakItemReader() {
 
-        PDFReader flatFileItemReader = new PDFReader();
+        PDFReader flatFileItemReader = new PDFReader(processedFileRepository);
         flatFileItemReader.setName("KotakBank-CSV-Reader3");
         flatFileItemReader.setFilePassword(filePassword);
 

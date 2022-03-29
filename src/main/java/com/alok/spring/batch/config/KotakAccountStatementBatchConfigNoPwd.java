@@ -3,6 +3,7 @@ package com.alok.spring.batch.config;
 import com.alok.spring.batch.model.RawTransaction;
 import com.alok.spring.batch.model.Transaction;
 import com.alok.spring.batch.processor.FileArchiveTasklet;
+import com.alok.spring.batch.repository.ProcessedFileRepository;
 import com.alok.spring.batch.utils.KotakLineExtractor;
 import com.alok.spring.batch.utils.LineExtractor;
 import com.alok.spring.batch.reader.PDFReader;
@@ -27,13 +28,18 @@ public class KotakAccountStatementBatchConfigNoPwd {
     @Value("file:${file.path.kotak_account.nopassword}")
     private Resource[] resources;
 
+
+    private ProcessedFileRepository processedFileRepository;
+
     @Bean("KotakBankNoPwdJob")
     public Job kotakBankNoPwdJob(JobBuilderFactory jobBuilderFactory,
                            StepBuilderFactory stepBuilderFactory,
                            ItemReader<RawTransaction> kotakItemsReaderNoPwd,
                            ItemProcessor<RawTransaction, Transaction> kotakAccountProcessor,
-                           ItemWriter<Transaction> bankAccountDbWriter
+                           ItemWriter<Transaction> bankAccountDbWriter,
+                                 ProcessedFileRepository processedFileRepository
     ) {
+        this.processedFileRepository = processedFileRepository;
         Step step1 = stepBuilderFactory.get("KotakAccount-ETL-file-load")
                 .<RawTransaction,Transaction>chunk(1000)
                 .reader(kotakItemsReaderNoPwd)
@@ -70,7 +76,7 @@ public class KotakAccountStatementBatchConfigNoPwd {
     @Bean
     public PDFReader kotakItemReaderNoPwd() {
 
-        PDFReader flatFileItemReader = new PDFReader();
+        PDFReader flatFileItemReader = new PDFReader(processedFileRepository);
         flatFileItemReader.setName("KotakBank-CSV-Reader3");
         //flatFileItemReader.setFilePassword(filePassword);
 
