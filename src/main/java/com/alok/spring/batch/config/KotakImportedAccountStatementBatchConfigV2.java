@@ -2,6 +2,7 @@ package com.alok.spring.batch.config;
 
 import com.alok.spring.batch.model.Transaction;
 import com.alok.spring.batch.processor.FileArchiveTasklet;
+import com.alok.spring.batch.reader.CSVReader;
 import com.alok.spring.batch.utils.KotakUtils;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -14,6 +15,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.MultiResourceItemReader;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,7 +37,7 @@ public class KotakImportedAccountStatementBatchConfigV2 {
                            ItemProcessor<Transaction, Transaction> defaultAccountProcessor,
                            ItemWriter<Transaction> bankAccountDbWriter
     ) {
-        Step step1 = stepBuilderFactory.get("KotakImportedAccount-ETL-file-load2")
+        Step step1 = stepBuilderFactory.get("KotakAccount-Imported-ETL-Job4-file-load")
                 .<Transaction,Transaction>chunk(1000)
                 .reader(kotakImportedItemsReaderV2)
                 .processor(defaultAccountProcessor)
@@ -45,11 +47,11 @@ public class KotakImportedAccountStatementBatchConfigV2 {
 
         FileArchiveTasklet archiveTask = new FileArchiveTasklet();
         archiveTask.setResources(resources);
-        Step step2 = stepBuilderFactory.get("KotakImportedAccount-ETL-file-archive2")
+        Step step2 = stepBuilderFactory.get("KotakAccount-Imported-ETL-Job4-file-archive")
                 .tasklet(archiveTask)
                 .build();
 
-        return jobBuilderFactory.get("KotakImportedAccount-ETL-Load")
+        return jobBuilderFactory.get("KotakAccount-Imported-ETL-Job4")
                 .incrementer(new RunIdIncrementer())
                 .start(step1)
                 .next(step2)
@@ -57,18 +59,29 @@ public class KotakImportedAccountStatementBatchConfigV2 {
     }
 
     @Bean
-    public MultiResourceItemReader<Transaction> kotakImportedItemsReaderV2() {
+    public MultiResourceItemReader<Transaction> kotakImportedItemsReaderV2(@Qualifier("kotakImportedItemReaderV2") CSVReader kotakImportedItemReaderV2) {
 
         MultiResourceItemReader<Transaction> reader = new MultiResourceItemReader<>();
         reader.setResources(resources);
         reader.setStrict(false);
-        reader.setDelegate(kotakImportedItemReaderV2());
+        reader.setDelegate(kotakImportedItemReaderV2);
         return reader;
     }
 
     @Bean
-    public FlatFileItemReader<Transaction> kotakImportedItemReaderV2() {
+    public CSVReader<Transaction> kotakImportedItemReaderV2(@Qualifier("CSVReader") CSVReader<Transaction> flatFileItemReader) {
 
-        return KotakUtils.kotakImportedItemReader(fieldNames);
+        // return KotakUtils.kotakImportedItemReader(fieldNames);
+        flatFileItemReader.setName("KotakImportedAccount-CSV-Reader");
+        flatFileItemReader.setLineMapper(KotakUtils.kotakImportedAccountLineMapper(fieldNames));
+        flatFileItemReader.setStrict(false);
+        flatFileItemReader.setComments(new String[] {",", "\"", "#",
+                "ALOK", "Bangalore", "KARNATAKA", "INDIA", "Opening", "Closing", "You",
+                "202", "Doddakannalli", "SArjapur", "Bengaluru", "Karnataka", "India", "560035"
+        });
+        flatFileItemReader.setLinesToSkip(1);
+        flatFileItemReader.setTransactionType("BANK");
+
+        return flatFileItemReader;
     }
 }

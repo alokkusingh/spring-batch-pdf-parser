@@ -2,6 +2,7 @@ package com.alok.spring.batch.config;
 
 import com.alok.spring.batch.model.Transaction;
 import com.alok.spring.batch.processor.FileArchiveTasklet;
+import com.alok.spring.batch.reader.CSVReader;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -17,6 +18,7 @@ import org.springframework.batch.item.file.MultiResourceItemReader;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,7 +40,7 @@ public class MissingAccountStatementBatchConfig {
                           ItemProcessor<Transaction, Transaction> defaultAccountProcessor,
                           ItemWriter<Transaction> bankAccountDbWriter
     ) {
-        Step step1 = stepBuilderFactory.get("MissingAccount-ETL-file-load")
+        Step step1 = stepBuilderFactory.get("MissingAccount-ETL-Job-file-load")
                 .<Transaction,Transaction>chunk(100)
                 .reader(itemsReader)
                 .processor(defaultAccountProcessor)
@@ -48,11 +50,11 @@ public class MissingAccountStatementBatchConfig {
 
         FileArchiveTasklet archiveTask = new FileArchiveTasklet();
         archiveTask.setResources(resources);
-        Step step2 = stepBuilderFactory.get("MissingAccount-ETL-file-archive")
+        Step step2 = stepBuilderFactory.get("MissingAccount-ETL-Job-file-archive")
                 .tasklet(archiveTask)
                 .build();
 
-        return jobBuilderFactory.get("MissingAccount-ETL-Load")
+        return jobBuilderFactory.get("MissingAccount-ETL-Job")
                 .incrementer(new RunIdIncrementer())
                 .start(step1)
                 .next(step2)
@@ -62,23 +64,24 @@ public class MissingAccountStatementBatchConfig {
 
 
     @Bean
-    public MultiResourceItemReader<Transaction> itemsReader() {
+    public MultiResourceItemReader<Transaction> itemsReader(@Qualifier("itemReader") CSVReader itemReader) {
 
         MultiResourceItemReader<Transaction> reader = new MultiResourceItemReader<>();
         reader.setResources(resources);
         reader.setStrict(false);
-        reader.setDelegate(itemReader());
+        reader.setDelegate(itemReader);
         return reader;
     }
 
     @Bean
-    public FlatFileItemReader<Transaction> itemReader() {
+    public CSVReader<Transaction> itemReader(@Qualifier("CSVReader") CSVReader<Transaction> flatFileItemReader) {
 
-        FlatFileItemReader<Transaction> flatFileItemReader = new FlatFileItemReader<>();
+        //FlatFileItemReader<Transaction> flatFileItemReader = new FlatFileItemReader<>();
         flatFileItemReader.setName("MissingTransaction-CSV-Reader");
         //flatFileItemReader.setLinesToSkip(1);
         flatFileItemReader.setLineMapper(lineMapper());
         flatFileItemReader.setStrict(false);
+        flatFileItemReader.setTransactionType("BANK");
 
         return flatFileItemReader;
     }

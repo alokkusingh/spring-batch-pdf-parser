@@ -1,6 +1,7 @@
 package com.alok.spring.batch.service;
 
 import com.alok.spring.batch.model.Transaction;
+import com.alok.spring.batch.repository.ProcessedFileRepository;
 import com.alok.spring.batch.repository.TransactionRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -61,6 +62,9 @@ public class BankJobExecutorService {
     @Autowired
     private TransactionRepository transactionRepository;
 
+    @Autowired
+    private ProcessedFileRepository processedFileRepository;
+
     private String outputFileName;
 
     @Autowired
@@ -78,6 +82,7 @@ public class BankJobExecutorService {
         log.info("Delete all the transactions first");
         log.info("Starting job execution");
         transactionRepository.deleteAll();
+        processedFileRepository.deleteAllByType("BANK");
 
         jobLauncher.run(citiBankJob1, new JobParametersBuilder()
                 .addString("JobID", String.valueOf(System.currentTimeMillis()))

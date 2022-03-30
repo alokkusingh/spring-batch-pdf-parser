@@ -1,6 +1,7 @@
 package com.alok.spring.batch.service;
 
 import com.alok.spring.batch.repository.ExpenseRepository;
+import com.alok.spring.batch.repository.ProcessedFileRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -23,11 +24,15 @@ public class ExpenseJobExecutorService {
     @Autowired
     private ExpenseRepository expenseRepository;
 
+    @Autowired
+    private ProcessedFileRepository processedFileRepository;
+
     public void executeAllJobs() throws Exception {
 
-        log.info("Delete all the transactions first");
-        log.info("Starting job execution");
+        log.info("Delete all the expenses first");
         expenseRepository.deleteAll();
+        processedFileRepository.deleteAllByType("EXPENSE");
+        log.info("Starting job execution");
 
         jobLauncher.run(expenseJob, new JobParametersBuilder()
                 .addString("JobID", String.valueOf(System.currentTimeMillis()))

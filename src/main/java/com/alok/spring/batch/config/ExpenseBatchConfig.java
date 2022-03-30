@@ -2,6 +2,7 @@ package com.alok.spring.batch.config;
 
 import com.alok.spring.batch.model.Expense;
 import com.alok.spring.batch.processor.FileArchiveTasklet;
+import com.alok.spring.batch.reader.CSVReader;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -11,12 +12,12 @@ import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.LineMapper;
 import org.springframework.batch.item.file.MultiResourceItemReader;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -62,22 +63,23 @@ public class ExpenseBatchConfig {
 
 
     @Bean
-    public MultiResourceItemReader<Expense> expenseItemsReader() {
+    public MultiResourceItemReader<Expense> expenseItemsReader(@Qualifier("expenseItemReader") CSVReader expenseItemReader) {
 
         MultiResourceItemReader<Expense> reader = new MultiResourceItemReader<>();
         reader.setResources(resources);
         reader.setStrict(false);
-        reader.setDelegate(expenseItemReader());
+        reader.setDelegate(expenseItemReader);
         return reader;
     }
 
     @Bean
-    public FlatFileItemReader<Expense> expenseItemReader() {
+    public CSVReader<Expense> expenseItemReader(@Qualifier("CSVReader") CSVReader<Expense> flatFileItemReader) {
 
-        FlatFileItemReader<Expense> flatFileItemReader = new FlatFileItemReader<>();
+        //FlatFileItemReader<Expense> flatFileItemReader = new FlatFileItemReader<>();
         flatFileItemReader.setName("Expense-CSV-Reader");
         flatFileItemReader.setLinesToSkip(1);
         flatFileItemReader.setLineMapper(expenseLineMapper());
+        flatFileItemReader.setTransactionType("EXPENSE");
         flatFileItemReader.setStrict(false);
 
         return flatFileItemReader;

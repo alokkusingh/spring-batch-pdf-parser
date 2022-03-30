@@ -11,6 +11,8 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.*;
 import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
@@ -22,11 +24,12 @@ import java.util.Optional;
 
 @Slf4j
 @Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class PDFReader implements ResourceAwareItemReaderItemStream {
     private Resource resource;
     private String pdfPasssword;
     private PdfReader pdfreader;
-    List<RawTransaction> items;
+    List<RawTransaction> items = new LinkedList<>();
     private int currentIndex = 0;
     private ProcessedFileRepository processedFileRepository;
 
@@ -58,11 +61,10 @@ public class PDFReader implements ResourceAwareItemReaderItemStream {
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
         log.info("Started Processing File: {}",String.valueOf(resource));
-        // TODO - skip file if already processed
-        Optional<ProcessedFile> processedFile = processedFileRepository.findAllByName(String.valueOf(resource));
 
+        Optional<List<ProcessedFile>> processedFile = processedFileRepository.findAllByName(String.valueOf(resource));
         if (processedFile.isPresent()) {
-            log.info("File already processed - skipping!");
+            log.warn("File already processed - skipping!");
             return;
         }
 
@@ -104,15 +106,20 @@ public class PDFReader implements ResourceAwareItemReaderItemStream {
     @Override
     public void close() throws ItemStreamException {
         log.info("Finished Processing File: {}",String.valueOf(resource));
-        if(pdfreader != null) {
+        if(pdfreader != null && resource != null) {
             pdfreader.close();
-            processedFileRepository.save(
-                    ProcessedFile.builder()
-                            .name(String.valueOf(resource))
-                            .date(new Date())
-                            .records(items.size())
-                            .build()
-            );
+            Optional<List<ProcessedFile>> processedFile = processedFileRepository.findAllByName(String.valueOf(resource));
+
+            if (!processedFile.isPresent()) {
+                processedFileRepository.save(
+                        ProcessedFile.builder()
+                                .name(String.valueOf(resource))
+                                .date(new Date())
+                                .records(items.size())
+                                .type("BANK")
+                                .build()
+                );
+            }
         }
     }
 

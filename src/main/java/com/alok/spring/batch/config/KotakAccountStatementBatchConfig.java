@@ -18,6 +18,7 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.MultiResourceItemReader;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,7 +48,7 @@ public class KotakAccountStatementBatchConfig {
     ) {
         this.processedFileRepository = processedFileRepository;
 
-        Step step1 = stepBuilderFactory.get("CitiAccount-ETL-file-load")
+        Step step1 = stepBuilderFactory.get("KotakAccount-ETL-Job1-file-load")
                 .<RawTransaction,Transaction>chunk(1000)
                 .reader(kotakItemsReader)
                 .processor(kotakAccountProcessor)
@@ -57,11 +58,11 @@ public class KotakAccountStatementBatchConfig {
 
         FileArchiveTasklet archiveTask = new FileArchiveTasklet();
         archiveTask.setResources(resources);
-        Step step2 = stepBuilderFactory.get("KotakAccount-ETL-file-archive")
+        Step step2 = stepBuilderFactory.get("KotakAccount-ETL-Job1-file-archive")
                 .tasklet(archiveTask)
                 .build();
 
-        return jobBuilderFactory.get("Kotak-ETL-Load")
+        return jobBuilderFactory.get("KotakAccount-ETL-Job1")
                 .incrementer(new RunIdIncrementer())
                 .start(step1)
                 .next(step2)
@@ -71,21 +72,21 @@ public class KotakAccountStatementBatchConfig {
 
 
     @Bean
-    public MultiResourceItemReader<RawTransaction> kotakItemsReader() {
+    public MultiResourceItemReader<RawTransaction> kotakItemsReader(PDFReader kotakItemReader) {
 
         MultiResourceItemReader<RawTransaction> reader = new MultiResourceItemReader<>();
         reader.setResources(resources);
         reader.setStrict(false);
-        reader.setDelegate(kotakItemReader());
+        reader.setDelegate(kotakItemReader);
         return reader;
     }
 
     @Bean
     @DependsOn({"processedFileRepository"})
-    public PDFReader kotakItemReader() {
+    public PDFReader kotakItemReader(@Qualifier("PDFReader") PDFReader flatFileItemReader) {
 
-        PDFReader flatFileItemReader = new PDFReader(processedFileRepository);
-        flatFileItemReader.setName("KotakBank-CSV-Reader3");
+        //PDFReader flatFileItemReader = new PDFReader(processedFileRepository);
+        flatFileItemReader.setName("KotakBank-PDF-Reader3");
         flatFileItemReader.setFilePassword(filePassword);
 
         LineExtractor kotakLineExtractor = new KotakLineExtractor();

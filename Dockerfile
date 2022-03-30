@@ -16,5 +16,5 @@ USER alok
 #VOLUME /Users/aloksingh/BankStatements
 EXPOSE 8081
 WORKDIR /opt
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/urandom","-jar","/opt/app.jar"]
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/urandom","-Dspring.profiles.active=prod","-jar","/opt/app.jar"]
 #ENTRYPOINT ["/usr/bin/tail "]
