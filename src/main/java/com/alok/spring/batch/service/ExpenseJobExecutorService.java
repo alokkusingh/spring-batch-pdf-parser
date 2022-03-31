@@ -28,7 +28,6 @@ public class ExpenseJobExecutorService {
     @Autowired
     private ProcessedFileRepository processedFileRepository;
 
-    @Transactional
     public void executeAllJobs() throws Exception {
 
         log.info("Delete all the expenses first");
