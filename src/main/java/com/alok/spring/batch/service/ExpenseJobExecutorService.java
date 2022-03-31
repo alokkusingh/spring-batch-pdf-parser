@@ -9,6 +9,7 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -27,6 +28,7 @@ public class ExpenseJobExecutorService {
     @Autowired
     private ProcessedFileRepository processedFileRepository;
 
+    @Transactional
     public void executeAllJobs() throws Exception {
 
         log.info("Delete all the expenses first");
