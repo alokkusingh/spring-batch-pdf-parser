@@ -9,6 +9,6 @@ import java.util.Optional;
 
 public interface ProcessedFileRepository extends JpaRepository<ProcessedFile, Integer> {
     Optional<List<ProcessedFile>> findAllByName(String valueOf);
-    @Query("DELETE from  ProcessedFile pf where pf.type = ?1")
+    @Query(value = "DELETE from  processed_file pf where pf.type = ?1", nativeQuery = true)
     void deleteAllByType(String type);
 }
