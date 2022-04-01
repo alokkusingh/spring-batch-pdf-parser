@@ -6,7 +6,7 @@ import com.alok.spring.batch.model.IExpenseMonthSum;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,7 +27,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     List<IExpenseMonthSum> findSumGroupByMonth();
 
     @Query(value = "SELECT MAX(DATE) FROM expense", nativeQuery = true)
-    Optional<Date> findLastTransactionDate();
+    Optional<LocalDate> findLastTransactionDate();
 
 
 }
