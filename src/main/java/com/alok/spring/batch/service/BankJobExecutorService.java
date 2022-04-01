@@ -82,7 +82,9 @@ public class BankJobExecutorService {
         log.info("Delete all the transactions first");
         log.info("Starting job execution");
         transactionRepository.deleteAll();
-        processedFileRepository.deleteAllByType("BANK");
+
+        // No need to process all file - only new file process - so below line to be committed
+        //processedFileRepository.deleteAllByType("BANK");
 
         jobLauncher.run(citiBankJob1, new JobParametersBuilder()
                 .addString("JobID", String.valueOf(System.currentTimeMillis()))
