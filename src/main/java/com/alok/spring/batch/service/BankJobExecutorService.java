@@ -79,12 +79,12 @@ public class BankJobExecutorService {
 
     public void executeAllJobs() throws Exception {
 
-        log.info("Delete all the transactions first");
+        //log.info("Delete all the transactions first");
         log.info("Starting job execution");
-        transactionRepository.deleteAll();
+        //transactionRepository.deleteAll();
 
         // No need to process all file - only new file process - so below line to be committed
-        processedFileRepository.deleteAllByType("BANK");
+        //processedFileRepository.deleteAllByType("BANK");
 
         jobLauncher.run(citiBankJob1, new JobParametersBuilder()
                 .addString("JobID", String.valueOf(System.currentTimeMillis()))
