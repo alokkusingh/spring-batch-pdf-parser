@@ -105,7 +105,7 @@ public class PDFReader implements ResourceAwareItemReaderItemStream {
 
     @Override
     public void close() throws ItemStreamException {
-        log.info("Finished Processing File: {}",String.valueOf(resource));
+        log.debug("Finished Processing File: {}",String.valueOf(resource));
         if(pdfreader != null && resource != null) {
             pdfreader.close();
             Optional<List<ProcessedFile>> processedFile = processedFileRepository.findAllByName(String.valueOf(resource));
