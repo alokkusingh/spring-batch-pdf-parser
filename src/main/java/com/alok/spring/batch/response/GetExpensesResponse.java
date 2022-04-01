@@ -3,7 +3,7 @@ package com.alok.spring.batch.response;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -12,13 +12,13 @@ public class GetExpensesResponse {
 
     private List<Expense> expenses;
     private Integer count;
-    private LocalDate lastTransactionDate;
+    private Date lastTransactionDate;
 
     @Data
     @Builder
     public static class Expense {
         private Long id;
-        private LocalDate date;
+        private Date date;
         private String head;
         private Double amount;
         private String category;

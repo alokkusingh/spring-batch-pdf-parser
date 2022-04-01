@@ -8,8 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-
-import java.time.LocalDate;
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -20,8 +19,8 @@ public class Expense implements Comparable<Expense> {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    //@Temporal(TemporalType.DATE)
-    private LocalDate date;
+    @Temporal(TemporalType.DATE)
+    private Date date;
     private String head;
     private Double amount;
     private String comment;
