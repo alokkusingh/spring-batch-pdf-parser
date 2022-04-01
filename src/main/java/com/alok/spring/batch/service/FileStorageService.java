@@ -32,11 +32,20 @@ public class FileStorageService {
         throw new RuntimeException("Invalid Upload Type");
     }
 
+    private String getUploadFileName(UploadType uploadType, String fileName) {
+        if (uploadType.equals(UploadType.KotakExportedStatement))
+            return fileName;
+
+        // Hard coding so that any file name uplaod will replace the same file
+        if (uploadType.equals(UploadType.ExpenseGoogleSheet))
+            return StringUtils.cleanPath("Expense Sheet - Form Responses 1.csv");
+
+        throw new RuntimeException("Invalid Upload Type");
+    }
+
     public String storeFile(MultipartFile file, UploadType uploadType) {
         // Normalize file name
-        //String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-        // Hard coding so that any file name uplaod will replace the same file
-        String fileName = StringUtils.cleanPath("Expense Sheet - Form Responses 1.csv");
+        String fileName = getUploadFileName(uploadType, StringUtils.cleanPath(file.getOriginalFilename()));
 
         try {
             // Check if the file's name contains invalid characters
