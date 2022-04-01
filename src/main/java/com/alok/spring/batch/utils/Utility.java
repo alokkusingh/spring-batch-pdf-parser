@@ -154,6 +154,11 @@ public class Utility {
         if (dateString.trim().matches("....\\/...\\/..")) {
             return "yyyy/MMM/dd";
         }
+
+        if (dateString.trim().matches("..-..-....")) {
+            return "dd-MM-yyyy";
+        }
+
         return "dd/MM/yyyy";
     }
 }
