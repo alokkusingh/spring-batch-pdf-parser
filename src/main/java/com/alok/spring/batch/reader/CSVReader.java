@@ -46,6 +46,16 @@ public class CSVReader<T> extends FlatFileItemReader<T> {
     }
 
     @Override
+    protected T doRead() throws Exception {
+        Optional<List<ProcessedFile>> processedFile = processedFileRepository.findAllByName(String.valueOf(resource));
+        if (processedFile.isPresent()) {
+            return null;
+        }
+
+        return super.doRead();
+    }
+
+    @Override
     public void setResource(Resource resource) {
         super.setResource(resource);
         this.resource = resource;
