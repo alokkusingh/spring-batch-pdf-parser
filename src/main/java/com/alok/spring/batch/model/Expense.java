@@ -19,7 +19,7 @@ public class Expense implements Comparable<Expense> {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date date;
     private String head;
     private Double amount;
