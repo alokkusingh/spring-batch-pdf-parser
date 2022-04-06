@@ -2,7 +2,6 @@ package com.alok.spring.batch.processor;
 
 import com.alok.spring.batch.model.Expense;
 import com.alok.spring.batch.model.RawTransaction;
-import com.alok.spring.batch.model.Transaction;
 import com.alok.spring.batch.utils.Utility;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemProcessor;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Component;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.TimeZone;
 
 @Component("defaultExpenseProcessor")
 @Slf4j
