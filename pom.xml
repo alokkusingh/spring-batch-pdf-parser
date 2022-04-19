@@ -26,8 +26,6 @@
 	</properties>
 
 	<dependencies>
-
-
 		<!-- https://mvnrepository.com/artifact/com.github.librepdf/openpdf -->
 		<dependency>
 			<groupId>com.github.librepdf</groupId>
@@ -66,6 +64,11 @@
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
+		<dependency>
+			<groupId>io.opentracing.contrib</groupId>
+			<artifactId>opentracing-spring-jaeger-web-starter</artifactId>
+			<version>3.3.1</version>
+		</dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
