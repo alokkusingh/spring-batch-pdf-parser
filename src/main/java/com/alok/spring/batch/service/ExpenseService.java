@@ -4,10 +4,7 @@ import com.alok.spring.batch.model.Expense;
 import com.alok.spring.batch.model.IExpenseCategoryMonthSum;
 import com.alok.spring.batch.model.IExpenseMonthSum;
 import com.alok.spring.batch.repository.ExpenseRepository;
-import com.alok.spring.batch.response.GetExpensesMonthSumResponse;
-import com.alok.spring.batch.response.GetExpensesResponse;
-import com.alok.spring.batch.response.GetExpensesMonthSumByCategoryResponse;
-import com.alok.spring.batch.response.GetExpensesResponseAggByDay;
+import com.alok.spring.batch.response.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -125,13 +122,11 @@ public class ExpenseService {
     public GetExpensesMonthSumResponse getMonthWiseExpenseSum() {
 
         List<IExpenseMonthSum> expenseSums = expenseRepository.findSumGroupByMonth();
-        for (IExpenseMonthSum expenseSum: expenseSums) {
-            System.out.println(expenseSum.getYear() + ":" + expenseSum.getMonth() + ":" + expenseSum.getSum());
-        }
 
         return GetExpensesMonthSumResponse.builder()
                 .expenseCategorySums(expenseSums)
                 .count(expenseSums.size())
                 .build();
     }
+
 }
