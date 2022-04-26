@@ -11,7 +11,19 @@ import java.util.Map;
 @Builder
 public class GetExpensesResponseAggByDay {
 
-    private Map<String, Double> expenses;
+    private List<DayExpense> expenses;
     private Integer count;
     private Date lastTransactionDate;
+
+    @Data
+    @Builder
+    public static class DayExpense implements Comparable<DayExpense> {
+        private Date date;
+        private Double amount;
+
+        @Override
+        public int compareTo(DayExpense o) {
+            return o.getDate().compareTo(date);
+        }
+    }
 }

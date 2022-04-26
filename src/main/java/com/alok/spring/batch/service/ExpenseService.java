@@ -11,6 +11,7 @@ import com.alok.spring.batch.response.GetExpensesResponseAggByDay;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
@@ -77,17 +78,35 @@ public class ExpenseService {
 
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
-        return GetExpensesResponseAggByDay.builder()
-                .expenses(expenses.stream().
-                        collect(
-                                Collectors.groupingBy(expense -> df.format(expense.getDate()),
-                                        Collectors.collectingAndThen(
-                                                Collectors.summarizingDouble(Expense::getAmount),
-                                                dss -> dss.getSum()
-                                        )
+        Map<String, Double> dayExpenses = expenses.stream().
+                collect(
+                        Collectors.groupingBy(expense -> df.format(expense.getDate()),
+                                Collectors.collectingAndThen(
+                                        Collectors.summarizingDouble(Expense::getAmount),
+                                        dss -> dss.getSum()
                                 )
                         )
+                );
+
+        List<GetExpensesResponseAggByDay.DayExpense> dayByExpenses = dayExpenses.entrySet().stream()
+                .map(entry -> {
+                            try {
+                                return GetExpensesResponseAggByDay.DayExpense.builder()
+                                        .date(df.parse(entry.getKey()))
+                                        .amount(entry.getValue())
+                                        .build();
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                                return null;
+                            }
+                        }
                 )
+                .collect(Collectors.toList());
+
+        Collections.sort(dayByExpenses);
+
+        return GetExpensesResponseAggByDay.builder()
+                .expenses(dayByExpenses)
                 .lastTransactionDate(lastExpenseDate)
                 .count(expenses.size())
                 .build();
