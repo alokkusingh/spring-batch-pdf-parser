@@ -9,8 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -29,6 +28,42 @@ public class SummaryService {
 
         List<IExpenseMonthSum> expenseSums = expenseRepository.findSumGroupByMonth();
         List<Transaction> transactions = transactionRepository.findAll();
+
+        // From June 2007 June to May 2019 don't have expense entry - so lets add 0 every month later the
+        // same will be overridden with actual value
+        // This is needed because "expenseSums" collection is used to travers months
+        TreeMap<Integer, IExpenseMonthSum> expenseMonthSumMap = new TreeMap<>(Comparator.reverseOrder());
+
+        for (int year = 2007; year <= 2019; year++) {
+            for (int month = 1; month <= 12; month++) {
+                int finalYear = year;
+                int finalMonth = month;
+                expenseMonthSumMap.put(
+                    Integer.valueOf(String.format("%d%02d", year, month)) ,
+                    new IExpenseMonthSum() {
+                        @Override
+                        public Integer getYear() {
+                            return finalYear;
+                        }
+
+                        @Override
+                        public Integer getMonth() {
+                            return finalMonth;
+                        }
+
+                        @Override
+                        public Double getSum() {
+                            return 0.0;
+                        }
+                    }
+                );
+            }
+        }
+        for (IExpenseMonthSum expenseMonthSum: expenseSums) {
+            expenseMonthSumMap.put(
+                    Integer.valueOf(String.format("%d%02d", expenseMonthSum.getYear(), expenseMonthSum.getMonth())),
+                    expenseMonthSum);
+        }
 
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM");
 
@@ -72,7 +107,7 @@ public class SummaryService {
                         )
                 );
 
-        List<GetMonthlySummaryResponse.MonthlySummary> monthSummaryRecord = expenseSums.stream().
+        List<GetMonthlySummaryResponse.MonthlySummary> monthSummaryRecord = expenseMonthSumMap.values().stream().
                 map(
                         expenseMonthRecord -> GetMonthlySummaryResponse.MonthlySummary.builder()
                                 .year(expenseMonthRecord.getYear())
