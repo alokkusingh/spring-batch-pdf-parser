@@ -7,13 +7,13 @@ import com.alok.spring.batch.repository.ExpenseRepository;
 import com.alok.spring.batch.response.GetExpensesMonthSumResponse;
 import com.alok.spring.batch.response.GetExpensesResponse;
 import com.alok.spring.batch.response.GetExpensesMonthSumByCategoryResponse;
+import com.alok.spring.batch.response.GetExpensesResponseAggByDay;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -62,6 +62,33 @@ public class ExpenseService {
                                 .comment(expense.getComment())
                                 .build())
                         .collect(Collectors.toList()))
+                .count(expenses.size())
+                .build();
+    }
+
+    public GetExpensesResponseAggByDay getCurrentMonthExpensesSumByDay() {
+
+        Date lastExpenseDate = expenseRepository.findLastTransactionDate()
+                .orElse(new Date());
+
+        LocalDate currentDate = LocalDate.now();
+        List<Expense> expenses = expenseRepository.findAllForCurrentMonth(currentDate.getYear(), currentDate.getMonthValue());
+        Collections.sort(expenses, (t1, t2) -> t2.getDate().compareTo(t1.getDate()));
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+
+        return GetExpensesResponseAggByDay.builder()
+                .expenses(expenses.stream().
+                        collect(
+                                Collectors.groupingBy(expense -> df.format(expense.getDate()),
+                                        Collectors.collectingAndThen(
+                                                Collectors.summarizingDouble(Expense::getAmount),
+                                                dss -> dss.getSum()
+                                        )
+                                )
+                        )
+                )
+                .lastTransactionDate(lastExpenseDate)
                 .count(expenses.size())
                 .build();
     }

@@ -1,9 +1,6 @@
 package com.alok.spring.batch.controller;
 
-import com.alok.spring.batch.response.GetExpensesMonthSumResponse;
-import com.alok.spring.batch.response.GetExpensesResponse;
-import com.alok.spring.batch.response.GetExpensesMonthSumByCategoryResponse;
-import com.alok.spring.batch.response.UploadFileResponse;
+import com.alok.spring.batch.response.*;
 import com.alok.spring.batch.service.ExpenseJobExecutorService;
 import com.alok.spring.batch.service.ExpenseService;
 import com.alok.spring.batch.service.FileStorageService;
@@ -101,5 +98,12 @@ public class ExpenseController {
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(300, TimeUnit.SECONDS).noTransform().mustRevalidate())
                 .body(expenseService.getMonthWiseExpenseSum());
+    }
+
+    @GetMapping(value = "/current_month_by_day", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<GetExpensesResponseAggByDay> getCurrentMonthExpensesSumByDay() {
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(300, TimeUnit.SECONDS).noTransform().mustRevalidate())
+                .body(expenseService.getCurrentMonthExpensesSumByDay());
     }
 }
