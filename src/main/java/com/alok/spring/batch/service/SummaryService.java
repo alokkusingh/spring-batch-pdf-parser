@@ -71,7 +71,8 @@ public class SummaryService {
         Map<String, Double> monthlySalary = transactions.stream()
                 .filter(transaction -> transaction.isSalary())
                 .collect(
-                        Collectors.groupingBy(transaction -> df.format(transaction.getDate()),
+                        Collectors.groupingBy(
+                                transaction -> df.format(transaction.getDate()),
                                 Collectors.collectingAndThen(
                                         Collectors.summarizingDouble(Transaction::getDebit),
                                         dss -> dss.getSum()
@@ -85,7 +86,8 @@ public class SummaryService {
                     return "Family".equals(transaction.getHead()) && transaction.getCredit() != null;
                 })
                 .collect(
-                        Collectors.groupingBy(transaction -> df.format(transaction.getDate()),
+                        Collectors.groupingBy(
+                                transaction -> df.format(transaction.getDate()),
                                 Collectors.collectingAndThen(
                                         Collectors.summarizingDouble(Transaction::getCredit),
                                         dss -> dss.getSum()
@@ -99,7 +101,8 @@ public class SummaryService {
                     return "Family".equals(transaction.getHead()) && transaction.getDebit() != null;
                 })
                 .collect(
-                        Collectors.groupingBy(transaction -> df.format(transaction.getDate()),
+                        Collectors.groupingBy(
+                                transaction -> df.format(transaction.getDate()),
                                 Collectors.collectingAndThen(
                                         Collectors.summarizingDouble(Transaction::getDebit),
                                         dss -> dss.getSum()

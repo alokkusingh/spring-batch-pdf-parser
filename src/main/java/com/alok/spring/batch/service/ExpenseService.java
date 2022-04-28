@@ -73,37 +73,9 @@ public class ExpenseService {
         List<Expense> expenses = expenseRepository.findAllForCurrentMonth(currentDate.getYear(), currentDate.getMonthValue());
         Collections.sort(expenses, (t1, t2) -> t2.getDate().compareTo(t1.getDate()));
 
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-
-        Map<String, Double> dayExpenses = expenses.stream().
-                collect(
-                        Collectors.groupingBy(expense -> df.format(expense.getDate()),
-                                Collectors.collectingAndThen(
-                                        Collectors.summarizingDouble(Expense::getAmount),
-                                        dss -> dss.getSum()
-                                )
-                        )
-                );
-
-        List<GetExpensesResponseAggByDay.DayExpense> dayByExpenses = dayExpenses.entrySet().stream()
-                .map(entry -> {
-                            try {
-                                return GetExpensesResponseAggByDay.DayExpense.builder()
-                                        .date(df.parse(entry.getKey()))
-                                        .amount(entry.getValue())
-                                        .build();
-                            } catch (ParseException e) {
-                                e.printStackTrace();
-                                return null;
-                            }
-                        }
-                )
-                .collect(Collectors.toList());
-
-        Collections.sort(dayByExpenses);
-
         return GetExpensesResponseAggByDay.builder()
-                .expenses(dayByExpenses)
+                .expenses(aggregateExpensesByDay(expenses))
+                .categoryExpenses(aggregateExpensesByCategory(expenses))
                 .lastTransactionDate(lastExpenseDate)
                 .count(expenses.size())
                 .build();
@@ -127,6 +99,68 @@ public class ExpenseService {
                 .expenseCategorySums(expenseSums)
                 .count(expenseSums.size())
                 .build();
+    }
+
+    private List<GetExpensesResponseAggByDay.DayExpense> aggregateExpensesByDay(List<Expense> expenses) {
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+
+        Map<String, Double> dayExpenses = expenses.stream()
+                .collect(
+                        Collectors.groupingBy(
+                                expense -> df.format(expense.getDate()),
+                                Collectors.collectingAndThen(
+                                        Collectors.summarizingDouble(Expense::getAmount),
+                                        dss -> dss.getSum()
+                                )
+                        )
+                );
+
+        List<GetExpensesResponseAggByDay.DayExpense> expensesByDay = dayExpenses.entrySet().stream()
+                .map(entry -> {
+                            try {
+                                return GetExpensesResponseAggByDay.DayExpense.builder()
+                                        .date(df.parse(entry.getKey()))
+                                        .amount(entry.getValue())
+                                        .build();
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                                return null;
+                            }
+                        }
+                )
+                .collect(Collectors.toList());
+
+        Collections.sort(expensesByDay);
+
+        return expensesByDay;
+    }
+
+    private List<GetExpensesResponseAggByDay.CategoryExpense> aggregateExpensesByCategory(List<Expense> expenses) {
+
+        Map<String, Double> catExpenses = expenses.stream()
+                .collect(
+                        Collectors.groupingBy(
+                                Expense::getCategory,
+                                Collectors.collectingAndThen(
+                                        Collectors.toList(),
+                                        catExpList -> catExpList.stream()
+                                                .map(Expense::getAmount)
+                                                .reduce(0.0, (sub, amount) -> sub + amount)
+                                )
+                        )
+
+                );
+
+        List<GetExpensesResponseAggByDay.CategoryExpense> expenseByCategory = catExpenses.entrySet().stream()
+                .map(entry -> GetExpensesResponseAggByDay.CategoryExpense.builder()
+                        .category(entry.getKey())
+                        .amount(entry.getValue())
+                        .build())
+                .collect(Collectors.toList());
+
+        Collections.sort(expenseByCategory);
+
+        return expenseByCategory;
     }
 
 }
