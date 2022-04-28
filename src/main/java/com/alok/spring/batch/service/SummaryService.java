@@ -69,7 +69,7 @@ public class SummaryService {
 
         // Salary aggregation
         Map<String, Double> monthlySalary = transactions.stream()
-                .filter(transaction -> transaction.isSalary())
+                .filter(Transaction::isSalary)
                 .collect(
                         Collectors.groupingBy(
                                 transaction -> df.format(transaction.getDate()),
@@ -82,9 +82,7 @@ public class SummaryService {
 
         // Family transfer aggregation
         Map<String, Double> familyTransferMonthly = transactions.stream()
-                .filter(transaction -> {
-                    return "Family".equals(transaction.getHead()) && transaction.getCredit() != null;
-                })
+                .filter(transaction -> "Family".equals(transaction.getHead()) && transaction.getCredit() != null)
                 .collect(
                         Collectors.groupingBy(
                                 transaction -> df.format(transaction.getDate()),
@@ -97,9 +95,7 @@ public class SummaryService {
 
         // Family received aggregation
         Map<String, Double> familyReceivedMonthly = transactions.stream()
-                .filter(transaction -> {
-                    return "Family".equals(transaction.getHead()) && transaction.getDebit() != null;
-                })
+                .filter(transaction -> "Family".equals(transaction.getHead()) && transaction.getDebit() != null)
                 .collect(
                         Collectors.groupingBy(
                                 transaction -> df.format(transaction.getDate()),
