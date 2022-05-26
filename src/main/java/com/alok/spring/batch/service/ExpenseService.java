@@ -24,7 +24,7 @@ public class ExpenseService {
     @Autowired
     private ExpenseRepository expenseRepository;
 
-    @Cacheable(CacheConfig.CacheName.EXPENSE)
+    @Cacheable(value = CacheConfig.CacheName.EXPENSE, key = "#root.methodName")
     public GetExpensesResponse getAllExpenses() {
         log.info("All Expenses not available in cache");
 
@@ -54,7 +54,7 @@ public class ExpenseService {
         return getCurrentMonthExpenses(currentDate);
     }
 
-    @Cacheable(CacheConfig.CacheName.EXPENSE)
+    @Cacheable(value = CacheConfig.CacheName.EXPENSE, key = "#root.methodName")
     public GetExpensesResponse getCurrentMonthExpenses(LocalDate currentDate) {
         log.info("Current Month Expenses not available in cache");
 
@@ -81,7 +81,7 @@ public class ExpenseService {
         return getCurrentMonthExpensesSumByDay(currentDate);
     }
 
-    @Cacheable(CacheConfig.CacheName.EXPENSE)
+    @Cacheable(value = CacheConfig.CacheName.EXPENSE, key = "#root.methodName")
     public GetExpensesResponseAggByDay getCurrentMonthExpensesSumByDay(LocalDate currentDate) {
         log.info("Current Month Expenses Sum By Day not available in cache");
 
@@ -99,7 +99,7 @@ public class ExpenseService {
                 .build();
     }
 
-    @Cacheable(CacheConfig.CacheName.EXPENSE)
+    @Cacheable(value = CacheConfig.CacheName.EXPENSE, key = "#root.methodName")
     public GetExpensesMonthSumByCategoryResponse getMonthWiseExpenseCategorySum() {
         log.info("Month wise Expenses Category Sum not available in cache");
 
@@ -111,7 +111,7 @@ public class ExpenseService {
                 .build();
     }
 
-    @Cacheable(CacheConfig.CacheName.EXPENSE)
+    @Cacheable(value = CacheConfig.CacheName.EXPENSE, key = "#root.methodName")
     public GetExpensesMonthSumResponse getMonthWiseExpenseSum() {
         log.info("Month wise Expenses Sum not available in cache");
 
