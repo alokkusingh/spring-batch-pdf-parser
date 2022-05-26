@@ -3,6 +3,7 @@ package com.alok.spring.batch.controller;
 import com.alok.spring.batch.response.GetMonthlySummaryResponse;
 import com.alok.spring.batch.service.SummaryService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,9 @@ public class SummaryController {
 
     private SummaryService summaryService;
 
+    @Value("${web.cache-control.max-age}")
+    private Long cacheControlMaxAge;
+
     public SummaryController(SummaryService summaryService) {
         this.summaryService = summaryService;
     }
@@ -26,7 +30,7 @@ public class SummaryController {
     @GetMapping(value = "/monthly", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GetMonthlySummaryResponse> getMonthlySummary() {
         return ResponseEntity.ok()
-                .cacheControl(CacheControl.maxAge(300, TimeUnit.SECONDS).noTransform().mustRevalidate())
+                .cacheControl(CacheControl.maxAge(cacheControlMaxAge, TimeUnit.SECONDS).noTransform().mustRevalidate())
                 .body(summaryService.getMonthSummary());
     }
 }
