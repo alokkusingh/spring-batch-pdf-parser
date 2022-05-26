@@ -49,12 +49,7 @@ public class ExpenseService {
                 .build();
     }
 
-    public GetExpensesResponse getCurrentMonthExpenses() {
-        LocalDate currentDate = LocalDate.now();
-        return getCurrentMonthExpenses(currentDate);
-    }
-
-    @Cacheable(value = CacheConfig.CacheName.EXPENSE, key = "#root.methodName")
+    @Cacheable(value = CacheConfig.CacheName.EXPENSE, key = "{ #root.methodName, #currentDate }")
     public GetExpensesResponse getCurrentMonthExpenses(LocalDate currentDate) {
         log.info("Current Month Expenses not available in cache");
 
@@ -76,12 +71,7 @@ public class ExpenseService {
                 .build();
     }
 
-    public GetExpensesResponseAggByDay getCurrentMonthExpensesSumByDay() {
-        LocalDate currentDate = LocalDate.now();
-        return getCurrentMonthExpensesSumByDay(currentDate);
-    }
-
-    @Cacheable(value = CacheConfig.CacheName.EXPENSE, key = "#root.methodName")
+    @Cacheable(value = CacheConfig.CacheName.EXPENSE, key = "{ #root.methodName, #currentDate }")
     public GetExpensesResponseAggByDay getCurrentMonthExpensesSumByDay(LocalDate currentDate) {
         log.info("Current Month Expenses Sum By Day not available in cache");
 

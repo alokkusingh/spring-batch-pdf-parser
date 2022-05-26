@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -84,9 +85,10 @@ public class ExpenseController {
 
     @GetMapping(value = "/current_month", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GetExpensesResponse> getCurrentMonthExpenses() {
+        LocalDate currentDate = LocalDate.now();
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(cacheControlMaxAge, TimeUnit.SECONDS).noTransform().mustRevalidate())
-                .body(expenseService.getCurrentMonthExpenses());
+                .body(expenseService.getCurrentMonthExpenses(currentDate));
     }
 
     @GetMapping(value = "/sum_by_category_month", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -105,8 +107,10 @@ public class ExpenseController {
 
     @GetMapping(value = "/current_month_by_day", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GetExpensesResponseAggByDay> getCurrentMonthExpensesSumByDay() {
+        LocalDate currentDate = LocalDate.now();
+
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(cacheControlMaxAge, TimeUnit.SECONDS).noTransform().mustRevalidate())
-                .body(expenseService.getCurrentMonthExpensesSumByDay());
+                .body(expenseService.getCurrentMonthExpensesSumByDay(currentDate));
     }
 }
