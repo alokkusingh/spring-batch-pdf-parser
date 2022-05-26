@@ -1,5 +1,6 @@
 package com.alok.spring.batch.service;
 
+import com.alok.spring.batch.config.CacheConfig;
 import com.alok.spring.batch.model.Transaction;
 import com.alok.spring.batch.repository.ProcessedFileRepository;
 import com.alok.spring.batch.repository.TransactionRepository;
@@ -55,6 +56,9 @@ public class BankJobExecutorService {
     @Autowired
     @Qualifier("MissingAccountJob")
     private Job missingAccountJob;
+
+    @Autowired
+    private CacheService cacheService;
 
     @Autowired
     FlatFileItemWriter<Transaction> csvWriterForGoogleSheet;
@@ -119,6 +123,8 @@ public class BankJobExecutorService {
                 .toJobParameters());
 
         log.debug("Completed job execution");
+        cacheService.evictCacheByName(CacheConfig.CacheName.TRANSACTION);
+        cacheService.evictCacheByName(CacheConfig.CacheName.SUMMARY);
         log.debug("Started writing csv report");
 
         // generate csv file now for Google Sheet

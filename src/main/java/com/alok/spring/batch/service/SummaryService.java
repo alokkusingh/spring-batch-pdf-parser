@@ -1,11 +1,13 @@
 package com.alok.spring.batch.service;
 
+import com.alok.spring.batch.config.CacheConfig;
 import com.alok.spring.batch.model.IExpenseMonthSum;
 import com.alok.spring.batch.model.Transaction;
 import com.alok.spring.batch.repository.ExpenseRepository;
 import com.alok.spring.batch.repository.TransactionRepository;
 import com.alok.spring.batch.response.GetMonthlySummaryResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
@@ -24,8 +26,10 @@ public class SummaryService {
         this.transactionRepository = transactionRepository;
     }
 
+    @Cacheable(CacheConfig.CacheName.SUMMARY)
     public GetMonthlySummaryResponse getMonthSummary() {
 
+        log.info("Summary not available in cache");
         List<IExpenseMonthSum> expenseSums = expenseRepository.findSumGroupByMonth();
         List<Transaction> transactions = transactionRepository.findAll();
 

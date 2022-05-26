@@ -1,11 +1,14 @@
 package com.alok.spring.batch.service;
 
+import com.alok.spring.batch.config.CacheConfig;
 import com.alok.spring.batch.exception.ResourceNotFoundException;
 import com.alok.spring.batch.model.Transaction;
 import com.alok.spring.batch.repository.TransactionRepository;
 import com.alok.spring.batch.response.GetTransactionResponse;
 import com.alok.spring.batch.response.GetTransactionsResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -13,14 +16,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class BankService {
 
     @Autowired
     private TransactionRepository transactionRepository;
 
+    @Cacheable(CacheConfig.CacheName.TRANSACTION)
     public GetTransactionsResponse getAllTransactions() {
-
+        log.info("All Transactions not available in cache");
 
         List<Transaction> transactions = transactionRepository.findAll();
         Date lastTransactionDate = transactionRepository.findLastTransactionDate()
@@ -44,7 +49,9 @@ public class BankService {
                 .build();
     }
 
+    @Cacheable(CacheConfig.CacheName.TRANSACTION)
     public GetTransactionResponse getTransaction(Integer id) {
+        log.info("Transaction by id not available in cache");
         Transaction transaction = transactionRepository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Transaction not found!"));

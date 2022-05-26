@@ -1,5 +1,6 @@
 package com.alok.spring.batch.service;
 
+import com.alok.spring.batch.config.CacheConfig;
 import com.alok.spring.batch.repository.ExpenseRepository;
 import com.alok.spring.batch.repository.ProcessedFileRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,9 @@ public class ExpenseJobExecutorService {
     @Autowired
     private ProcessedFileRepository processedFileRepository;
 
+    @Autowired
+    private CacheService cacheService;
+
     public void executeAllJobs() throws Exception {
 
         log.info("Delete all the expenses first");
@@ -40,5 +44,7 @@ public class ExpenseJobExecutorService {
                 .toJobParameters());
 
         log.debug("Completed job execution");
+        cacheService.evictCacheByName(CacheConfig.CacheName.EXPENSE);
+        cacheService.evictCacheByName(CacheConfig.CacheName.SUMMARY);
     }
 }

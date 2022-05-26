@@ -1,11 +1,14 @@
 package com.alok.spring.batch.service;
 
+import com.alok.spring.batch.config.CacheConfig;
 import com.alok.spring.batch.model.Expense;
 import com.alok.spring.batch.model.IExpenseCategoryMonthSum;
 import com.alok.spring.batch.model.IExpenseMonthSum;
 import com.alok.spring.batch.repository.ExpenseRepository;
 import com.alok.spring.batch.response.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
@@ -14,13 +17,16 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class ExpenseService {
 
     @Autowired
     private ExpenseRepository expenseRepository;
 
+    @Cacheable(CacheConfig.CacheName.EXPENSE)
     public GetExpensesResponse getAllExpenses() {
+        log.info("All Expenses not available in cache");
 
         List<Expense> expenses = expenseRepository.findAll();
         Date lastExpenseDate = expenseRepository.findLastTransactionDate()
@@ -44,8 +50,14 @@ public class ExpenseService {
     }
 
     public GetExpensesResponse getCurrentMonthExpenses() {
-
         LocalDate currentDate = LocalDate.now();
+        return getCurrentMonthExpenses(currentDate);
+    }
+
+    @Cacheable(CacheConfig.CacheName.EXPENSE)
+    public GetExpensesResponse getCurrentMonthExpenses(LocalDate currentDate) {
+        log.info("Current Month Expenses not available in cache");
+
         List<Expense> expenses = expenseRepository.findAllForCurrentMonth(currentDate.getYear(), currentDate.getMonthValue());
         Collections.sort(expenses, (t1, t2) -> t2.getDate().compareTo(t1.getDate()));
 
@@ -65,11 +77,17 @@ public class ExpenseService {
     }
 
     public GetExpensesResponseAggByDay getCurrentMonthExpensesSumByDay() {
+        LocalDate currentDate = LocalDate.now();
+        return getCurrentMonthExpensesSumByDay(currentDate);
+    }
+
+    @Cacheable(CacheConfig.CacheName.EXPENSE)
+    public GetExpensesResponseAggByDay getCurrentMonthExpensesSumByDay(LocalDate currentDate) {
+        log.info("Current Month Expenses Sum By Day not available in cache");
 
         Date lastExpenseDate = expenseRepository.findLastTransactionDate()
                 .orElse(new Date());
 
-        LocalDate currentDate = LocalDate.now();
         List<Expense> expenses = expenseRepository.findAllForCurrentMonth(currentDate.getYear(), currentDate.getMonthValue());
         Collections.sort(expenses, (t1, t2) -> t2.getDate().compareTo(t1.getDate()));
 
@@ -81,7 +99,9 @@ public class ExpenseService {
                 .build();
     }
 
+    @Cacheable(CacheConfig.CacheName.EXPENSE)
     public GetExpensesMonthSumByCategoryResponse getMonthWiseExpenseCategorySum() {
+        log.info("Month wise Expenses Category Sum not available in cache");
 
         List<IExpenseCategoryMonthSum> expenseCategorySums = expenseRepository.findCategorySumGroupByMonth();
 
@@ -91,7 +111,9 @@ public class ExpenseService {
                 .build();
     }
 
+    @Cacheable(CacheConfig.CacheName.EXPENSE)
     public GetExpensesMonthSumResponse getMonthWiseExpenseSum() {
+        log.info("Month wise Expenses Sum not available in cache");
 
         List<IExpenseMonthSum> expenseSums = expenseRepository.findSumGroupByMonth();
 
