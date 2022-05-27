@@ -1,5 +1,6 @@
 package com.alok.spring.batch.controller;
 
+import com.alok.spring.batch.annotation.LogExecutionTime;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -27,6 +28,7 @@ public class CitiBankController {
     @Qualifier("CitiBankJob1")
     Job job;
 
+    @LogExecutionTime
     @GetMapping("/load")
     public BatchStatus load() throws JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
         Map<String, JobParameter> parameters = new HashMap<>();

@@ -1,5 +1,6 @@
 package com.alok.spring.batch.controller;
 
+import com.alok.spring.batch.annotation.LogExecutionTime;
 import com.alok.spring.batch.response.GetMonthlySummaryResponse;
 import com.alok.spring.batch.service.SummaryService;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ public class SummaryController {
         this.summaryService = summaryService;
     }
 
+    @LogExecutionTime
     @GetMapping(value = "/monthly", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GetMonthlySummaryResponse> getMonthlySummary() {
         return ResponseEntity.ok()

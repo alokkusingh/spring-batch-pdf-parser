@@ -1,5 +1,6 @@
 package com.alok.spring.batch.controller;
 
+import com.alok.spring.batch.annotation.LogExecutionTime;
 import com.alok.spring.batch.response.*;
 import com.alok.spring.batch.service.ExpenseJobExecutorService;
 import com.alok.spring.batch.service.ExpenseService;
@@ -38,6 +39,7 @@ public class ExpenseController {
     @Value("${web.cache-control.max-age}")
     private Long cacheControlMaxAge;
 
+    @LogExecutionTime
     @CrossOrigin
     @PostMapping(value = "/upload", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UploadFileResponse> uploadStatement(
@@ -75,6 +77,7 @@ public class ExpenseController {
                 );
     }
 
+    @LogExecutionTime
     @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GetExpensesResponse> getAllExpenses() {
 
@@ -83,6 +86,7 @@ public class ExpenseController {
                 .body(expenseService.getAllExpenses());
     }
 
+    @LogExecutionTime
     @GetMapping(value = "/current_month", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GetExpensesResponse> getCurrentMonthExpenses() {
         LocalDate currentDate = LocalDate.now();
@@ -91,6 +95,7 @@ public class ExpenseController {
                 .body(expenseService.getCurrentMonthExpenses(currentDate));
     }
 
+    @LogExecutionTime
     @GetMapping(value = "/sum_by_category_month", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GetExpensesMonthSumByCategoryResponse> getMonthWiseExpenseCategorySum() {
         return ResponseEntity.ok()
@@ -98,6 +103,7 @@ public class ExpenseController {
                 .body(expenseService.getMonthWiseExpenseCategorySum());
     }
 
+    @LogExecutionTime
     @GetMapping(value = "/sum_by_month", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GetExpensesMonthSumResponse> getMonthWiseExpenseSum() {
         return ResponseEntity.ok()
@@ -105,6 +111,7 @@ public class ExpenseController {
                 .body(expenseService.getMonthWiseExpenseSum());
     }
 
+    @LogExecutionTime
     @GetMapping(value = "/current_month_by_day", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GetExpensesResponseAggByDay> getCurrentMonthExpensesSumByDay() {
         LocalDate currentDate = LocalDate.now();

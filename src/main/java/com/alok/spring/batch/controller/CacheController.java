@@ -1,5 +1,6 @@
 package com.alok.spring.batch.controller;
 
+import com.alok.spring.batch.annotation.LogExecutionTime;
 import com.alok.spring.batch.service.CacheService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +32,7 @@ public class CacheController {
         this.cacheService = cacheService;
     }
 
+    @LogExecutionTime
     @GetMapping("/evict-all")
     public ResponseEntity<Resource> evictAllCache() {
         log.info("Evicting all caches");

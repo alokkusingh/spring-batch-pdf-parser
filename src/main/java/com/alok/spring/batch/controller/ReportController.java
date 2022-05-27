@@ -1,5 +1,6 @@
 package com.alok.spring.batch.controller;
 
+import com.alok.spring.batch.annotation.LogExecutionTime;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
@@ -28,6 +29,7 @@ public class ReportController {
     @Value("${file.export.google.sheet}")
     private String googleCsvFile;
 
+    @LogExecutionTime
     @GetMapping("/download")
     public ResponseEntity<Resource> downloadReport() throws IOException {
         log.info("Downloading report request!");

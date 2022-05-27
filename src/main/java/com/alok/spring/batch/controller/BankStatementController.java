@@ -1,5 +1,6 @@
 package com.alok.spring.batch.controller;
 
+import com.alok.spring.batch.annotation.LogExecutionTime;
 import com.alok.spring.batch.response.GetTransactionResponse;
 import com.alok.spring.batch.response.GetTransactionsResponse;
 import com.alok.spring.batch.response.UploadFileResponse;
@@ -40,6 +41,7 @@ public class BankStatementController {
     private Long cacheControlMaxAge;
 
 
+    @LogExecutionTime
     @CrossOrigin
     @PostMapping(value = "/statement/upload", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UploadFileResponse> uploadStatement(
@@ -79,6 +81,7 @@ public class BankStatementController {
                 );
     }
 
+    @LogExecutionTime
     @GetMapping(value = "/transactions", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GetTransactionsResponse> getAllTransactions() {
         return ResponseEntity.ok()
@@ -86,6 +89,7 @@ public class BankStatementController {
                 .body(bankService.getAllTransactions());
     }
 
+    @LogExecutionTime
     @CrossOrigin
     @GetMapping(value = "/transactions/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GetTransactionResponse> getTransaction(@PathVariable(value = "id") Integer id) {
