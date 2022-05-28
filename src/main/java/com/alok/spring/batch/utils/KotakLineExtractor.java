@@ -1,6 +1,7 @@
 package com.alok.spring.batch.utils;
 
-import com.alok.spring.batch.model.RawTransaction;
+import com.alok.spring.batch.utils.DefaultLineExtractor;
+import com.alok.spring.model.RawTransaction;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;

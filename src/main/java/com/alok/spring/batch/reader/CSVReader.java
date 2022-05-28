@@ -1,7 +1,7 @@
 package com.alok.spring.batch.reader;
 
-import com.alok.spring.batch.model.ProcessedFile;
-import com.alok.spring.batch.repository.ProcessedFileRepository;
+import com.alok.spring.model.ProcessedFile;
+import com.alok.spring.repository.ProcessedFileRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;

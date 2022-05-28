@@ -1,7 +1,7 @@
 package com.alok.spring.batch.processor;
 
-import com.alok.spring.batch.model.Expense;
-import com.alok.spring.batch.model.RawTransaction;
+import com.alok.spring.model.Expense;
+import com.alok.spring.model.RawTransaction;
 import com.alok.spring.batch.utils.Utility;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemProcessor;

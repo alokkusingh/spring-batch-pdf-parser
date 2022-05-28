@@ -1,13 +1,10 @@
 package com.alok.spring.batch.processor;
 
-import com.alok.spring.batch.model.RawTransaction;
-import com.alok.spring.batch.model.Transaction;
-import com.alok.spring.batch.utils.DefaultFieldExtractor;
+import com.alok.spring.model.RawTransaction;
+import com.alok.spring.model.Transaction;
 import com.alok.spring.batch.utils.Utility;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;

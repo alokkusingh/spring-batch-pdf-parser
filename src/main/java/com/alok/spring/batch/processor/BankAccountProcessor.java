@@ -1,7 +1,7 @@
 package com.alok.spring.batch.processor;
 
-import com.alok.spring.batch.model.RawTransaction;
-import com.alok.spring.batch.model.Transaction;
+import com.alok.spring.model.RawTransaction;
+import com.alok.spring.model.Transaction;
 import com.alok.spring.batch.utils.DefaultFieldExtractor;
 import com.alok.spring.batch.utils.Utility;
 import lombok.extern.slf4j.Slf4j;

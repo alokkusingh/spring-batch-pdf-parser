@@ -1,7 +1,7 @@
 package com.alok.spring.batch.utils;
 
-import com.alok.spring.batch.model.Transaction;
-import org.springframework.batch.item.file.FlatFileItemReader;
+import com.alok.spring.batch.utils.KotakImportedFieldSetMapper;
+import com.alok.spring.model.Transaction;
 import org.springframework.batch.item.file.LineMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;

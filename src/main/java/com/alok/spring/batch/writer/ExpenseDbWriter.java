@@ -1,7 +1,7 @@
 package com.alok.spring.batch.writer;
 
-import com.alok.spring.batch.model.Expense;
-import com.alok.spring.batch.repository.ExpenseRepository;
+import com.alok.spring.model.Expense;
+import com.alok.spring.repository.ExpenseRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;

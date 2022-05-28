@@ -1,6 +1,6 @@
 package com.alok.spring.batch.utils;
 
-import com.alok.spring.batch.model.RawTransaction;
+import com.alok.spring.model.RawTransaction;
 
 import java.util.List;
 

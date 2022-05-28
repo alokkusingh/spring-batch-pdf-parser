@@ -1,6 +1,6 @@
 package com.alok.spring.batch.utils;
 
-import com.alok.spring.batch.model.Transaction;
+import com.alok.spring.model.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.FieldSet;

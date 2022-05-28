@@ -1,8 +1,8 @@
 package com.alok.spring.batch.reader;
 
-import com.alok.spring.batch.model.ProcessedFile;
-import com.alok.spring.batch.model.RawTransaction;
-import com.alok.spring.batch.repository.ProcessedFileRepository;
+import com.alok.spring.model.ProcessedFile;
+import com.alok.spring.model.RawTransaction;
+import com.alok.spring.repository.ProcessedFileRepository;
 import com.alok.spring.batch.utils.DefaultLineExtractor;
 import com.alok.spring.batch.utils.LineExtractor;
 import com.lowagie.text.pdf.PdfReader;

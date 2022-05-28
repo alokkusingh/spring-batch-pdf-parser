@@ -1,7 +1,7 @@
 package com.alok.spring.batch.writer;
 
-import com.alok.spring.batch.model.Transaction;
-import com.alok.spring.batch.repository.TransactionRepository;
+import com.alok.spring.model.Transaction;
+import com.alok.spring.repository.TransactionRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
