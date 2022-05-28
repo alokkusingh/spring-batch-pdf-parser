@@ -204,22 +204,19 @@ public class ExpenseService {
                                         Collectors.toList(),
                                         catExpList -> catExpList.stream()
                                                 .map(Expense::getAmount)
-                                                .reduce(0.0, (sub, amount) -> sub + amount)
+                                                .reduce(0.0, Double::sum)
                                 )
                         )
 
                 );
 
-        List<GetExpensesResponseAggByDay.CategoryExpense> expenseByCategory = catExpenses.entrySet().stream()
+        return catExpenses.entrySet().stream()
                 .map(entry -> GetExpensesResponseAggByDay.CategoryExpense.builder()
                         .category(entry.getKey())
                         .amount(entry.getValue())
                         .build())
+                .sorted()
                 .collect(Collectors.toList());
-
-        Collections.sort(expenseByCategory);
-
-        return expenseByCategory;
     }
 
 }
