@@ -119,7 +119,7 @@ public class ExpenseService {
     private List<GetExpensesResponseAggByDay.DayExpense> aggregateExpensesByDay(List<Expense> expenses) {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
-        Map<String, Double> dayExpenses = expenses.stream()
+        Map<String, Double> dayExpensesSum = expenses.stream()
                 .collect(
                         Collectors.groupingBy(
                                 expense -> df.format(expense.getDate()),
@@ -130,18 +130,32 @@ public class ExpenseService {
                         )
                 );
 
-        List<GetExpensesResponseAggByDay.DayExpense> expensesByDay = dayExpenses.entrySet().stream()
+        Map<String, List<GetExpensesResponseAggByDay.Expense>> dayExpenses = expenses.stream()
+                .collect(Collectors.groupingBy(
+                        expense -> df.format(expense.getDate()),
+                        Collectors.mapping(
+                                expense -> GetExpensesResponseAggByDay.Expense.builder()
+                                        .head(expense.getHead())
+                                        .comment(expense.getComment())
+                                        .amount(expense.getAmount())
+                                        .build(),
+                                Collectors.toList())
+                        )
+                );
+
+        List<GetExpensesResponseAggByDay.DayExpense> expensesByDay = dayExpensesSum.entrySet().stream()
                 .map(entry -> {
-                            try {
-                                return GetExpensesResponseAggByDay.DayExpense.builder()
-                                        .date(df.parse(entry.getKey()))
-                                        .amount(entry.getValue())
-                                        .build();
-                            } catch (ParseException e) {
-                                e.printStackTrace();
-                                return null;
-                            }
+                        try {
+                            return GetExpensesResponseAggByDay.DayExpense.builder()
+                                    .date(df.parse(entry.getKey()))
+                                    .amount(entry.getValue())
+                                    .expenses(dayExpenses.get(entry.getKey()))
+                                    .build();
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                            return null;
                         }
+                    }
                 )
                 .collect(Collectors.toList());
 

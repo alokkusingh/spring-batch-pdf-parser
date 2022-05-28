@@ -66,7 +66,8 @@ public class SummaryService {
         for (IExpenseMonthSum expenseMonthSum: expenseSums) {
             expenseMonthSumMap.put(
                     Integer.valueOf(String.format("%d%02d", expenseMonthSum.getYear(), expenseMonthSum.getMonth())),
-                    expenseMonthSum);
+                    expenseMonthSum
+            );
         }
 
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM");
@@ -110,6 +111,7 @@ public class SummaryService {
                         )
                 );
 
+        // Expense aggregation
         List<GetMonthlySummaryResponse.MonthlySummary> monthSummaryRecord = expenseMonthSumMap.values().stream().
                 map(
                         expenseMonthRecord -> GetMonthlySummaryResponse.MonthlySummary.builder()
