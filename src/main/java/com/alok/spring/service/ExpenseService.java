@@ -27,6 +27,8 @@ public class ExpenseService {
     @Autowired
     private ExpenseRepository expenseRepository;
 
+    private final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+
     @Cacheable(value = CacheConfig.CacheName.EXPENSE, key = "#root.methodName")
     public GetExpensesResponse getAllExpenses() {
         log.info("All Expenses not available in cache");
@@ -117,7 +119,7 @@ public class ExpenseService {
     }
 
     private List<GetExpensesResponseAggByDay.DayExpense> aggregateExpensesByDay(List<Expense> expenses) {
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+
 
         Map<String, Double> dayExpensesSum = expenses.stream()
                 .collect(Collectors.groupingBy(
@@ -142,25 +144,54 @@ public class ExpenseService {
                         )
                 );
 
-        List<GetExpensesResponseAggByDay.DayExpense> expensesByDay = dayExpensesSum.entrySet().stream()
-                .map(entry -> {
-                        try {
-                            return GetExpensesResponseAggByDay.DayExpense.builder()
-                                    .date(df.parse(entry.getKey()))
-                                    .amount(entry.getValue())
-                                    .expenses(dayExpenses.get(entry.getKey()))
-                                    .build();
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                            return null;
-                        }
-                    }
+        /*
+        Map<String, GetExpensesResponseAggByDay.DayExpense> dayExpensesTest = expenses.stream()
+                .collect(Collectors.groupingBy(
+                        expense -> df.format(expense.getDate()),
+                        Collectors.collectingAndThen(Collectors.toList(), list -> {
+                                DoubleSummaryStatistics dss = list.stream().collect(
+                                        Collectors.summarizingDouble(Expense::getAmount)
+                                );
+
+                                List<GetExpensesResponseAggByDay.Expense> expenseRecords = list.stream().collect(
+                                        Collectors.mapping(expense -> GetExpensesResponseAggByDay.Expense.builder()
+                                                .head(expense.getHead())
+                                                .comment(expense.getComment())
+                                                .amount(expense.getAmount())
+                                                .build(),
+                                        Collectors.toList()));
+
+                                Optional<Date> date = list.stream().findAny().map(Expense::getDate);
+
+                                return GetExpensesResponseAggByDay.DayExpense.builder()
+                                        .date(date.get())
+                                        .amount(dss.getSum())
+                                        .expenses(expenseRecords)
+                                        .build();
+
+                            }
+                        )
+                    )
+                );
+        */
+
+        return dayExpensesSum.entrySet().stream()
+                .map(entry -> GetExpensesResponseAggByDay.DayExpense.builder()
+                        .date(strToDate(entry.getKey()))
+                        .amount(entry.getValue())
+                        .expenses(dayExpenses.get(entry.getKey()))
+                        .build()
                 )
+                .sorted()
                 .collect(Collectors.toList());
+    }
 
-        Collections.sort(expensesByDay);
-
-        return expensesByDay;
+    private Date strToDate(String dateStr) {
+        try {
+            return df.parse(dateStr);
+        } catch (ParseException e) {
+            return null;
+        }
     }
 
     private List<GetExpensesResponseAggByDay.CategoryExpense> aggregateExpensesByCategory(List<Expense> expenses) {
