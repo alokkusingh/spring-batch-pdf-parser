@@ -120,14 +120,13 @@ public class ExpenseService {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
         Map<String, Double> dayExpensesSum = expenses.stream()
-                .collect(
-                        Collectors.groupingBy(
-                                expense -> df.format(expense.getDate()),
-                                Collectors.collectingAndThen(
-                                        Collectors.summarizingDouble(Expense::getAmount),
-                                        dss -> dss.getSum()
-                                )
+                .collect(Collectors.groupingBy(
+                        expense -> df.format(expense.getDate()),
+                        Collectors.collectingAndThen(
+                                Collectors.summarizingDouble(Expense::getAmount),
+                                DoubleSummaryStatistics::getSum
                         )
+                    )
                 );
 
         Map<String, List<GetExpensesResponseAggByDay.Expense>> dayExpenses = expenses.stream()
