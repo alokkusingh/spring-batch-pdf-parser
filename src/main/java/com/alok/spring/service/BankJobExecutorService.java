@@ -4,15 +4,19 @@ import com.alok.spring.config.CacheConfig;
 import com.alok.spring.model.Transaction;
 import com.alok.spring.repository.ProcessedFileRepository;
 import com.alok.spring.repository.TransactionRepository;
+import com.alok.spring.utils.UploadType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.file.FlatFileItemWriter;
+import org.springframework.batch.item.file.MultiResourceItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -23,39 +27,30 @@ import java.util.List;
 public class BankJobExecutorService {
 
     @Autowired
+    private ResourceLoader resourceLoader;
+
+    @Value("${dir.path.hdfc_account.imported}")
+    private String hdfcExportDir;
+
+    @Value("${dir.path.kotak_account.imported}")
+    private String kotakExportDir;
+
+    @Autowired
     private JobLauncher jobLauncher;
-
-    @Autowired
-    @Qualifier("CitiBankJob1")
-    private Job citiBankJob1;
-
-    @Autowired
-    @Qualifier("CitiBankJob2")
-    private Job citiBankJob2;
-
-    @Autowired
-    @Qualifier("CitiBankJob3")
-    private Job citiBankJob3;
-
-    @Autowired
-    @Qualifier("KotakBankJob")
-    private Job kotakBankJob;
-
-    @Autowired
-    @Qualifier("KotakBankNoPwdJob")
-    private Job kotakBankNoPwdJob;
-
-    @Autowired
-    @Qualifier("KotakImportedAccountJob")
-    private Job kotakImportedAccountJob;
 
     @Autowired
     @Qualifier("KotakImportedAccountJobV2")
     private Job kotakImportedAccountJobV2;
 
     @Autowired
-    @Qualifier("MissingAccountJob")
-    private Job missingAccountJob;
+    @Qualifier("HDFCImportedAccountJob")
+    private Job hdfcImportedAccountJob;
+
+    @Autowired
+    private MultiResourceItemReader<Transaction> hdfcImportedItemsReader;
+
+    @Autowired
+    private MultiResourceItemReader<Transaction> kotakImportedItemsReaderV2;
 
     @Autowired
     private CacheService cacheService;
@@ -81,46 +76,36 @@ public class BankJobExecutorService {
         this.outputFileName = outputFileName;
     }
 
-    public void executeAllJobs() throws Exception {
+    public void executeBatchJob(UploadType uploadType, final String fileName) throws Exception {
 
         //log.info("Delete all the transactions first");
         log.info("Starting job execution");
         //transactionRepository.deleteAll();
 
-        // No need to process all file - only new file process - so below line to be committed
+        // No need to process all file - only new file process - so below line to be commented
         //processedFileRepository.deleteAllByType("BANK");
 
-        jobLauncher.run(citiBankJob1, new JobParametersBuilder()
-                .addString("JobID", String.valueOf(System.currentTimeMillis()))
-                .toJobParameters());
+        // Only for below jobs file upload supported - others jobs will be executed at startup only
 
-        jobLauncher.run(citiBankJob2, new JobParametersBuilder()
-                .addString("JobID", String.valueOf(System.currentTimeMillis()))
-                .toJobParameters());
+        // Job - Kotak Exported V2
+        if (uploadType == UploadType.KotakExportedStatement) {
+            kotakImportedItemsReaderV2.setResources(new Resource[]{
+                    resourceLoader.getResource("file:" + kotakExportDir + "/" + fileName)
+            });
+            jobLauncher.run(kotakImportedAccountJobV2, new JobParametersBuilder()
+                    .addString("JobID", String.valueOf(System.currentTimeMillis()))
+                    .toJobParameters());
+        }
 
-        jobLauncher.run(citiBankJob3, new JobParametersBuilder()
-                .addString("JobID", String.valueOf(System.currentTimeMillis()))
-                .toJobParameters());
-
-        jobLauncher.run(kotakBankJob, new JobParametersBuilder()
-                .addString("JobID", String.valueOf(System.currentTimeMillis()))
-                .toJobParameters());
-
-        jobLauncher.run(kotakBankNoPwdJob, new JobParametersBuilder()
-                .addString("JobID", String.valueOf(System.currentTimeMillis()))
-                .toJobParameters());
-
-        jobLauncher.run(kotakImportedAccountJob, new JobParametersBuilder()
-                .addString("JobID", String.valueOf(System.currentTimeMillis()))
-                .toJobParameters());
-
-        jobLauncher.run(kotakImportedAccountJobV2, new JobParametersBuilder()
-                .addString("JobID", String.valueOf(System.currentTimeMillis()))
-                .toJobParameters());
-
-        jobLauncher.run(missingAccountJob, new JobParametersBuilder()
-                .addString("JobID", String.valueOf(System.currentTimeMillis()))
-                .toJobParameters());
+        // Job - HDFC Exported
+        if (uploadType == UploadType.HDFCExportedStatement) {
+            hdfcImportedItemsReader.setResources(new Resource[]{
+                    resourceLoader.getResource("file:" + hdfcExportDir + "/" + fileName)
+            });
+            jobLauncher.run(hdfcImportedAccountJob, new JobParametersBuilder()
+                    .addString("JobID", String.valueOf(System.currentTimeMillis()))
+                    .toJobParameters());
+        }
 
         log.debug("Completed job execution");
         cacheService.evictCacheByName(CacheConfig.CacheName.TRANSACTION);

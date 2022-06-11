@@ -4,9 +4,6 @@ import com.alok.spring.model.Transaction;
 import com.alok.spring.repository.TransactionRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor;
@@ -22,7 +19,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 
 import java.util.Collections;
 import java.util.List;
@@ -34,9 +30,6 @@ public class PDFBatchApplication implements ApplicationRunner {
 
 	@Autowired
 	private TransactionRepository transactionRepository;
-
-	@Autowired
-	private JobLauncher jobLauncher;
 
 	@Autowired
 	FlatFileItemWriter<Transaction> csvWriterForGoogleSheet;
@@ -60,16 +53,6 @@ public class PDFBatchApplication implements ApplicationRunner {
 
 	public static void main(String[] args) {
 		SpringApplication.run(PDFBatchApplication.class, args);
-	}
-
-
-	@Scheduled(cron = "0 * * 1 * ?")
-	public void performCitiBankLoad() throws Exception
-	{
-		JobParameters params = new JobParametersBuilder()
-				.addString("JobID", String.valueOf(System.currentTimeMillis()))
-				.toJobParameters();
-		jobLauncher.run(citiBankJob, params);
 	}
 
 	@Override

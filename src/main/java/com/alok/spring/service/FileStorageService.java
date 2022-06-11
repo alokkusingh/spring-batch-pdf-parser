@@ -19,12 +19,18 @@ public class FileStorageService {
     @Value("${dir.path.kotak_account.imported}")
     private String kotakImportedLocation;
 
+    @Value("${dir.path.hdfc_account.imported}")
+    private String hdfcImportedLocation;
+
     @Value("${dir.path.expense}")
     private String expenseDirLocation;
 
     private Path getStoragePath(UploadType uploadType) {
         if (uploadType.equals(UploadType.KotakExportedStatement))
             return Paths.get(kotakImportedLocation).toAbsolutePath().normalize();
+
+        if (uploadType.equals(UploadType.HDFCExportedStatement))
+            return Paths.get(hdfcImportedLocation).toAbsolutePath().normalize();
 
         if (uploadType.equals(UploadType.ExpenseGoogleSheet))
             return Paths.get(expenseDirLocation).toAbsolutePath().normalize();
@@ -33,7 +39,7 @@ public class FileStorageService {
     }
 
     private String getUploadFileName(UploadType uploadType, String fileName) {
-        if (uploadType.equals(UploadType.KotakExportedStatement))
+        if (uploadType.equals(UploadType.KotakExportedStatement) || uploadType.equals(UploadType.HDFCExportedStatement))
             return fileName;
 
         // Hard coding so that any file name uplaod will replace the same file

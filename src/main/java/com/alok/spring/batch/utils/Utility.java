@@ -1,5 +1,6 @@
 package com.alok.spring.batch.utils;
 
+import com.alok.spring.utils.UploadType;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
@@ -99,7 +100,7 @@ public class Utility {
     }
 
     static public boolean isSalaryTransaction(String transation) {
-        if (transation.toLowerCase().matches(".*salary.*|.*evolving.*|.*wipro.*|.*yodlee.*|.*bosch.*")) {
+        if (transation.toLowerCase().matches(".*salary.*|.*evolving.*|.*wipro.*|.*yodlee.*|.*bosch.*|.*j.p. morgan services.*")) {
             if (!transation.toLowerCase().matches(".*reimbursement.*|.*withdrawal.*" +
                     "|.*corp.trf.*|.*trip.*|.*hotel.*|.*ref: .*|.*imps.*")) {
                 return true;
@@ -159,6 +160,21 @@ public class Utility {
             return "dd-MM-yyyy";
         }
 
+        if (dateString.trim().matches("..\\/..\\/..")) {
+            return "dd/MM/yy";
+        }
+
         return "dd/MM/yyyy";
+    }
+
+    static public UploadType getUploadType(String fileName) {
+
+        if (fileName.matches("^Report-.*.csv$|^KM52025632.*.csv$"))
+            return UploadType.KotakExportedStatement;
+
+        if (fileName.matches("^190992811_.*.txt$"))
+            return UploadType.HDFCExportedStatement;
+
+        return null;
     }
 }

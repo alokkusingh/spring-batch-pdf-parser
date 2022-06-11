@@ -3,7 +3,7 @@ package com.alok.spring.batch.job;
 import com.alok.spring.model.Transaction;
 import com.alok.spring.batch.processor.FileArchiveTasklet;
 import com.alok.spring.batch.reader.CSVReader;
-import com.alok.spring.batch.utils.KotakUtils;
+import com.alok.spring.batch.utils.BankUtils;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -72,7 +72,7 @@ public class KotakImportedAccountStatementBatchJob {
         //return KotakUtils.kotakImportedItemReader(fieldNames);
         //FlatFileItemReader<Transaction> flatFileItemReader = new FlatFileItemReader<>();
         flatFileItemReader.setName("KotakImportedAccount-CSV-Reader");
-        flatFileItemReader.setLineMapper(KotakUtils.kotakImportedAccountLineMapper(fieldNames));
+        flatFileItemReader.setLineMapper(BankUtils.importedAccountLineMapper(fieldNames, BankUtils.LineMapperType.KOTAK));
         flatFileItemReader.setStrict(false);
         flatFileItemReader.setComments(new String[] {",", "\"", "#",
                 "ALOK", "Bangalore", "KARNATAKA", "INDIA", "Opening", "Closing", "You",

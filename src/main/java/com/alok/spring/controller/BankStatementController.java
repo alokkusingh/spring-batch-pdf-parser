@@ -1,13 +1,13 @@
 package com.alok.spring.controller;
 
 import com.alok.spring.annotation.LogExecutionTime;
+import com.alok.spring.batch.utils.Utility;
 import com.alok.spring.response.GetTransactionResponse;
 import com.alok.spring.response.GetTransactionsResponse;
 import com.alok.spring.response.UploadFileResponse;
 import com.alok.spring.service.BankService;
 import com.alok.spring.service.FileStorageService;
 import com.alok.spring.service.BankJobExecutorService;
-import com.alok.spring.utils.UploadType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
@@ -51,12 +51,11 @@ public class BankStatementController {
         log.info("Uploaded file: {}, type: {}, size: {}", file.getOriginalFilename(),
                 file.getContentType(), file.getSize());
 
-        String fineName = fileStorageService.storeFile(file, UploadType.KotakExportedStatement);
-
+        String fileName = fileStorageService.storeFile(file, Utility.getUploadType(file.getOriginalFilename()));
 
         // brute force way
         try {
-            bankJobExecutorService.executeAllJobs();
+            bankJobExecutorService.executeBatchJob(Utility.getUploadType(file.getOriginalFilename()), fileName);
         } catch (JobParametersInvalidException e) {
             e.printStackTrace();
         } catch (JobExecutionAlreadyRunningException e) {
@@ -72,7 +71,7 @@ public class BankStatementController {
         return ResponseEntity.ok()
                 .body(
                         UploadFileResponse.builder()
-                                .fileName(fineName)
+                                .fileName( fileName)
                                 .size(file.getSize())
                                 .fileType(file.getContentType())
                                 .message("File submitted for processing")
