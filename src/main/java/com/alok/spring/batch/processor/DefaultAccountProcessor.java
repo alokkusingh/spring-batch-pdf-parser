@@ -35,6 +35,7 @@ public class DefaultAccountProcessor implements ItemProcessor<Transaction, Trans
         transaction.setBank(MDC.get(MDCKey.BANK.name()));
         if (transaction.isSalary()) {
             processSalaryTransaction(transaction);
+            transaction.setSubHead(Utility.getCompanyName(transaction.getDescription()));
         } else if (Utility.isFamilyTransaction(transaction.getDescription())) {
             processFamilyTransaction(transaction);
         }

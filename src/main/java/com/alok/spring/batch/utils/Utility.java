@@ -1,6 +1,7 @@
 package com.alok.spring.batch.utils;
 
 import com.alok.spring.constant.Bank;
+import com.alok.spring.constant.Company;
 import com.alok.spring.constant.UploadType;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -178,5 +179,27 @@ public class Utility {
             return UploadType.HDFCExportedStatement;
 
         return null;
+    }
+
+    static public String getCompanyName(String salaryCreditDescription) {
+        if (salaryCreditDescription.toLowerCase().matches(".*j.p. morgan services.*"))
+            return Company.JPMC.name();
+
+        if (salaryCreditDescription.toLowerCase().matches(".*evolving.*"))
+            return Company.EVOLVING.name();
+
+        if (salaryCreditDescription.toLowerCase().matches(".*wipro.*"))
+            return Company.WIPRO.name();
+
+        if (salaryCreditDescription.toLowerCase().matches(".*yodlee.*"))
+            return Company.YODLEE.name();
+
+        if (salaryCreditDescription.toLowerCase().matches(".*bosch.*"))
+            return Company.ROBERT_BOSCH.name();
+
+        if (salaryCreditDescription.toLowerCase().matches(".*salary.*"))
+            return Company.SUBEX.name();
+
+        return Company.UNKNOWN.name();
     }
 }

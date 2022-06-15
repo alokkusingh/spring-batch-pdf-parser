@@ -53,6 +53,7 @@ public class BankAccountProcessor implements ItemProcessor<RawTransaction, Trans
 
         if (transaction.isSalary()) {
             processSalaryTransaction(transaction);
+            transaction.setSubHead(Utility.getCompanyName(transaction.getDescription()));
         } else if (Utility.isFamilyTransaction(transaction.getDescription())) {
             if (Utility.isReversalTransaction(transaction.getDescription())) {
                 processFamilyTransactionReversal(transaction);

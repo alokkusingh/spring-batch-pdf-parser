@@ -6,5 +6,6 @@ public enum Company {
     WIPRO,
     YODLEE,
     ROBERT_BOSCH,
-    JPMC
+    JPMC,
+    UNKNOWN
 }
