@@ -1,6 +1,7 @@
 package com.alok.spring.service;
 
 import com.alok.spring.config.CacheConfig;
+import com.alok.spring.constant.BatchOf;
 import com.alok.spring.repository.ExpenseRepository;
 import com.alok.spring.repository.ProcessedFileRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class ExpenseJobExecutorService {
+public class JobExecutorOfExpenseService {
 
     @Autowired
     private JobLauncher jobLauncher;
@@ -40,6 +41,7 @@ public class ExpenseJobExecutorService {
 
         jobLauncher.run(expenseJob, new JobParametersBuilder()
                 .addString("JobID", String.valueOf(System.currentTimeMillis()))
+                .addString("batchOf", BatchOf.EXPENSE.name())
                 .toJobParameters());
 
         log.debug("Completed job execution");

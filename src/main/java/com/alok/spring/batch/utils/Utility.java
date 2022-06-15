@@ -1,7 +1,9 @@
 package com.alok.spring.batch.utils;
 
-import com.alok.spring.utils.UploadType;
+import com.alok.spring.constant.Bank;
+import com.alok.spring.constant.UploadType;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 
 import java.util.*;
 

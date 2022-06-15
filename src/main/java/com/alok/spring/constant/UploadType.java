@@ -1,4 +1,4 @@
-package com.alok.spring.utils;
+package com.alok.spring.constant;
 
 public enum UploadType {
     KotakExportedStatement,

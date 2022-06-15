@@ -1,9 +1,11 @@
 package com.alok.spring.batch.processor;
 
+import com.alok.spring.constant.MDCKey;
 import com.alok.spring.model.RawTransaction;
 import com.alok.spring.model.Transaction;
 import com.alok.spring.batch.utils.Utility;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;
 
@@ -30,6 +32,7 @@ public class DefaultAccountProcessor implements ItemProcessor<Transaction, Trans
     public Transaction process(Transaction transaction) throws ParseException {
         transaction.setSalary(Utility.isSalaryTransaction(transaction.getDescription()));
 
+        transaction.setBank(MDC.get(MDCKey.BANK.name()));
         if (transaction.isSalary()) {
             processSalaryTransaction(transaction);
         } else if (Utility.isFamilyTransaction(transaction.getDescription())) {

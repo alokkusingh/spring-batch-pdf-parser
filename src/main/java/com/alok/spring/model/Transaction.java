@@ -21,8 +21,10 @@ public class Transaction implements Comparable<Transaction> {
     private Integer debit;
     private Integer credit;
     private String head;
+    private String subHead;
     private String description;
     private boolean isSalary;
+    private String bank;
     private String file;
 
     @Transient

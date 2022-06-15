@@ -1,7 +1,7 @@
 package com.alok.spring.service;
 
 import com.alok.spring.exception.FileStorageException;
-import com.alok.spring.utils.UploadType;
+import com.alok.spring.constant.UploadType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;

@@ -37,8 +37,10 @@ public class BankService {
                         .id(transaction.getId())
                         .date(transaction.getDate())
                         .head(transaction.getHead())
+                        .subHead(transaction.getSubHead())
                         .credit(transaction.getCredit())
                         .debit(transaction.getDebit())
+                        .bank(transaction.getBank())
                         .build())
                 .collect(Collectors.toList());
 
@@ -60,9 +62,11 @@ public class BankService {
                 .id(transaction.getId())
                 .date(transaction.getDate())
                 .head(transaction.getHead())
+                .subHead(transaction.getSubHead())
                 .credit(transaction.getCredit())
                 .debit(transaction.getDebit())
                 .description(transaction.getDescription())
+                .bank(transaction.getBank())
                 .build();
     }
 }

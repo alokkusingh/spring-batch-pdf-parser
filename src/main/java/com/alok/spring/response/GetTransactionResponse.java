@@ -15,6 +15,8 @@ public class GetTransactionResponse {
     private Integer debit;
     private Integer credit;
     private String head;
+    private String subHead;
     private String description;
+    private String bank;
 
 }

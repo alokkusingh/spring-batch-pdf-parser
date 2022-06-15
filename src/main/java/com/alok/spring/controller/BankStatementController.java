@@ -7,7 +7,7 @@ import com.alok.spring.response.GetTransactionsResponse;
 import com.alok.spring.response.UploadFileResponse;
 import com.alok.spring.service.BankService;
 import com.alok.spring.service.FileStorageService;
-import com.alok.spring.service.BankJobExecutorService;
+import com.alok.spring.service.JobExecutorOfBankService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
@@ -32,7 +32,7 @@ public class BankStatementController {
     private FileStorageService fileStorageService;
 
     @Autowired
-    private BankJobExecutorService bankJobExecutorService;
+    private JobExecutorOfBankService bankJobExecutorService;
 
     @Autowired
     private BankService bankService;

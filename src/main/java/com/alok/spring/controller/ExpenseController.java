@@ -2,10 +2,10 @@ package com.alok.spring.controller;
 
 import com.alok.spring.annotation.LogExecutionTime;
 import com.alok.spring.response.*;
-import com.alok.spring.service.ExpenseJobExecutorService;
+import com.alok.spring.service.JobExecutorOfExpenseService;
 import com.alok.spring.service.ExpenseService;
 import com.alok.spring.service.FileStorageService;
-import com.alok.spring.utils.UploadType;
+import com.alok.spring.constant.UploadType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
@@ -31,7 +31,7 @@ public class ExpenseController {
     private FileStorageService fileStorageService;
 
     @Autowired
-    private ExpenseJobExecutorService expenseJobExecutorService;
+    private JobExecutorOfExpenseService expenseJobExecutorService;
 
     @Autowired
     private ExpenseService expenseService;
