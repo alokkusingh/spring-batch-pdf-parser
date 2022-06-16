@@ -33,10 +33,17 @@ public class JobExecutorOfExpenseService {
     private CacheService cacheService;
 
     public void executeAllJobs() throws Exception {
+        executeAllJobs(false);
+    }
 
-        log.info("Delete all the expenses first");
-        expenseRepository.deleteAll();
-        processedFileRepository.deleteAllByType("EXPENSE");
+    public void executeAllJobs(boolean force) throws Exception {
+
+        if (force) {
+            log.info("Delete all the expenses first");
+            expenseRepository.deleteAll();
+            processedFileRepository.deleteAllByType("EXPENSE");
+        }
+
         log.info("Starting job execution");
 
         jobLauncher.run(expenseJob, new JobParametersBuilder()

@@ -53,7 +53,7 @@ public class ExpenseController {
 
         // brute force way
         try {
-            expenseJobExecutorService.executeAllJobs();
+            expenseJobExecutorService.executeAllJobs(true);
         } catch (JobParametersInvalidException e) {
             e.printStackTrace();
         } catch (JobExecutionAlreadyRunningException e) {
