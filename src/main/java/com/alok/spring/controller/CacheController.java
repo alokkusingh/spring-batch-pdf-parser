@@ -25,7 +25,7 @@ public class CacheController {
     public ResponseEntity<Resource> evictAllCache() {
         log.info("Evicting all caches");
 
-        cacheService.evictAllCache();
+        cacheService.evictAllCaches();
 
         return ResponseEntity.accepted().build();
 

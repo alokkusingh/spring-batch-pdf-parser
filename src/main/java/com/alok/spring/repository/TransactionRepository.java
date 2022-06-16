@@ -13,6 +13,9 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
     @Query("SELECT t FROM Transaction t WHERE t.head IS NOT NULL")
     List<Transaction> findAll();
 
+    @Query("SELECT t FROM Transaction t WHERE t.head = 'Salary'")
+    List<Transaction> findSalaryTransactions();
+
     @Query(value = "SELECT MAX(DATE) FROM transaction", nativeQuery = true)
     Optional<Date>  findLastTransactionDate();
 }

@@ -2,6 +2,7 @@ package com.alok.spring.controller;
 
 import com.alok.spring.annotation.LogExecutionTime;
 import com.alok.spring.batch.utils.Utility;
+import com.alok.spring.response.GetSalaryByCompanyResponse;
 import com.alok.spring.response.GetTransactionResponse;
 import com.alok.spring.response.GetTransactionsResponse;
 import com.alok.spring.response.UploadFileResponse;
@@ -53,7 +54,6 @@ public class BankStatementController {
 
         String fileName = fileStorageService.storeFile(file, Utility.getUploadType(file.getOriginalFilename()));
 
-        // brute force way
         try {
             bankJobExecutorService.executeBatchJob(Utility.getUploadType(file.getOriginalFilename()), fileName);
         } catch (JobParametersInvalidException e) {
@@ -95,5 +95,13 @@ public class BankStatementController {
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.noCache())
                 .body(bankService.getTransaction(id));
+    }
+
+    @LogExecutionTime
+    @GetMapping(value = "/salary/bycompany", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<GetSalaryByCompanyResponse> getSalaryByCompany() {
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(cacheControlMaxAge, TimeUnit.SECONDS).noTransform().mustRevalidate())
+                .body(bankService.getSalaryByCompany());
     }
 }
