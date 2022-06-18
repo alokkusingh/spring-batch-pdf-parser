@@ -185,7 +185,7 @@ public class Utility {
         if (salaryCreditDescription.toLowerCase().matches(".*j.p. morgan services.*"))
             return Company.JPMC.name();
 
-        if (salaryCreditDescription.toLowerCase().matches(".*evolving.*"))
+        if (salaryCreditDescription.toLowerCase().matches(".*evolving.*|.*evoling.*"))
             return Company.EVOLVING.name();
 
         if (salaryCreditDescription.toLowerCase().matches(".*wipro.*"))

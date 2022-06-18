@@ -94,13 +94,18 @@ public class BankAccountProcessor implements ItemProcessor<RawTransaction, Trans
         String salary = salaryAmountExtractor.getField(transaction.getDescription().replaceAll(",", ""));
         try {
             transaction.setDebit(Integer.valueOf(salary));
+            if (transaction.getDebit() == 0) {
+                // Don't consider as Salary
+                return;
+            }
         } catch (NumberFormatException nfe) {
             log.error("Failed parse salary amount: {}, Line: {}", salary, transaction.getDescription());
             nfe.printStackTrace();
+            return;
         }
         log.debug("Salary Amount: {}", transaction.getDebit());
-        transaction.setCredit(0);
         transaction.setHead("Salary");
+        transaction.setCredit(0);
     }
 
     private Date extractDate(RawTransaction rawTransaction) throws ParseException {

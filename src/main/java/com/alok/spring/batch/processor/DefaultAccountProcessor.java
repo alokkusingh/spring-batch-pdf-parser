@@ -48,6 +48,10 @@ public class DefaultAccountProcessor implements ItemProcessor<Transaction, Trans
     }
 
     protected void processSalaryTransaction(Transaction transaction) {
+        if (transaction.getDebit() == null || transaction.getDebit() == 0) {
+            // Don't consider as Salary
+            return;
+        }
         transaction.setHead("Salary");
     }
 
