@@ -18,8 +18,8 @@ public class Tax implements Comparable<Tax> {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String financialYear;
-    private Double paidAmount;
-    private String refundAmount;
+    private Integer paidAmount;
+    private Integer refundAmount;
 
     @Override
     public int compareTo(Tax o) {

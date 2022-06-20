@@ -39,6 +39,7 @@ public class ExpenseController {
     @Value("${web.cache-control.max-age}")
     private Long cacheControlMaxAge;
 
+    @Deprecated
     @LogExecutionTime
     @CrossOrigin
     @PostMapping(value = "/upload", produces = MediaType.APPLICATION_JSON_VALUE)
