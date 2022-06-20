@@ -178,6 +178,15 @@ public class Utility {
         if (fileName.matches("^190992811_.*.txt$"))
             return UploadType.HDFCExportedStatement;
 
+        if (fileName.matches("^Expense Sheet - Form Responses.*.csv$"))
+            return UploadType.ExpenseGoogleSheet;
+
+        if (fileName.matches("^Expense Sheet - Tax by year.*.csv$"))
+            return UploadType.TaxGoogleSheet;
+
+        if (fileName.matches("^Expense Sheet - Investment.*.csv$"))
+            return UploadType.InvestmentGoogleSheet;
+
         return null;
     }
 

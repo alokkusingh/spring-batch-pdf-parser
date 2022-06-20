@@ -5,5 +5,7 @@ public enum BatchOf {
     CITI_BANK,
     KOTAK_BANK,
     HDFC_BANK,
-    EXPENSE
+    EXPENSE,
+    TAX,
+    INVESTMENT
 }

@@ -1,5 +1,6 @@
 package com.alok.spring.response;
 
+import com.alok.spring.constant.UploadType;
 import lombok.Builder;
 import lombok.Data;
 
@@ -11,4 +12,5 @@ public class UploadFileResponse {
         private long size;
         private String message;
         private String fileDownloadUri;
+        private UploadType uploadType;
 }

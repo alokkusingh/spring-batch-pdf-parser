@@ -3,6 +3,7 @@ package com.alok.spring;
 import com.alok.spring.model.Transaction;
 import com.alok.spring.service.JobExecutorOfBankService;
 import com.alok.spring.service.JobExecutorOfExpenseService;
+import com.alok.spring.service.JobExecutorOfTaxService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor;
@@ -28,6 +29,9 @@ public class PDFBatchApplication implements ApplicationRunner {
 
 	@Autowired
 	private JobExecutorOfExpenseService jobExecutorOfExpenseService;
+
+	@Autowired
+	private JobExecutorOfTaxService jobExecutorOfTaxService;
 
 	@Autowired
 	FlatFileItemWriter<Transaction> csvWriterForGoogleSheet;
@@ -56,6 +60,7 @@ public class PDFBatchApplication implements ApplicationRunner {
 
 		jobExecutorOfBankService.executeAllBatchJobs();
 		jobExecutorOfExpenseService.executeAllJobs();
+		jobExecutorOfTaxService.executeAllJobs();
 	}
 
 	@Bean

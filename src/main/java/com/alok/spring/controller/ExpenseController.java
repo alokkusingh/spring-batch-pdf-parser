@@ -73,6 +73,7 @@ public class ExpenseController {
                                 .size(file.getSize())
                                 .fileType(file.getContentType())
                                 .message("File submitted for processing")
+                                .uploadType(UploadType.ExpenseGoogleSheet)
                                 .build()
                 );
     }

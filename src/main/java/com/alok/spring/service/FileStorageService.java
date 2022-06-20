@@ -25,6 +25,12 @@ public class FileStorageService {
     @Value("${dir.path.expense}")
     private String expenseDirLocation;
 
+    @Value("${dir.path.tax}")
+    private String taxDirLocation;
+
+    @Value("${dir.path.investment}")
+    private String investmentDirLocation;
+
     private Path getStoragePath(UploadType uploadType) {
         if (uploadType.equals(UploadType.KotakExportedStatement))
             return Paths.get(kotakImportedLocation).toAbsolutePath().normalize();
@@ -35,6 +41,12 @@ public class FileStorageService {
         if (uploadType.equals(UploadType.ExpenseGoogleSheet))
             return Paths.get(expenseDirLocation).toAbsolutePath().normalize();
 
+        if (uploadType.equals(UploadType.TaxGoogleSheet))
+            return Paths.get(taxDirLocation).toAbsolutePath().normalize();
+
+        if (uploadType.equals(UploadType.InvestmentGoogleSheet))
+            return Paths.get(investmentDirLocation).toAbsolutePath().normalize();
+
         throw new RuntimeException("Invalid Upload Type");
     }
 
@@ -42,9 +54,17 @@ public class FileStorageService {
         if (uploadType.equals(UploadType.KotakExportedStatement) || uploadType.equals(UploadType.HDFCExportedStatement))
             return fileName;
 
-        // Hard coding so that any file name uplaod will replace the same file
+        // Hard coding so that any file name upload will replace the same file
         if (uploadType.equals(UploadType.ExpenseGoogleSheet))
             return StringUtils.cleanPath("Expense Sheet - Form Responses 1.csv");
+
+        // Hard coding so that any file name upload will replace the same file
+        if (uploadType.equals(UploadType.TaxGoogleSheet))
+            return StringUtils.cleanPath("Expense Sheet - Tax by year.csv");
+
+        // Hard coding so that any file name upload will replace the same file
+        if (uploadType.equals(UploadType.InvestmentGoogleSheet))
+            return StringUtils.cleanPath("Expense Sheet - Investment.csv");
 
         throw new RuntimeException("Invalid Upload Type");
     }
