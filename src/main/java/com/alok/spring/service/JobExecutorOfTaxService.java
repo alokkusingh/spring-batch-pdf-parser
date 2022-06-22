@@ -1,6 +1,5 @@
 package com.alok.spring.service;
 
-import com.alok.spring.config.CacheConfig;
 import com.alok.spring.constant.BatchOf;
 import com.alok.spring.repository.ProcessedFileRepository;
 import com.alok.spring.repository.TaxRepository;
@@ -8,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -16,21 +14,20 @@ import org.springframework.stereotype.Service;
 @Service
 public class JobExecutorOfTaxService {
 
-    @Autowired
     private JobLauncher jobLauncher;
-
-    @Autowired
-    @Qualifier("TaxJob")
     private Job taxJob;
-
-    @Autowired
     private TaxRepository taxRepository;
-
-    @Autowired
     private ProcessedFileRepository processedFileRepository;
 
-    @Autowired
-    private CacheService cacheService;
+    public JobExecutorOfTaxService(
+            JobLauncher jobLauncher, @Qualifier("TaxJob") Job taxJob,
+            TaxRepository taxRepository, ProcessedFileRepository processedFileRepository
+    ) {
+        this.jobLauncher = jobLauncher;
+        this.taxJob = taxJob;
+        this.taxRepository = taxRepository;
+        this.processedFileRepository = processedFileRepository;
+    }
 
     public void executeAllJobs() throws Exception {
         executeAllJobs(false);

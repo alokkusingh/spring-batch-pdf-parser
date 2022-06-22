@@ -3,6 +3,7 @@ package com.alok.spring.batch.job;
 import com.alok.spring.batch.processor.FileArchiveTasklet;
 import com.alok.spring.batch.reader.CSVReader;
 import com.alok.spring.model.Investment;
+import com.alok.spring.model.RawInvestment;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -23,6 +24,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 
+import java.util.List;
+
 @Configuration
 @EnableBatchProcessing
 public class InvestmentBatchJob {
@@ -35,17 +38,16 @@ public class InvestmentBatchJob {
     @Bean("InvestmentJob")
     public Job investmentJob(JobBuilderFactory jobBuilderFactory,
                           StepBuilderFactory stepBuilderFactory,
-                          ItemReader<Investment> investmentItemsReader,
-                          ItemProcessor<Investment, Investment> defaultInvestmentProcessor,
-                          ItemWriter<Investment> investmentDbWriter
+                          ItemReader<RawInvestment> investmentItemsReader,
+                          ItemProcessor<RawInvestment, List<Investment>> defaultInvestmentProcessor,
+                          ItemWriter<List<Investment>> investmentDbWriter
     ) {
         Step step1 = stepBuilderFactory.get("Investment-ETL-file-load")
-                .<Investment,Investment>chunk(100)
+                .<RawInvestment,List<Investment>>chunk(100)
                 .reader(investmentItemsReader)
                 .processor(defaultInvestmentProcessor)
                 .writer(investmentDbWriter)
                 .build();
-
 
         FileArchiveTasklet archiveTask = new FileArchiveTasklet();
         archiveTask.setResources(resources);
@@ -61,9 +63,9 @@ public class InvestmentBatchJob {
     }
 
     @Bean
-    public MultiResourceItemReader<Investment> investmentItemsReader(@Qualifier("investmentItemReader") CSVReader investmentItemReader) {
+    public MultiResourceItemReader<RawInvestment> investmentItemsReader(@Qualifier("investmentItemReader") CSVReader investmentItemReader) {
 
-        MultiResourceItemReader<Investment> reader = new MultiResourceItemReader<>();
+        MultiResourceItemReader<RawInvestment> reader = new MultiResourceItemReader<>();
         reader.setResources(resources);
         reader.setStrict(false);
         reader.setDelegate(investmentItemReader);
@@ -71,10 +73,10 @@ public class InvestmentBatchJob {
     }
 
     @Bean
-    public CSVReader<Investment> investmentItemReader(@Qualifier("CSVReader") CSVReader<Investment> flatFileItemReader) {
+    public CSVReader<RawInvestment> investmentItemReader(@Qualifier("CSVReader") CSVReader<RawInvestment> flatFileItemReader) {
 
         flatFileItemReader.setName("Investment-CSV-Reader");
-        flatFileItemReader.setLinesToSkip(1);
+        flatFileItemReader.setLinesToSkip(2);
         flatFileItemReader.setLineMapper(investmentLineMapper());
         flatFileItemReader.setTransactionType("INVESTMENT");
         flatFileItemReader.setStrict(false);
@@ -83,16 +85,16 @@ public class InvestmentBatchJob {
     }
 
     @Bean
-    public LineMapper<Investment> investmentLineMapper() {
-        DefaultLineMapper<Investment> defaultLineMapper = new DefaultLineMapper<>();
+    public LineMapper<RawInvestment> investmentLineMapper() {
+        DefaultLineMapper<RawInvestment> defaultLineMapper = new DefaultLineMapper<>();
 
         DelimitedLineTokenizer lineTokenizer = new DelimitedLineTokenizer();
         lineTokenizer.setDelimiter(",");
         lineTokenizer.setStrict(false);
         lineTokenizer.setNames(fieldNames);
 
-        BeanWrapperFieldSetMapper<Investment> fieldSetMapper = new BeanWrapperFieldSetMapper<>();
-        fieldSetMapper.setTargetType(Investment.class);
+        BeanWrapperFieldSetMapper<RawInvestment> fieldSetMapper = new BeanWrapperFieldSetMapper<>();
+        fieldSetMapper.setTargetType(RawInvestment.class);
 
         defaultLineMapper.setLineTokenizer(lineTokenizer);
         defaultLineMapper.setFieldSetMapper(fieldSetMapper);

@@ -4,7 +4,6 @@ import com.alok.spring.model.Tax;
 import com.alok.spring.repository.TaxRepository;
 import com.alok.spring.response.GetTaxesResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
@@ -15,10 +14,12 @@ import java.util.stream.Collectors;
 @Service
 public class TaxService {
 
-    @Autowired
     private TaxRepository taxRepository;
-
     private final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+
+    public TaxService(TaxRepository taxRepository) {
+        this.taxRepository = taxRepository;
+    }
 
     public GetTaxesResponse getAllTaxes() {
         log.info("All Taxes not available in cache");

@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -15,21 +14,20 @@ import org.springframework.stereotype.Service;
 @Service
 public class JobExecutorOfInvestmentService {
 
-    @Autowired
     private JobLauncher jobLauncher;
-
-    @Autowired
-    @Qualifier("InvestmentJob")
     private Job investmentJob;
-
-    @Autowired
     private InvestmentRepository investmentRepository;
-
-    @Autowired
     private ProcessedFileRepository processedFileRepository;
 
-    @Autowired
-    private CacheService cacheService;
+    public JobExecutorOfInvestmentService(
+            JobLauncher jobLauncher, @Qualifier("InvestmentJob") Job investmentJob, InvestmentRepository investmentRepository,
+            ProcessedFileRepository processedFileRepository
+    ) {
+        this.jobLauncher = jobLauncher;
+        this.investmentJob = investmentJob;
+        this.investmentRepository = investmentRepository;
+        this.processedFileRepository = processedFileRepository;
+    }
 
     public void executeAllJobs() throws Exception {
         executeAllJobs(false);

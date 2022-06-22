@@ -120,7 +120,6 @@ public class ExpenseService {
 
     private List<GetExpensesResponseAggByDay.DayExpense> aggregateExpensesByDay(List<Expense> expenses) {
 
-
         Map<String, Double> dayExpensesSum = expenses.stream()
                 .collect(Collectors.groupingBy(
                         expense -> df.format(expense.getDate()),

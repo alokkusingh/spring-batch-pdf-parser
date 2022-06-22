@@ -1,8 +1,8 @@
 package com.alok.spring.controller;
 
 import com.alok.spring.annotation.LogExecutionTime;
-import com.alok.spring.response.GetTaxesResponse;
-import com.alok.spring.service.TaxService;
+import com.alok.spring.response.GetInvestmentsResponse;
+import com.alok.spring.service.InvestmentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.CacheControl;
@@ -16,26 +16,26 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @RestController
-@RequestMapping("/tax")
-public class TaxController {
+@RequestMapping("/investment")
+public class InvestmentController {
 
-    private TaxService taxService;
+    private InvestmentService investmentService;
     private Long cacheControlMaxAge;
 
-    public TaxController(
-            TaxService taxService,
+    public InvestmentController(
+            InvestmentService investmentService,
             @Value("${web.cache-control.max-age}") Long cacheControlMaxAge
     ) {
-        this.taxService = taxService;
+        this.investmentService = investmentService;
         this.cacheControlMaxAge = cacheControlMaxAge;
     }
 
     @LogExecutionTime
     @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<GetTaxesResponse> getAllTaxes() {
+    public ResponseEntity<GetInvestmentsResponse> getAllInvestments() {
 
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(cacheControlMaxAge, TimeUnit.SECONDS).noTransform().mustRevalidate())
-                .body(taxService.getAllTaxes());
+                .body(investmentService.getAllInvestments());
     }
 }
