@@ -85,6 +85,7 @@ public class InvestmentService {
                 );
 
         AtomicReference<Long> totalInvestments = new AtomicReference<>(0L);
+        // TODO this should be the last mon value not the sum
         AtomicReference<Long> totalValues = new AtomicReference<>(0L);
         List<GetInvestmentsResponse.MonthInvestment> monthInvestments = new ArrayList<>(300);
         monthInvestmentsMap.entrySet().forEach(

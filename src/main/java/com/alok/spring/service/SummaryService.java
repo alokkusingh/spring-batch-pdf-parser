@@ -2,8 +2,11 @@ package com.alok.spring.service;
 
 import com.alok.spring.config.CacheConfig;
 import com.alok.spring.model.IExpenseMonthSum;
+import com.alok.spring.model.IInvestmentMonthSum;
+import com.alok.spring.model.Investment;
 import com.alok.spring.model.Transaction;
 import com.alok.spring.repository.ExpenseRepository;
+import com.alok.spring.repository.InvestmentRepository;
 import com.alok.spring.repository.TransactionRepository;
 import com.alok.spring.response.GetMonthlySummaryResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -20,10 +23,12 @@ public class SummaryService {
 
     private ExpenseRepository expenseRepository;
     private TransactionRepository transactionRepository;
+    private InvestmentRepository investmentRepository;
 
-    public SummaryService(ExpenseRepository expenseRepository, TransactionRepository transactionRepository) {
+    public SummaryService(ExpenseRepository expenseRepository, TransactionRepository transactionRepository, InvestmentRepository investmentRepository) {
         this.expenseRepository = expenseRepository;
         this.transactionRepository = transactionRepository;
+        this.investmentRepository = investmentRepository;
     }
 
     @Cacheable(CacheConfig.CacheName.SUMMARY)
@@ -32,6 +37,7 @@ public class SummaryService {
         log.info("Summary not available in cache");
         List<IExpenseMonthSum> expenseSums = expenseRepository.findSumGroupByMonth();
         List<Transaction> transactions = transactionRepository.findAll();
+        List<Investment> investments = investmentRepository.findAll();
 
         // From June 2007 June to May 2019 don't have expense entry - so lets add 0 every month later the
         // same will be overridden with actual value
@@ -111,6 +117,18 @@ public class SummaryService {
                         )
                 );
 
+        // Investment aggregation
+        Map<String, Long> investmentMonthly = investments.stream()
+                .collect(
+                        Collectors.groupingBy(
+                                investment -> String.format("%d-%02d", investment.getYear(), investment.getMonth()),
+                                Collectors.collectingAndThen(
+                                        Collectors.summarizingInt(Investment::getContribution),
+                                        iss -> iss.getSum()
+                                )
+                        )
+                );
+
         // Expense aggregation
         List<GetMonthlySummaryResponse.MonthlySummary> monthSummaryRecord = expenseMonthSumMap.values().stream().
                 map(
@@ -126,7 +144,11 @@ public class SummaryService {
                                                 familyReceivedMonthly.get(String.format("%d-%02d", expenseMonthRecord.getYear(), expenseMonthRecord.getMonth()))
                                         )
                                 )
-                                .build())
+                                .investmentAmount(
+                                        investmentMonthly.get(String.format("%d-%02d", expenseMonthRecord.getYear(), expenseMonthRecord.getMonth()))
+                                )
+                                .build()
+                )
                 .collect(Collectors.toList());
 
 

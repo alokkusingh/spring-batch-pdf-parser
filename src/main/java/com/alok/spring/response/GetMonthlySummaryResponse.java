@@ -21,6 +21,6 @@ public class GetMonthlySummaryResponse {
         private Double expenseAmount;
         private Double transferAmount;
         private Double savingAmount;
-        private Double investmentAmount;
+        private Long investmentAmount;
     }
 }
