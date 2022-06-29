@@ -37,7 +37,7 @@ public class CSVReader<T> extends FlatFileItemReader<T> {
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
         log.info("Started Processing File: {}", String.valueOf(resource));
-        Optional<List<ProcessedFile>> processedFile = processedFileRepository.findAllByName(String.valueOf(resource));
+        Optional<List<ProcessedFile>> processedFile = processedFileRepository.findAllByName(resource.getFilename());
         if (processedFile.isPresent()) {
             log.warn("File already processed - skipping!");
             return;
@@ -47,7 +47,7 @@ public class CSVReader<T> extends FlatFileItemReader<T> {
 
     @Override
     protected T doRead() throws Exception {
-        Optional<List<ProcessedFile>> processedFile = processedFileRepository.findAllByName(String.valueOf(resource));
+        Optional<List<ProcessedFile>> processedFile = processedFileRepository.findAllByName(resource.getFilename());
         if (processedFile.isPresent()) {
             return null;
         }
@@ -66,11 +66,11 @@ public class CSVReader<T> extends FlatFileItemReader<T> {
         super.close();
         if (resource != null) {
             log.debug("Finished Processing File: {}", String.valueOf(resource));
-            Optional<List<ProcessedFile>> processedFile = processedFileRepository.findAllByName(String.valueOf(resource));
+            Optional<List<ProcessedFile>> processedFile = processedFileRepository.findAllByName(resource.getFilename());
             if (!processedFile.isPresent()) {
                 processedFileRepository.save(
                         ProcessedFile.builder()
-                                .name(String.valueOf(resource))
+                                .name(resource.getFilename())
                                 .date(new Date())
                                 .type(transactionType)
                                 .build()
