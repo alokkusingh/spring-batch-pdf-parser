@@ -103,7 +103,7 @@ public class Utility {
     }
 
     static public boolean isSalaryTransaction(String transation) {
-        if (transation.toLowerCase().matches(".*salary.*|.*evolving.*|.*wipro.*|.*yodlee.*|.*bosch.*|.*j.p. morgan services.*")) {
+        if (transation.toLowerCase().matches(".*salary.*|.*evolving.*|.*wipro.*|.*yodlee.*|.*bosch.*|.*j.p. morgan services.*|.*jpmcremittance.*")) {
             if (!transation.toLowerCase().matches(".*reimbursement.*|.*withdrawal.*" +
                     "|.*corp.trf.*|.*trip.*|.*hotel.*|.*ref: .*|.*imps.*")) {
                 return true;
