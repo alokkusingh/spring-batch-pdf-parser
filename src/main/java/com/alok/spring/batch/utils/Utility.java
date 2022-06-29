@@ -191,7 +191,7 @@ public class Utility {
     }
 
     static public String getCompanyName(String salaryCreditDescription) {
-        if (salaryCreditDescription.toLowerCase().matches(".*j.p. morgan services.*"))
+        if (salaryCreditDescription.toLowerCase().matches(".*j.p. morgan services.*|.*jpmcremittance.*"))
             return Company.JPMC.name();
 
         if (salaryCreditDescription.toLowerCase().matches(".*evolving.*|.*evoling.*"))
