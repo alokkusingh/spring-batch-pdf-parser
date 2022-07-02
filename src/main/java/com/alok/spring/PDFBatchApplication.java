@@ -1,5 +1,6 @@
 package com.alok.spring;
 
+import com.alok.spring.annotation.LogExecutionTime;
 import com.alok.spring.model.Transaction;
 import com.alok.spring.service.JobExecutorOfBankService;
 import com.alok.spring.service.JobExecutorOfExpenseService;
@@ -42,6 +43,7 @@ public class PDFBatchApplication implements ApplicationRunner {
 		SpringApplication.run(PDFBatchApplication.class, args);
 	}
 
+	@LogExecutionTime
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
 		log.info("Application Started!!!");

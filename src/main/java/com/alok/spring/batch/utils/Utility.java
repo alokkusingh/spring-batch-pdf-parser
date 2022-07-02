@@ -116,7 +116,8 @@ public class Utility {
         if (transation.toLowerCase().matches(".*ramawatar.*|.*avinash.*|.*avin.*|.*gopal.*|.*papa.*|.*31987667084.*|.*punbx0113.*" +
                 "|.*3209010000019.*|.*kharagpur.*|.*mb hr.*|.*kumari  jyoti.*|.*pankaj  kumar.*|.*bihar.*" +
                 "|.*yogendra  narayan.*|.*shailendra  singh.*|.*manju  devi.*|.*vivekanand  singh.*")) {
-            if (!transation.toLowerCase().matches(".*rachna.*|.*withdrawal.*|.*9916661247@.*"
+            if (!transation.toLowerCase().matches(".*rachna.*|.*withdrawal.*|.*9916661247@.*|.*interest.*|" +
+                    ".*monthly  principal  payment.*|.*gopal  rao.*|.*int  payment  for.*|.*blocked.released.*"
             )) {
                 return true;
             }

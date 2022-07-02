@@ -1,5 +1,6 @@
 package com.alok.spring.service;
 
+import com.alok.spring.annotation.LogExecutionTime;
 import com.alok.spring.constant.BatchOf;
 import com.alok.spring.repository.ProcessedFileRepository;
 import com.alok.spring.repository.TaxRepository;
@@ -33,6 +34,7 @@ public class JobExecutorOfTaxService {
         executeAllJobs(false);
     }
 
+    @LogExecutionTime
     public void executeAllJobs(boolean force) throws Exception {
 
         if (force) {

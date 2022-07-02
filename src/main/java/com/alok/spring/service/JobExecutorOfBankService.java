@@ -1,5 +1,6 @@
 package com.alok.spring.service;
 
+import com.alok.spring.annotation.LogExecutionTime;
 import com.alok.spring.config.CacheConfig;
 import com.alok.spring.constant.Bank;
 import com.alok.spring.constant.BatchOf;
@@ -153,6 +154,7 @@ public class JobExecutorOfBankService {
         generateCSVFile();
     }
 
+    @LogExecutionTime
     public void executeAllBatchJobs() throws Exception {
         log.info("Starting all Bank jobs execution");
 

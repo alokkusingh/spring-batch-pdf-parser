@@ -1,5 +1,6 @@
 package com.alok.spring.service;
 
+import com.alok.spring.annotation.LogExecutionTime;
 import com.alok.spring.config.CacheConfig;
 import com.alok.spring.constant.BatchOf;
 import com.alok.spring.repository.ExpenseRepository;
@@ -36,6 +37,7 @@ public class JobExecutorOfExpenseService {
         executeAllJobs(false);
     }
 
+    @LogExecutionTime
     public void executeAllJobs(boolean force) throws Exception {
 
         if (force) {
