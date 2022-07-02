@@ -17,12 +17,13 @@
     </parent>
 	<groupId>com.alok.spring</groupId>
 	<artifactId>spring-batch-pdf-parser</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<name>spring-batch-pdf-parser</name>
 	<description>PDF Batch parser project for Spring Boot</description>
 
 	<properties>
 		<maven.test.skip>true</maven.test.skip>
+		<java.version>17</java.version>
 	</properties>
 
 	<dependencies>
