@@ -7,10 +7,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ProcessedFileRepository extends JpaRepository<ProcessedFile, Integer> {
-    Optional<List<ProcessedFile>> findAllByName(String valueOf);
+    List<ProcessedFile> findAllByName(String valueOf);
     @Query(value = "DELETE from  processed_file pf where pf.type = ?1", nativeQuery = true)
     @Modifying
     @Transactional
