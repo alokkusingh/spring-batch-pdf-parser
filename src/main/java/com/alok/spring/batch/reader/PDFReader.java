@@ -110,7 +110,7 @@ public class PDFReader implements ResourceAwareItemReaderItemStream {
             pdfreader.close();
             List<ProcessedFile> processedFile = processedFileRepository.findAllByName(resource.getFilename());
 
-            if (!processedFile.isEmpty()) {
+            if (processedFile.isEmpty()) {
                 processedFileRepository.save(
                         ProcessedFile.builder()
                                 .name(resource.getFilename())

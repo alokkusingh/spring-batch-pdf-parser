@@ -66,7 +66,7 @@ public class CSVReader<T> extends FlatFileItemReader<T> {
         if (resource != null) {
             log.debug("Finished Processing File: {}", resource);
             List<ProcessedFile> processedFile = processedFileRepository.findAllByName(resource.getFilename());
-            if (!processedFile.isEmpty()) {
+            if (processedFile.isEmpty()) {
                 processedFileRepository.save(
                         ProcessedFile.builder()
                                 .name(resource.getFilename())
