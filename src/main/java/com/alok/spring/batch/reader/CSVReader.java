@@ -19,7 +19,6 @@ import java.util.List;
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class CSVReader<T> extends FlatFileItemReader<T> {
-
     private Resource resource;
     private String transactionType;
     private final ProcessedFileRepository processedFileRepository;
@@ -32,7 +31,6 @@ public class CSVReader<T> extends FlatFileItemReader<T> {
     public void setTransactionType(String transactionType) {
         this.transactionType = transactionType;
     }
-
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
         log.info("Started Processing File: {}", resource);
