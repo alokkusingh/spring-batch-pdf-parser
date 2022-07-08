@@ -111,7 +111,6 @@ public class JobExecutorOfBankService {
 
     public void executeBatchJob(UploadType uploadType, final String fileName) throws Exception {
 
-        //log.info("Delete all the transactions first");
         log.info("Starting a Bank job execution");
         //transactionRepository.deleteAll();
 
@@ -119,31 +118,30 @@ public class JobExecutorOfBankService {
         //processedFileRepository.deleteAllByType("BANK");
 
         // Only for below jobs file upload supported - others jobs will be executed at startup only
-
         // Job - Kotak Exported V2
-        if (uploadType == UploadType.KotakExportedStatement) {
-            MDC.put(MDCKey.BANK.name(), Bank.KOTAK.name());
-            kotakImportedItemsReaderV2.setResources(new Resource[]{
-                    resourceLoader.getResource("file:" + kotakExportDir + "/" + fileName)
-            });
-            jobLauncher.run(kotakImportedAccountJobV2, new JobParametersBuilder()
-                    .addString("JobID", String.valueOf(System.currentTimeMillis()))
-                    .addString("batchOf", BatchOf.KOTAK_BANK.name())
-                    .toJobParameters());
-            MDC.remove(MDCKey.BANK.name());
-        }
-
-        // Job - HDFC Exported
-        if (uploadType == UploadType.HDFCExportedStatement) {
-            MDC.put(MDCKey.BANK.name(), Bank.HDFC.name());
-            hdfcImportedItemsReader.setResources(new Resource[]{
-                    resourceLoader.getResource("file:" + hdfcExportDir + "/" + fileName)
-            });
-            jobLauncher.run(hdfcImportedAccountJob, new JobParametersBuilder()
-                    .addString("JobID", String.valueOf(System.currentTimeMillis()))
-                    .addString("batchOf", BatchOf.HDFC_BANK.name())
-                    .toJobParameters());
-            MDC.remove(MDCKey.BANK.name());
+        switch(uploadType) {
+            case KotakExportedStatement -> {
+                MDC.put(MDCKey.BANK.name(), Bank.KOTAK.name());
+                kotakImportedItemsReaderV2.setResources(new Resource[]{
+                        resourceLoader.getResource("file:" + kotakExportDir + "/" + fileName)
+                });
+                jobLauncher.run(kotakImportedAccountJobV2, new JobParametersBuilder()
+                        .addString("JobID", String.valueOf(System.currentTimeMillis()))
+                        .addString("batchOf", BatchOf.KOTAK_BANK.name())
+                        .toJobParameters());
+                MDC.remove(MDCKey.BANK.name());
+            }
+            case HDFCExportedStatement -> {
+                MDC.put(MDCKey.BANK.name(), Bank.HDFC.name());
+                hdfcImportedItemsReader.setResources(new Resource[]{
+                        resourceLoader.getResource("file:" + hdfcExportDir + "/" + fileName)
+                });
+                jobLauncher.run(hdfcImportedAccountJob, new JobParametersBuilder()
+                        .addString("JobID", String.valueOf(System.currentTimeMillis()))
+                        .addString("batchOf", BatchOf.HDFC_BANK.name())
+                        .toJobParameters());
+                MDC.remove(MDCKey.BANK.name());
+            }
         }
 
         log.debug("Completed job execution");
