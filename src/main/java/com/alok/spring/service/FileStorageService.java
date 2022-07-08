@@ -32,22 +32,15 @@ public class FileStorageService {
     private String investmentDirLocation;
 
     private Path getStoragePath(UploadType uploadType) {
-        if (uploadType.equals(UploadType.KotakExportedStatement))
-            return Paths.get(kotakImportedLocation).toAbsolutePath().normalize();
-
-        if (uploadType.equals(UploadType.HDFCExportedStatement))
-            return Paths.get(hdfcImportedLocation).toAbsolutePath().normalize();
-
-        if (uploadType.equals(UploadType.ExpenseGoogleSheet))
-            return Paths.get(expenseDirLocation).toAbsolutePath().normalize();
-
-        if (uploadType.equals(UploadType.TaxGoogleSheet))
-            return Paths.get(taxDirLocation).toAbsolutePath().normalize();
-
-        if (uploadType.equals(UploadType.InvestmentGoogleSheet))
-            return Paths.get(investmentDirLocation).toAbsolutePath().normalize();
-
-        throw new RuntimeException("Invalid Upload Type");
+        return switch(uploadType) {
+            case KotakExportedStatement -> Paths.get(kotakImportedLocation).toAbsolutePath().normalize() ;
+            case HDFCExportedStatement -> Paths.get(hdfcImportedLocation).toAbsolutePath().normalize();
+            case ExpenseGoogleSheet -> Paths.get(expenseDirLocation).toAbsolutePath().normalize();
+            case TaxGoogleSheet -> Paths.get(taxDirLocation).toAbsolutePath().normalize();
+            case InvestmentGoogleSheet -> Paths.get(investmentDirLocation).toAbsolutePath().normalize();
+            case null -> throw new RuntimeException("Upload Type is null");
+            default -> throw new RuntimeException("Invalid Upload Type");
+        };
     }
 
     private String getUploadFileName(UploadType uploadType, String fileName) {

@@ -4,8 +4,8 @@ resources/data/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**
 !**/src/test/**
-log/
-logs/
+!log/
+!logs/
 
 ### STS ###
 .apt_generated
@@ -17,7 +17,7 @@ logs/
 .sts4-cache
 
 ### IntelliJ IDEA ###
-#.idea
+.idea
 *.iws
 *.iml
 *.ipr
