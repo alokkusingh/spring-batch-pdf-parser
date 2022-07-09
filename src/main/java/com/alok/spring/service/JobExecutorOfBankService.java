@@ -8,7 +8,6 @@ import com.alok.spring.constant.BatchOf;
 import com.alok.spring.constant.MDCKey;
 import com.alok.spring.exception.UploadTypeNotSupportedException;
 import com.alok.spring.model.Transaction;
-import com.alok.spring.repository.ProcessedFileRepository;
 import com.alok.spring.repository.TransactionRepository;
 import com.alok.spring.constant.UploadType;
 import lombok.extern.slf4j.Slf4j;
@@ -34,25 +33,24 @@ import java.util.List;
 @Service
 public class JobExecutorOfBankService {
 
-    private ResourceLoader resourceLoader;
-    private String hdfcExportDir;
-    private String kotakExportDir;
-    private JobLauncher jobLauncher;
-    private Job missingAccountJob;
-    private Job citiBankJob1;
-    private Job citiBankJob2;
-    private Job citiBankJob3;
-    private Job kotakBankJob;
-    private Job kotakBankNoPwdJob;
-    private Job kotakImportedAccountJob;
-    private Job kotakImportedAccountJobV2;
-    private Job hdfcImportedAccountJob;
-    private MultiResourceItemReader<Transaction> hdfcImportedItemsReader;
-    private MultiResourceItemReader<Transaction> kotakImportedItemsReaderV2;
-    private CacheService cacheService;
-    private FlatFileItemWriter<Transaction> csvWriterForGoogleSheet;
-    private TransactionRepository transactionRepository;
-    private ProcessedFileRepository processedFileRepository;
+    private final ResourceLoader resourceLoader;
+    private final String hdfcExportDir;
+    private final String kotakExportDir;
+    private final JobLauncher jobLauncher;
+    private final Job missingAccountJob;
+    private final Job citiBankJob1;
+    private final Job citiBankJob2;
+    private final Job citiBankJob3;
+    private final Job kotakBankJob;
+    private final Job kotakBankNoPwdJob;
+    private final Job kotakImportedAccountJob;
+    private final Job kotakImportedAccountJobV2;
+    private final Job hdfcImportedAccountJob;
+    private final MultiResourceItemReader<Transaction> hdfcImportedItemsReader;
+    private final MultiResourceItemReader<Transaction> kotakImportedItemsReaderV2;
+    private final CacheService cacheService;
+    private final FlatFileItemWriter<Transaction> csvWriterForGoogleSheet;
+    private final TransactionRepository transactionRepository;
     private final String outputFileName;
 
     @Autowired
@@ -74,8 +72,9 @@ public class JobExecutorOfBankService {
             MultiResourceItemReader<Transaction> hdfcImportedItemsReader,
             MultiResourceItemReader<Transaction> kotakImportedItemsReaderV2,
             CacheService cacheService,
-            TransactionRepository transactionRepository,
-            ProcessedFileRepository processedFileRepository
+            FlatFileItemWriter<Transaction> csvWriterForGoogleSheet,
+            TransactionRepository transactionRepository
+
     ) {
         this.resourceLoader = resourceLoader;
         this.hdfcExportDir = hdfcExportDir;
@@ -93,8 +92,8 @@ public class JobExecutorOfBankService {
         this.hdfcImportedItemsReader = hdfcImportedItemsReader;
         this.kotakImportedItemsReaderV2 = kotakImportedItemsReaderV2;
         this.cacheService = cacheService;
+        this.csvWriterForGoogleSheet = csvWriterForGoogleSheet;
         this.transactionRepository = transactionRepository;
-        this.processedFileRepository = processedFileRepository;
         // outputFileName was required injection via constructor otherwise it was coming null
         // during csvWriterForGoogleSheet bean creation
         this.outputFileName = outputFileName;
