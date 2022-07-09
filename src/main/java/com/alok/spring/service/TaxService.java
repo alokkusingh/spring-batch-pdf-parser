@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @Service
 public class TaxService {
 
-    private TaxRepository taxRepository;
+    private final TaxRepository taxRepository;
     private final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
     public TaxService(TaxRepository taxRepository) {

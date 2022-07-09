@@ -16,7 +16,7 @@
 	<description>PDF Batch parser project for Spring Boot</description>
 
 	<properties>
-		<maven.test.skip>false</maven.test.skip>
+		<maven.test.skip>true</maven.test.skip>
 		<java.version>17</java.version>
 		<lombok.version>1.18.22</lombok.version>
 	</properties>
