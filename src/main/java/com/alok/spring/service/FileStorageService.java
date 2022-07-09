@@ -2,6 +2,7 @@ package com.alok.spring.service;
 
 import com.alok.spring.exception.FileStorageException;
 import com.alok.spring.constant.UploadType;
+import com.alok.spring.exception.UploadTypeNotSupportedException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -38,28 +39,19 @@ public class FileStorageService {
             case ExpenseGoogleSheet -> Paths.get(expenseDirLocation).toAbsolutePath().normalize();
             case TaxGoogleSheet -> Paths.get(taxDirLocation).toAbsolutePath().normalize();
             case InvestmentGoogleSheet -> Paths.get(investmentDirLocation).toAbsolutePath().normalize();
-            case null -> throw new RuntimeException("Upload Type is null");
-            default -> throw new RuntimeException("Invalid Upload Type");
+            case null -> throw new UploadTypeNotSupportedException("Upload Type is null");
+            default -> throw new UploadTypeNotSupportedException(String.format("Upload Type %s not supported", uploadType.name()));
         };
     }
 
     private String getUploadFileName(UploadType uploadType, String fileName) {
-        if (uploadType.equals(UploadType.KotakExportedStatement) || uploadType.equals(UploadType.HDFCExportedStatement))
-            return fileName;
-
-        // Hard coding so that any file name upload will replace the same file
-        if (uploadType.equals(UploadType.ExpenseGoogleSheet))
-            return StringUtils.cleanPath("Expense Sheet - Form Responses 1.csv");
-
-        // Hard coding so that any file name upload will replace the same file
-        if (uploadType.equals(UploadType.TaxGoogleSheet))
-            return StringUtils.cleanPath("Expense Sheet - Tax by year.csv");
-
-        // Hard coding so that any file name upload will replace the same file
-        if (uploadType.equals(UploadType.InvestmentGoogleSheet))
-            return StringUtils.cleanPath("Expense Sheet - Investment.csv");
-
-        throw new RuntimeException("Invalid Upload Type");
+        return switch(uploadType) {
+            case HDFCExportedStatement, KotakExportedStatement -> fileName;
+            case ExpenseGoogleSheet -> StringUtils.cleanPath("Expense Sheet - Form Responses 1.csv");
+            case TaxGoogleSheet -> StringUtils.cleanPath("Expense Sheet - Tax by year.csv");
+            case InvestmentGoogleSheet -> StringUtils.cleanPath("Expense Sheet - Investment.csv");
+            default -> throw new UploadTypeNotSupportedException(String.format("Upload Type %s not supported", uploadType.name()));
+        };
     }
 
     public String storeFile(MultipartFile file, UploadType uploadType) {

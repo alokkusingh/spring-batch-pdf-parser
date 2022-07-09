@@ -1,10 +1,12 @@
 package com.alok.spring.service;
 
 import com.alok.spring.annotation.LogExecutionTime;
+import com.alok.spring.batch.constant.JobConstants;
 import com.alok.spring.config.CacheConfig;
 import com.alok.spring.constant.Bank;
 import com.alok.spring.constant.BatchOf;
 import com.alok.spring.constant.MDCKey;
+import com.alok.spring.exception.UploadTypeNotSupportedException;
 import com.alok.spring.model.Transaction;
 import com.alok.spring.repository.ProcessedFileRepository;
 import com.alok.spring.repository.TransactionRepository;
@@ -126,7 +128,7 @@ public class JobExecutorOfBankService {
                         resourceLoader.getResource("file:" + kotakExportDir + "/" + fileName)
                 });
                 jobLauncher.run(kotakImportedAccountJobV2, new JobParametersBuilder()
-                        .addString("JobID", String.valueOf(System.currentTimeMillis()))
+                        .addString(JobConstants.JOB_ID, String.valueOf(System.currentTimeMillis()))
                         .addString("batchOf", BatchOf.KOTAK_BANK.name())
                         .toJobParameters());
                 MDC.remove(MDCKey.BANK.name());
@@ -137,11 +139,12 @@ public class JobExecutorOfBankService {
                         resourceLoader.getResource("file:" + hdfcExportDir + "/" + fileName)
                 });
                 jobLauncher.run(hdfcImportedAccountJob, new JobParametersBuilder()
-                        .addString("JobID", String.valueOf(System.currentTimeMillis()))
-                        .addString("batchOf", BatchOf.HDFC_BANK.name())
+                        .addString(JobConstants.JOB_ID, String.valueOf(System.currentTimeMillis()))
+                        .addString(JobConstants.BATCH_OF, BatchOf.HDFC_BANK.name())
                         .toJobParameters());
                 MDC.remove(MDCKey.BANK.name());
             }
+            default -> throw new UploadTypeNotSupportedException(String.format("Upload Type %s not supported", uploadType.name()));
         }
 
         log.debug("Completed job execution");
@@ -158,64 +161,64 @@ public class JobExecutorOfBankService {
 
         MDC.put(MDCKey.BANK.name(), Bank.AXIS.name());
         jobLauncher.run(missingAccountJob, new JobParametersBuilder()
-                .addString("JobID", String.valueOf(System.currentTimeMillis()))
-                .addString("batchOf", BatchOf.AXIS_BANK.name())
+                .addString(JobConstants.JOB_ID, String.valueOf(System.currentTimeMillis()))
+                .addString(JobConstants.BATCH_OF, BatchOf.AXIS_BANK.name())
                 .toJobParameters());
         MDC.remove(MDCKey.BANK.name());
 
         MDC.put(MDCKey.BANK.name(), Bank.CITI.name());
         jobLauncher.run(citiBankJob1, new JobParametersBuilder()
-                .addString("JobID", String.valueOf(System.currentTimeMillis()))
-                .addString("batchOf", BatchOf.CITI_BANK.name())
+                .addString(JobConstants.JOB_ID, String.valueOf(System.currentTimeMillis()))
+                .addString(JobConstants.BATCH_OF, BatchOf.CITI_BANK.name())
                 .toJobParameters());
         MDC.remove(MDCKey.BANK.name());
 
         MDC.put(MDCKey.BANK.name(), Bank.CITI.name());
         jobLauncher.run(citiBankJob2, new JobParametersBuilder()
-                .addString("JobID", String.valueOf(System.currentTimeMillis()))
-                .addString("batchOf", BatchOf.CITI_BANK.name())
+                .addString(JobConstants.JOB_ID, String.valueOf(System.currentTimeMillis()))
+                .addString(JobConstants.BATCH_OF, BatchOf.CITI_BANK.name())
                 .toJobParameters());
         MDC.remove(MDCKey.BANK.name());
 
         MDC.put(MDCKey.BANK.name(), Bank.CITI.name());
         jobLauncher.run(citiBankJob3, new JobParametersBuilder()
-                .addString("JobID", String.valueOf(System.currentTimeMillis()))
-                .addString("batchOf", BatchOf.CITI_BANK.name())
+                .addString(JobConstants.JOB_ID, String.valueOf(System.currentTimeMillis()))
+                .addString(JobConstants.BATCH_OF, BatchOf.CITI_BANK.name())
                 .toJobParameters());
         MDC.remove(MDCKey.BANK.name());
 
         MDC.put(MDCKey.BANK.name(), Bank.KOTAK.name());
         jobLauncher.run(kotakBankJob, new JobParametersBuilder()
-                .addString("JobID", String.valueOf(System.currentTimeMillis()))
-                .addString("batchOf", BatchOf.KOTAK_BANK.name())
+                .addString(JobConstants.JOB_ID, String.valueOf(System.currentTimeMillis()))
+                .addString(JobConstants.BATCH_OF, BatchOf.KOTAK_BANK.name())
                 .toJobParameters());
         MDC.remove(MDCKey.BANK.name());
 
         MDC.put(MDCKey.BANK.name(), Bank.KOTAK.name());
         jobLauncher.run(kotakBankNoPwdJob, new JobParametersBuilder()
-                .addString("JobID", String.valueOf(System.currentTimeMillis()))
-                .addString("batchOf", BatchOf.KOTAK_BANK.name())
+                .addString(JobConstants.JOB_ID, String.valueOf(System.currentTimeMillis()))
+                .addString(JobConstants.BATCH_OF, BatchOf.KOTAK_BANK.name())
                 .toJobParameters());
         MDC.remove(MDCKey.BANK.name());
 
         MDC.put(MDCKey.BANK.name(), Bank.KOTAK.name());
         jobLauncher.run(kotakImportedAccountJob, new JobParametersBuilder()
-                .addString("JobID", String.valueOf(System.currentTimeMillis()))
-                .addString("batchOf", BatchOf.KOTAK_BANK.name())
+                .addString(JobConstants.JOB_ID, String.valueOf(System.currentTimeMillis()))
+                .addString(JobConstants.BATCH_OF, BatchOf.KOTAK_BANK.name())
                 .toJobParameters());
         MDC.remove(MDCKey.BANK.name());
 
         MDC.put(MDCKey.BANK.name(), Bank.KOTAK.name());
         jobLauncher.run(kotakImportedAccountJobV2, new JobParametersBuilder()
-                .addString("JobID", String.valueOf(System.currentTimeMillis()))
-                .addString("batchOf", BatchOf.KOTAK_BANK.name())
+                .addString(JobConstants.JOB_ID, String.valueOf(System.currentTimeMillis()))
+                .addString(JobConstants.BATCH_OF, BatchOf.KOTAK_BANK.name())
                 .toJobParameters());
         MDC.remove(MDCKey.BANK.name());
 
         MDC.put(MDCKey.BANK.name(), Bank.HDFC.name());
         jobLauncher.run(hdfcImportedAccountJob, new JobParametersBuilder()
-                .addString("JobID", String.valueOf(System.currentTimeMillis()))
-                .addString("batchOf", BatchOf.HDFC_BANK.name())
+                .addString(JobConstants.JOB_ID, String.valueOf(System.currentTimeMillis()))
+                .addString(JobConstants.BATCH_OF, BatchOf.HDFC_BANK.name())
                 .toJobParameters());
         MDC.remove(MDCKey.BANK.name());
 
