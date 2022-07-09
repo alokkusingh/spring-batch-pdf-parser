@@ -39,7 +39,6 @@ public class FileStorageService {
             case ExpenseGoogleSheet -> Paths.get(expenseDirLocation).toAbsolutePath().normalize();
             case TaxGoogleSheet -> Paths.get(taxDirLocation).toAbsolutePath().normalize();
             case InvestmentGoogleSheet -> Paths.get(investmentDirLocation).toAbsolutePath().normalize();
-            case null -> throw new UploadTypeNotSupportedException("Upload Type is null");
             default -> throw new UploadTypeNotSupportedException(String.format("Upload Type %s not supported", uploadType.name()));
         };
     }
