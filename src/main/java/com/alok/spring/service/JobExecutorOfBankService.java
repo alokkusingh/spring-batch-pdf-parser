@@ -12,6 +12,7 @@ import com.alok.spring.repository.ProcessedFileRepository;
 import com.alok.spring.repository.TransactionRepository;
 import com.alok.spring.constant.UploadType;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.MDC;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -99,7 +100,7 @@ public class JobExecutorOfBankService {
     @Autowired
     private ProcessedFileRepository processedFileRepository;
 
-    private String outputFileName;
+    private final String outputFileName;
 
     @Autowired
     public JobExecutorOfBankService(
@@ -111,7 +112,7 @@ public class JobExecutorOfBankService {
         this.outputFileName = outputFileName;
     }
 
-    public void executeBatchJob(UploadType uploadType, final String fileName) throws Exception {
+    public void executeBatchJob(@NotNull UploadType uploadType, final String fileName) throws Exception {
 
         log.info("Starting a Bank job execution");
 
