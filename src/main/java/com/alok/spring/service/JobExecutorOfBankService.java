@@ -114,10 +114,6 @@ public class JobExecutorOfBankService {
     public void executeBatchJob(UploadType uploadType, final String fileName) throws Exception {
 
         log.info("Starting a Bank job execution");
-        //transactionRepository.deleteAll();
-
-        // No need to process all file - only new file process - so below line to be commented
-        //processedFileRepository.deleteAllByType("BANK");
 
         // Only for below jobs file upload supported - others jobs will be executed at startup only
         // Job - Kotak Exported V2
