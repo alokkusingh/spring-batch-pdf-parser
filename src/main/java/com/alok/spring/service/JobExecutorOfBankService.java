@@ -34,79 +34,67 @@ import java.util.List;
 @Service
 public class JobExecutorOfBankService {
 
-    @Autowired
     private ResourceLoader resourceLoader;
-
-    @Value("${dir.path.hdfc_account.imported}")
     private String hdfcExportDir;
-
-    @Value("${dir.path.kotak_account.imported}")
     private String kotakExportDir;
-
-    @Autowired
     private JobLauncher jobLauncher;
-
-    @Autowired
-    @Qualifier("MissingAccountJob")
     private Job missingAccountJob;
-
-    @Autowired
-    @Qualifier("CitiBankJob1")
     private Job citiBankJob1;
-
-    @Autowired
-    @Qualifier("CitiBankJob2")
     private Job citiBankJob2;
-
-    @Autowired
-    @Qualifier("CitiBankJob3")
     private Job citiBankJob3;
-
-    @Autowired
-    @Qualifier("KotakBankJob")
     private Job kotakBankJob;
-
-    @Autowired
-    @Qualifier("KotakBankNoPwdJob")
     private Job kotakBankNoPwdJob;
-
-    @Autowired
-    @Qualifier("KotakImportedAccountJob")
     private Job kotakImportedAccountJob;
-
-    @Autowired
-    @Qualifier("KotakImportedAccountJobV2")
     private Job kotakImportedAccountJobV2;
-
-    @Autowired
-    @Qualifier("HDFCImportedAccountJob")
     private Job hdfcImportedAccountJob;
-
-    @Autowired
     private MultiResourceItemReader<Transaction> hdfcImportedItemsReader;
-
-    @Autowired
     private MultiResourceItemReader<Transaction> kotakImportedItemsReaderV2;
-
-    @Autowired
     private CacheService cacheService;
-
-    @Autowired
-    FlatFileItemWriter<Transaction> csvWriterForGoogleSheet;
-
-    @Autowired
+    private FlatFileItemWriter<Transaction> csvWriterForGoogleSheet;
     private TransactionRepository transactionRepository;
-
-    @Autowired
     private ProcessedFileRepository processedFileRepository;
-
     private final String outputFileName;
 
     @Autowired
     public JobExecutorOfBankService(
-            @Value("${file.export.google.sheet}")
-                    String outputFileName
+            JobLauncher jobLauncher,
+            ResourceLoader resourceLoader,
+            @Value("${dir.path.hdfc_account.imported}")String hdfcExportDir,
+            @Value("${dir.path.kotak_account.imported}") String kotakExportDir,
+            @Value("${file.export.google.sheet}") String outputFileName,
+            @Qualifier("MissingAccountJob") Job missingAccountJob,
+            @Qualifier("CitiBankJob1") Job citiBankJob1,
+            @Qualifier("CitiBankJob2") Job citiBankJob2,
+            @Qualifier("CitiBankJob3") Job citiBankJob3,
+            @Qualifier("KotakBankJob") Job kotakBankJob,
+            @Qualifier("KotakBankNoPwdJob") Job kotakBankNoPwdJob,
+            @Qualifier("KotakImportedAccountJob") Job kotakImportedAccountJob,
+            @Qualifier("KotakImportedAccountJobV2") Job kotakImportedAccountJobV2,
+            @Qualifier("HDFCImportedAccountJob") Job hdfcImportedAccountJob,
+            MultiResourceItemReader<Transaction> hdfcImportedItemsReader,
+            MultiResourceItemReader<Transaction> kotakImportedItemsReaderV2,
+            CacheService cacheService,
+            TransactionRepository transactionRepository,
+            ProcessedFileRepository processedFileRepository
     ) {
+        this.resourceLoader = resourceLoader;
+        this.hdfcExportDir = hdfcExportDir;
+        this.kotakExportDir = kotakExportDir;
+        this.jobLauncher = jobLauncher;
+        this.missingAccountJob = missingAccountJob;
+        this.citiBankJob1 = citiBankJob1;
+        this.citiBankJob2 = citiBankJob2;
+        this.citiBankJob3 = citiBankJob3;
+        this.kotakBankJob = kotakBankJob;
+        this.kotakBankNoPwdJob = kotakBankNoPwdJob;
+        this.kotakImportedAccountJob = kotakImportedAccountJob;
+        this.kotakImportedAccountJobV2 = kotakImportedAccountJobV2;
+        this.hdfcImportedAccountJob = hdfcImportedAccountJob;
+        this.hdfcImportedItemsReader = hdfcImportedItemsReader;
+        this.kotakImportedItemsReaderV2 = kotakImportedItemsReaderV2;
+        this.cacheService = cacheService;
+        this.transactionRepository = transactionRepository;
+        this.processedFileRepository = processedFileRepository;
         // outputFileName was required injection via constructor otherwise it was coming null
         // during csvWriterForGoogleSheet bean creation
         this.outputFileName = outputFileName;
