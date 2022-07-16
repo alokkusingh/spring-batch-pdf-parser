@@ -106,6 +106,18 @@ public class ExpenseService {
                 .build();
     }
 
+    @Cacheable(value = CacheConfig.CacheName.EXPENSE, key = "{ #root.methodName, #category }")
+    public GetExpensesMonthSumByCategoryResponse getMonthlyExpenseForCategory(String category) {
+        log.info("Monthly was expense for category not available in cache");
+
+        List<IExpenseCategoryMonthSum> expenseCategorySums = expenseRepository.findMonthlyExpenseForCategory(category);
+
+        return GetExpensesMonthSumByCategoryResponse.builder()
+                .expenseCategorySums(expenseCategorySums)
+                .count(expenseCategorySums.size())
+                .build();
+    }
+
     @Cacheable(value = CacheConfig.CacheName.EXPENSE, key = "#root.methodName")
     public GetExpensesMonthSumResponse getMonthWiseExpenseSum() {
         log.info("Month wise Expenses Sum not available in cache");
@@ -218,4 +230,29 @@ public class ExpenseService {
                 .collect(Collectors.toList());
     }
 
+    @Cacheable(value = CacheConfig.CacheName.EXPENSE, key = "{ #root.methodName, #category }")
+    public GetExpensesResponse getExpensesForCategory(String category) {
+        log.info("Expenses for Category not available in cache");
+
+        List<Expense> expenses = expenseRepository.findAllForCategory(category);
+        Collections.sort(expenses, (t1, t2) -> t2.getDate().compareTo(t1.getDate()));
+
+        return GetExpensesResponse.builder()
+                .expenses(expenses.stream()
+                        .map(expense -> GetExpensesResponse.Expense.builder()
+                                .id(expense.getId())
+                                .date(expense.getDate())
+                                .head(expense.getHead())
+                                .amount(expense.getAmount())
+                                .category(expense.getCategory())
+                                .comment(expense.getComment())
+                                .build())
+                        .collect(Collectors.toList()))
+                .count(expenses.size())
+                .build();
+    }
+
+    public List<String> getExpenseCategories() {
+        return expenseRepository.findDistinctCategories();
+    }
 }

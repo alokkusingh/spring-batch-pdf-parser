@@ -22,6 +22,10 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
             "expense e group by year, month, e.category order by year desc, month desc, sum desc", nativeQuery = true)
     List<IExpenseCategoryMonthSum> findCategorySumGroupByMonth();
 
+    @Query(value = "select year, month, e.category, SUM(e.amount) sum from " +
+            "expense e WHERE e.category = ?1 group by year, month, e.category order by year desc, month desc, sum desc", nativeQuery = true)
+    List<IExpenseCategoryMonthSum> findMonthlyExpenseForCategory(String category);
+
     @Query(value = "select year, month, SUM(e.amount) sum from " +
             "expense e group by year, month order by year desc, month desc, sum desc", nativeQuery = true)
     List<IExpenseMonthSum> findSumGroupByMonth();
@@ -29,6 +33,11 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     @Query(value = "SELECT MAX(DATE) FROM expense", nativeQuery = true)
     Optional<Date> findLastTransactionDate();
 
+    @Query("SELECT e FROM Expense e WHERE e.category = ?1")
+    List<Expense> findAllForCategory(String category);
+
+    @Query("SELECT DISTINCT category from Expense")
+    List<String> findDistinctCategories();
 
 }
 

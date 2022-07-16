@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -95,6 +96,33 @@ public class ExpenseController {
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(cacheControlMaxAge, TimeUnit.SECONDS).noTransform().mustRevalidate())
                 .body(expenseService.getCurrentMonthExpenses(currentDate));
+    }
+
+    @LogExecutionTime
+    @GetMapping(value = "/categories/{category}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<GetExpensesResponse> getExpensesForCategory(
+            @PathVariable(value = "category") String category
+    ) {
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(cacheControlMaxAge, TimeUnit.SECONDS).noTransform().mustRevalidate())
+                .body(expenseService.getExpensesForCategory(category));
+    }
+
+    @LogExecutionTime
+    @GetMapping(value = "/categories/names", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<String>> getExpenseCategories() {
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(cacheControlMaxAge, TimeUnit.SECONDS).noTransform().mustRevalidate())
+                .body(expenseService.getExpenseCategories());
+    }
+    @LogExecutionTime
+    @GetMapping(value = "/monthly/categories/{category}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<GetExpensesMonthSumByCategoryResponse> getMonthlyExpenseForCategory(
+            @PathVariable(value = "category") String category
+    ) {
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(cacheControlMaxAge, TimeUnit.SECONDS).noTransform().mustRevalidate())
+                .body(expenseService.getMonthlyExpenseForCategory(category));
     }
 
     @LogExecutionTime
