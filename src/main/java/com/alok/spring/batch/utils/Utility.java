@@ -25,6 +25,9 @@ public class Utility {
                 "Fuel", Arrays.asList("fuel", "petrol", "patrol", "engine oil", "diesel")
         );
         categoryStringMap.put(
+                "Automotive", Arrays.asList("car service", "byke service", "puncture", "car lights", "scottie", "byke")
+        );
+        categoryStringMap.put(
                 "Milk", Arrays.asList("milk", "doodh")
         );
         categoryStringMap.put(
