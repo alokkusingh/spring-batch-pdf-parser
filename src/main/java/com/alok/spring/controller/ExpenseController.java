@@ -82,31 +82,34 @@ public class ExpenseController {
     }
 
     @LogExecutionTime
-    @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<GetExpensesResponse> getAllExpenses() {
-
-        return ResponseEntity.ok()
-                .cacheControl(CacheControl.maxAge(cacheControlMaxAge, TimeUnit.SECONDS).noTransform().mustRevalidate())
-                .body(expenseService.getAllExpenses());
-    }
-
-    @LogExecutionTime
-    @GetMapping(value = "/current_month", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<GetExpensesResponse> getCurrentMonthExpenses() {
-        LocalDate currentDate = LocalDate.now();
-        return ResponseEntity.ok()
-                .cacheControl(CacheControl.maxAge(cacheControlMaxAge, TimeUnit.SECONDS).noTransform().mustRevalidate())
-                .body(expenseService.getCurrentMonthExpenses(currentDate));
-    }
-
-    @LogExecutionTime
-    @GetMapping(value = "/categories/{category}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<GetExpensesResponse> getExpensesForCategory(
-            @PathVariable(value = "category") String category
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<GetExpensesResponse> getExpenses(
+            @RequestParam(required = false) String yearMonth,
+            @RequestParam(required = false) String category
     ) {
+        GetExpensesResponse expenses = null;
+        if (yearMonth == null && category == null)
+           expenses = expenseService.getAllExpenses();
+        else if (yearMonth == null && category != null)
+            expenses = expenseService.getExpensesForCategory(category);
+        else if (yearMonth != null) {
+             java.time.YearMonth ym = null;
+            if (yearMonth.equals("current_month"))
+                ym = java.time.YearMonth.now();
+            else {
+                String ymArr[] = yearMonth.split("-");
+                ym = java.time.YearMonth.of(Integer.valueOf(ymArr[0]), Integer.valueOf(ymArr[1]));
+            }
+
+            expenses = expenseService.getExpensesForMonth(
+                    ym,
+                    category
+            );
+        }
+
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(cacheControlMaxAge, TimeUnit.SECONDS).noTransform().mustRevalidate())
-                .body(expenseService.getExpensesForCategory(category));
+                .body(expenses);
     }
 
     @LogExecutionTime

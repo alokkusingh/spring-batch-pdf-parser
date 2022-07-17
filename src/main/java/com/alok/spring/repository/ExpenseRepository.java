@@ -15,7 +15,10 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 
     //@Query("SELECT e FROM Expense e WHERE to_char(e.date, 'YYYYMM') = to_char(sysdate, 'YYYYMM')")
     @Query("SELECT e FROM Expense e WHERE e.year = ?1 and e.month = ?2")
-    List<Expense> findAllForCurrentMonth(Integer year, Integer month);
+    List<Expense> findAllForMonth(Integer year, Integer month);
+
+    @Query("SELECT e FROM Expense e WHERE e.year = ?1 and e.month = ?2 and e.category = ?3")
+    List<Expense> findAllForMonthAndCategory(Integer year, Integer month, String category);
 
     //@Query(value = "select new com.alok.spring.batch.model.ExpenseCategorySum(to_char(e.date, 'YYYYMM') month, e.category, SUM(e.amount) sum) from " +
     //        "Expense e group by month, e.category order by month desc, sum desc")

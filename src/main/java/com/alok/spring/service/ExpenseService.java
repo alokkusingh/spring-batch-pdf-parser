@@ -55,11 +55,16 @@ public class ExpenseService {
                 .build();
     }
 
-    @Cacheable(value = CacheConfig.CacheName.EXPENSE, key = "{ #root.methodName, #currentDate }")
-    public GetExpensesResponse getCurrentMonthExpenses(LocalDate currentDate) {
+    @Cacheable(value = CacheConfig.CacheName.EXPENSE, key = "{ #root.methodName, #yearMonth, #category }")
+    public GetExpensesResponse getExpensesForMonth(java.time.YearMonth yearMonth, String category) {
         log.info("Current Month Expenses not available in cache");
 
-        List<Expense> expenses = expenseRepository.findAllForCurrentMonth(currentDate.getYear(), currentDate.getMonthValue());
+        List<Expense> expenses = null;
+        if (category == null)
+           expenses = expenseRepository.findAllForMonth(yearMonth.getYear(), yearMonth.getMonthValue());
+        else
+            expenses = expenseRepository.findAllForMonthAndCategory(yearMonth.getYear(), yearMonth.getMonthValue(), category);
+
         Collections.sort(expenses, (t1, t2) -> t2.getDate().compareTo(t1.getDate()));
 
         return GetExpensesResponse.builder()
@@ -84,7 +89,7 @@ public class ExpenseService {
         Date lastExpenseDate = expenseRepository.findLastTransactionDate()
                 .orElse(new Date());
 
-        List<Expense> expenses = expenseRepository.findAllForCurrentMonth(currentDate.getYear(), currentDate.getMonthValue());
+        List<Expense> expenses = expenseRepository.findAllForMonth(currentDate.getYear(), currentDate.getMonthValue());
         Collections.sort(expenses, (t1, t2) -> t2.getDate().compareTo(t1.getDate()));
 
         return GetExpensesResponseAggByDay.builder()
