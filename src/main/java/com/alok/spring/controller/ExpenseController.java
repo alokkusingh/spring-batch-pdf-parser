@@ -1,6 +1,7 @@
 package com.alok.spring.controller;
 
 import com.alok.spring.annotation.LogExecutionTime;
+import com.alok.spring.model.YearMonth;
 import com.alok.spring.response.*;
 import com.alok.spring.service.JobExecutorOfExpenseService;
 import com.alok.spring.service.ExpenseService;
@@ -114,6 +115,14 @@ public class ExpenseController {
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(cacheControlMaxAge, TimeUnit.SECONDS).noTransform().mustRevalidate())
                 .body(expenseService.getExpenseCategories());
+    }
+
+    @LogExecutionTime
+    @GetMapping(value = "/months", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<YearMonth>> getExpenseMonths() {
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(cacheControlMaxAge, TimeUnit.SECONDS).noTransform().mustRevalidate())
+                .body(expenseService.getExpenseMonths());
     }
     @LogExecutionTime
     @GetMapping(value = "/monthly/categories/{category}", produces = MediaType.APPLICATION_JSON_VALUE)

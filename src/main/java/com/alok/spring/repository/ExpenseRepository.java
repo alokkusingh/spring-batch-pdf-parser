@@ -3,6 +3,7 @@ package com.alok.spring.repository;
 import com.alok.spring.model.Expense;
 import com.alok.spring.model.IExpenseCategoryMonthSum;
 import com.alok.spring.model.IExpenseMonthSum;
+import com.alok.spring.model.YearMonth;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -38,6 +39,9 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 
     @Query("SELECT DISTINCT category from Expense")
     List<String> findDistinctCategories();
+
+    @Query("SELECT DISTINCT new com.alok.spring.model.YearMonth(year, month) from Expense")
+    List<YearMonth> findDistinctYearMonths();
 
 }
 

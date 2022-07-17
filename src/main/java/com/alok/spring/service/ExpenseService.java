@@ -4,6 +4,7 @@ import com.alok.spring.config.CacheConfig;
 import com.alok.spring.model.Expense;
 import com.alok.spring.model.IExpenseCategoryMonthSum;
 import com.alok.spring.model.IExpenseMonthSum;
+import com.alok.spring.model.YearMonth;
 import com.alok.spring.repository.ExpenseRepository;
 import com.alok.spring.response.GetExpensesMonthSumByCategoryResponse;
 import com.alok.spring.response.GetExpensesMonthSumResponse;
@@ -254,5 +255,12 @@ public class ExpenseService {
 
     public List<String> getExpenseCategories() {
         return expenseRepository.findDistinctCategories();
+    }
+
+    public List<YearMonth> getExpenseMonths() {
+        List<YearMonth> yearMonths = expenseRepository.findDistinctYearMonths();
+        Collections.sort(yearMonths);
+
+        return yearMonths;
     }
 }
