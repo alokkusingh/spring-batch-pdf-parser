@@ -1,10 +1,7 @@
 package com.alok.spring.service;
 
 import com.alok.spring.config.CacheConfig;
-import com.alok.spring.model.Expense;
-import com.alok.spring.model.IExpenseCategoryMonthSum;
-import com.alok.spring.model.IExpenseMonthSum;
-import com.alok.spring.model.YearMonth;
+import com.alok.spring.model.*;
 import com.alok.spring.repository.ExpenseRepository;
 import com.alok.spring.response.GetExpensesMonthSumByCategoryResponse;
 import com.alok.spring.response.GetExpensesMonthSumResponse;
@@ -14,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -267,5 +265,14 @@ public class ExpenseService {
         Collections.sort(yearMonths);
 
         return yearMonths;
+    }
+
+    @Transactional
+    public void saveAllExpenses(List<Expense> expenseRecords) {
+        log.info("Delete all the expenses first");
+        expenseRepository.deleteAll();
+
+        log.info("Save all the expenses");
+        expenseRepository.saveAll(expenseRecords);
     }
 }

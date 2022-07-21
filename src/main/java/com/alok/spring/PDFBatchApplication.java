@@ -43,10 +43,14 @@ public class PDFBatchApplication implements ApplicationRunner {
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
 		log.info("Application Started!!!");
+		System.out.println("Application Started!!!");
 
 		jobExecutorOfBankService.executeAllBatchJobs();
 		jobExecutorOfExpenseService.executeAllJobs();
 		jobExecutorOfTaxService.executeAllJobs();
 		jobExecutorOfInvestmentService.executeAllJobs();
+
+		log.info("All jobs completed!!!");
+		System.out.println("All jobs completed!!!");
 	}
 }

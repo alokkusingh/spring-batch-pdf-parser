@@ -1,11 +1,13 @@
 package com.alok.spring.service;
 
 import com.alok.spring.model.Investment;
+import com.alok.spring.model.Tax;
 import com.alok.spring.repository.InvestmentRepository;
 import com.alok.spring.response.GetInvestmentsResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -103,5 +105,14 @@ public class InvestmentService {
                 .investments(monthInvestments)
                 .totalInvestments(totalInvestments.get())
                 .build();
+    }
+
+    @Transactional
+    public void saveAllInvestments(List<Investment> investmentRecords) {
+        log.info("Delete all the investments first");
+        investmentRepository.deleteAll();
+
+        log.info("Save all the investments");
+        investmentRepository.saveAll(investmentRecords);
     }
 }

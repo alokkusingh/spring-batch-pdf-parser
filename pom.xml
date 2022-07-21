@@ -101,7 +101,18 @@
             <version>RELEASE</version>
             <scope>compile</scope>
         </dependency>
-    </dependencies>
+
+		<!-- https://mvnrepository.com/artifact/com.google.apis/google-api-services-sheets -->
+		<dependency>
+			<groupId>com.google.apis</groupId>
+			<artifactId>google-api-services-sheets</artifactId>
+			<version>v4-rev3-1.22.0</version>
+		</dependency>
+
+
+
+
+	</dependencies>
 
 	<build>
 		<plugins>
