@@ -1,5 +1,6 @@
 package com.alok.spring.service;
 
+import com.alok.spring.batch.utils.Utility;
 import com.alok.spring.constant.InvestmentType;
 import com.alok.spring.model.Expense;
 import com.alok.spring.model.Investment;
@@ -97,6 +98,7 @@ public class GoogleSheetService {
                         .comment(row.get(3) == null? "": (String) row.get(3))
                         .year(Integer.parseInt((String) row.get(4)))
                         .month(Integer.parseInt((String) row.get(5)))
+                        .category(Utility.getExpenseCategory((String) row.get(1), row.get(3) == null? "": (String) row.get(3)))
                         .build()
                 )
                 .toList();
