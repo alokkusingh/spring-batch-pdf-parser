@@ -32,6 +32,7 @@ public class GoogleSheetService {
     private TaxService taxService;
     private ExpenseService expenseService;
     private InvestmentService investmentService;
+    private CacheService cacheService;
 
     private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
 
@@ -43,7 +44,8 @@ public class GoogleSheetService {
             @Value("${range.investment-sheet}") String investmentSheetRange,
             TaxService taxService,
             ExpenseService expenseService,
-            InvestmentService investmentService
+            InvestmentService investmentService,
+            CacheService cacheService
     ) throws IOException, GeneralSecurityException {
         this.serviceAccountKeyFile = serviceAccountKeyFile;
         this.expenseSheetId = expenseSheetId;
@@ -53,6 +55,7 @@ public class GoogleSheetService {
         this.taxService = taxService;
         this.expenseService = expenseService;
         this.investmentService = investmentService;
+        this.cacheService = cacheService;
 
         InputStream inputStream = new FileInputStream(serviceAccountKeyFile); // put your service account's key.json file in asset folder.
 
@@ -82,6 +85,7 @@ public class GoogleSheetService {
                 .toList();
 
         taxService.saveAllTaxes(taxRecords);
+        cacheService.evictAllCaches();
     }
 
     public void refreshExpenseData() throws IOException {
@@ -104,6 +108,7 @@ public class GoogleSheetService {
                 .toList();
 
         expenseService.saveAllExpenses(expenseRecords);
+        cacheService.evictAllCaches();
     }
 
     public void refreshInvestmentData() throws IOException {
@@ -147,6 +152,7 @@ public class GoogleSheetService {
                 .toList();
 
         investmentService.saveAllInvestments(investmentRecords);
+        cacheService.evictAllCaches();
     }
 
     private Date parseToDate(String strDate) {
