@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/gsheet")
@@ -19,29 +20,47 @@ public class GoogleSheetController {
     }
 
     @GetMapping("/refresh/tax")
-    public ResponseEntity<String> refreshTaxData() throws IOException {
+    public ResponseEntity<String> refreshTaxData() {
 
-        googleSheetService.refreshTaxData();
+        CompletableFuture.runAsync(() -> {
+            try {
+                googleSheetService.refreshTaxData();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
-        return ResponseEntity.ok()
-                .body("Refreshed");
+        return ResponseEntity.accepted()
+                .body("Refresh submitted");
     }
 
     @GetMapping("/refresh/expense")
     public ResponseEntity<String> refreshExpenseData() throws IOException {
 
-        googleSheetService.refreshExpenseData();
+        CompletableFuture.runAsync(() -> {
+            try {
+                googleSheetService.refreshExpenseData();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
-        return ResponseEntity.ok()
-                .body("Refreshed");
+        return ResponseEntity.accepted()
+                .body("Refresh submitted");
     }
 
     @GetMapping("/refresh/investment")
-    public ResponseEntity<String> refreshInvestmentData() throws IOException {
+    public ResponseEntity<String> refreshInvestmentData() {
 
-        googleSheetService.refreshInvestmentData();
+        CompletableFuture.runAsync(() -> {
+            try {
+                googleSheetService.refreshInvestmentData();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
-        return ResponseEntity.ok()
-                .body("Refreshed");
+        return ResponseEntity.accepted()
+                .body("Refresh submitted");
     }
 }

@@ -267,6 +267,7 @@ public class ExpenseService {
         return yearMonths;
     }
 
+    @Transactional
     public void saveAllExpenses(List<Expense> expenseRecords) {
         log.info("Delete all the expenses first");
         expenseRepository.deleteAll();

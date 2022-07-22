@@ -107,6 +107,7 @@ public class InvestmentService {
                 .build();
     }
 
+    @Transactional
     public void saveAllInvestments(List<Investment> investmentRecords) {
         log.info("Delete all the investments first");
         investmentRepository.deleteAll();
