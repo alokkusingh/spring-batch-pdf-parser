@@ -1,6 +1,7 @@
 package com.alok.spring.controller;
 
 import com.alok.spring.service.GoogleSheetService;
+import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -8,12 +9,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/gsheet")
 public class GoogleSheetController {
 
     private GoogleSheetService googleSheetService;
+    private static final int REFRESH_CASH_CONTROL = 3000;
 
     public GoogleSheetController(GoogleSheetService googleSheetService) {
         this.googleSheetService = googleSheetService;
@@ -31,6 +34,7 @@ public class GoogleSheetController {
         });
 
         return ResponseEntity.accepted()
+                .cacheControl(CacheControl.maxAge(REFRESH_CASH_CONTROL, TimeUnit.SECONDS).noTransform().mustRevalidate())
                 .body("Refresh submitted");
     }
 
@@ -46,6 +50,7 @@ public class GoogleSheetController {
         });
 
         return ResponseEntity.accepted()
+                .cacheControl(CacheControl.maxAge(REFRESH_CASH_CONTROL, TimeUnit.SECONDS).noTransform().mustRevalidate())
                 .body("Refresh submitted");
     }
 
@@ -61,6 +66,7 @@ public class GoogleSheetController {
         });
 
         return ResponseEntity.accepted()
+                .cacheControl(CacheControl.maxAge(REFRESH_CASH_CONTROL, TimeUnit.SECONDS).noTransform().mustRevalidate())
                 .body("Refresh submitted");
     }
 }
