@@ -11,8 +11,10 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+@ConfigurationPropertiesScan("com.alok.spring.mqtt.config")
 @EnableScheduling
 @SpringBootApplication
 @Slf4j

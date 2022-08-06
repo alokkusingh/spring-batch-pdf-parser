@@ -38,6 +38,9 @@ public class MqttCallbackListener implements MqttCallback {
     @Value("${server.port}")
     private Integer serverPort;
 
+    @Autowired
+    private IotProperties iotProperties;
+
     @Override
     public void connectionLost(Throwable throwable) {
         log.warn("Connection Lost");
