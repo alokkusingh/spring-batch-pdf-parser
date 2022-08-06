@@ -1,7 +1,11 @@
 package com.alok.spring.mqtt.config;
 
-import com.alok.spring.mqtt.service.MqttClientService;
-import com.alok.spring.mqtt.utils.CertUtils;
+import com.alok.mqtt.listener.MqttCallbackListener;
+import com.alok.mqtt.processor.RequestProcessor;
+import com.alok.mqtt.service.MqttClientService;
+import com.alok.mqtt.utils.CertUtils;
+import com.alok.spring.config.ServerProperties;
+import com.alok.spring.mqtt.processor.CustomRequestProcessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.paho.client.mqttv3.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,34 +26,14 @@ public class MqttClientConfig {
     private IotProperties iotProperties;
 
     @Autowired
-    private MqttCallbackListener mqttCallbackListener;
+    private ServerProperties serverProperties;
 
-    public byte[] offlineMessage() {
+    @Autowired
+    private MqttClientService mqttClientService;
 
-        return (iotProperties.getMqtt().getClientId() + "-OFFLINE").getBytes(StandardCharsets.UTF_8);
-    }
-
-    public byte[] onlineMessage() {
-        return (iotProperties.getMqtt().getClientId() + "-ONLINE").getBytes(StandardCharsets.UTF_8);
-    }
 
     @Bean
-    public IMqttClient mqttClient() throws MqttException {
-
-        String publisherId = iotProperties.getMqtt().getClientId();
-        String iotClientUrl = String.format("ssl://%s:%s", iotProperties.getMqtt().getHost(), iotProperties.getMqtt().getPort());
-
-        MqttClient mqttClient = new MqttClient(iotClientUrl, publisherId);
-
-        mqttClient.setCallback(mqttCallbackListener);
-
-        return mqttClient;
-    }
-
-    @Bean
-    public MqttConnectOptions mqttClientConnectOptions(
-            Properties sslClientProperties
-    ) {
+    public MqttConnectOptions mqttClientConnectOptions() {
         MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
         mqttConnectOptions.setCleanSession(iotProperties.getMqtt().getCleanState());
         mqttConnectOptions.setAutomaticReconnect(iotProperties.getMqtt().getAutoReconnect());
@@ -57,7 +41,7 @@ public class MqttClientConfig {
         mqttConnectOptions.setKeepAliveInterval(iotProperties.getMqtt().getKeepAlive());
         mqttConnectOptions.setWill(iotProperties.getMqtt().getStatusTopic(), offlineMessage(), 1, false);
 
-        mqttConnectOptions.setSSLProperties(sslClientProperties);
+        mqttConnectOptions.setSSLProperties(sslClientProperties());
 
         return mqttConnectOptions;
     }
@@ -77,30 +61,45 @@ public class MqttClientConfig {
 
     @Bean(initMethod = "connect", destroyMethod = "disConnect")
     public MqttClientService mqttClientService(
-            IMqttClient mqttClient,
             MqttConnectOptions mqttClientConnectOptions
     ) {
 
         MqttClientService mqttClientService = new MqttClientService();
 
-        mqttClientService.setClientId(iotProperties.getMqtt().getClientId());
-        mqttClientService.setMqttClient(mqttClient);
+        mqttClientService.setIotProperties(iotProperties);
         mqttClientService.setMqttConnectOptions(mqttClientConnectOptions);
-        mqttClientService.setConnectRetry(iotProperties.getMqtt().getConnectionRetry());
-        mqttClientService.setSubscriptionTopic(iotProperties.getMqtt().getSubscribeTopic());
-        mqttClientService.setQos(iotProperties.getMqtt().getSubscribeQos());
-        mqttClientService.setPublishTopic(iotProperties.getMqtt().getPublishTopic());
+        mqttClientService.setMqttCallbackListener(mqttCallbackListener());
 
         return mqttClientService;
+    }
+
+
+    public MqttCallbackListener mqttCallbackListener() {
+        return MqttCallbackListener.builder()
+                .requestProcessor(requestProcessor())
+                .build();
+    }
+
+    @Bean
+    public RequestProcessor requestProcessor() {
+        return new CustomRequestProcessor(
+                objectMapper(),
+                restTemplate(),
+                serverProperties.getPort()
+        );
     }
 
     @Bean
     public ObjectMapper objectMapper() {
         return new ObjectMapper();
     }
-
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
+    }
+
+    public byte[] offlineMessage() {
+
+        return (iotProperties.getMqtt().getClientId() + "-OFFLINE").getBytes(StandardCharsets.UTF_8);
     }
 }
