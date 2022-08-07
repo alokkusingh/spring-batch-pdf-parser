@@ -4,6 +4,7 @@ import com.alok.mqtt.listener.MqttCallbackListener;
 import com.alok.mqtt.processor.RequestProcessor;
 import com.alok.mqtt.service.MqttClientService;
 import com.alok.spring.config.ServerProperties;
+import com.alok.spring.mqtt.listener.CustomMqttCallbackListener;
 import com.alok.spring.mqtt.processor.CustomRequestProcessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,6 @@ public class MqttClientConfig {
         MqttClientService mqttClientService = new MqttClientService();
 
         mqttClientService.setIotProperties(iotProperties);
-        //mqttClientService.setMqttConnectOptions(mqttClientConnectOptions);
         mqttClientService.setMqttCallbackListener(mqttCallbackListener());
 
         return mqttClientService;
@@ -43,9 +43,9 @@ public class MqttClientConfig {
 
 
     public MqttCallbackListener mqttCallbackListener() {
-        return MqttCallbackListener.builder()
-                .requestProcessor(requestProcessor())
-                .build();
+        return new CustomMqttCallbackListener(
+                requestProcessor()
+        );
     }
 
     @Bean
