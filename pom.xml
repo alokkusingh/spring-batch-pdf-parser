@@ -112,7 +112,7 @@
 		<dependency>
 			<groupId>com.alok.mqtt</groupId>
 			<artifactId>mqtt-proxy</artifactId>
-			<version>1.0.0</version>
+			<version>1.0.1</version>
 		</dependency>
 
 
@@ -132,7 +132,7 @@ Note: "github" repository definition is present in setting.xml
 -->
 	<distributionManagement>
 		<repository>
-			<id>github-pdf</id>
+			<id>mqtt-proxy</id>
 			<name>GitHub Packages</name>
 			<url>https://maven.pkg.github.com/alokkusingh/mqtt-proxy</url>
 		</repository>
