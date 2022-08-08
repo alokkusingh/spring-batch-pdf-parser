@@ -27,16 +27,25 @@ public class CustomMqttCallbackListener extends MqttCallbackListener {
     @Override
     public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
         log.info("Message arrived - {} - {}", topic, mqttMessage);
+        RequestPayload requestPayload = null;
+        ResponseEntity<String> httpResponse = null;
         try {
-            RequestPayload requestPayload = this.requestProcessor.parseMqttRequest(mqttMessage.getPayload());
-            ResponseEntity<String> httpResponse = this.requestProcessor.processRequest(requestPayload);
-            httpResponse = Optional.ofNullable(httpResponse).orElse(new ResponseEntity(HttpStatus.BAD_REQUEST));
-            requestPayload = Optional.ofNullable(requestPayload).orElse(new RequestPayload());
-            ResponsePayload responsePayload = this.requestProcessor.prepareMqttResponse(requestPayload, httpResponse);
-            super.getMqttClientService().publish(responsePayload);
+            requestPayload = this.requestProcessor.parseMqttRequest(mqttMessage.getPayload());
+
+            httpResponse = this.requestProcessor.processRequest(requestPayload);
         } catch (Exception e) {
             log.error("Error processing payload, error: {}", e.getMessage());
             e.printStackTrace();
+        } finally {
+            requestPayload = Optional.ofNullable(requestPayload).orElse(new RequestPayload());
+            httpResponse = Optional.ofNullable(httpResponse).orElse(new ResponseEntity("Bad Request", HttpStatus.BAD_REQUEST));
+            ResponsePayload responsePayload = this.requestProcessor.prepareMqttResponse(requestPayload, httpResponse);
+            try {
+                super.getMqttClientService().publish(responsePayload);
+            } catch (Exception e) {
+                // Dont throw otherwise the request wll payload will be received again
+                e.printStackTrace();
+            }
         }
     }
 }
