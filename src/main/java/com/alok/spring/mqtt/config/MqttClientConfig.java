@@ -57,7 +57,9 @@ public class MqttClientConfig {
         );
     }
 
-    @Bean
+    // Don't decalare ObjectMapper as bean
+    // Side effect - the actuall PDF API implementaion uses this bean and converts time to epoche
+    //@Bean
     public ObjectMapper objectMapper() {
         return new ObjectMapper();
     }
