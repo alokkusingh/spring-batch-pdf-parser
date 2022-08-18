@@ -10,4 +10,8 @@ public class CustomCollectors {
         return new DayExpenseCollector();
     }
 
+    public static MonthInvestmentCollector toMonthInvestmentList() {
+        return new MonthInvestmentCollector();
+    }
+
 }

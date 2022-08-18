@@ -102,6 +102,12 @@
             <scope>compile</scope>
         </dependency>
 
+		<dependency>
+			<groupId>org.javatuples</groupId>
+			<artifactId>javatuples</artifactId>
+			<version>1.2</version>
+		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/com.google.apis/google-api-services-sheets -->
 		<dependency>
 			<groupId>com.google.apis</groupId>
