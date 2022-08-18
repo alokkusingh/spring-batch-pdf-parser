@@ -20,6 +20,7 @@ public class GetInvestmentsResponse {
     public static class MonthInvestment implements Comparable<MonthInvestment> {
         String yearMonth;
         Long investmentAmount;
+        Long asOnInvestment;
         Long asOnValue;
         List<Investment> investments;
 
@@ -33,6 +34,7 @@ public class GetInvestmentsResponse {
         public static class Investment {
             String head;
             Integer investmentAmount;
+            Integer asOnInvestment;
             Integer asOnValue;
         }
     }

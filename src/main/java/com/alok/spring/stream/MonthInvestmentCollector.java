@@ -56,17 +56,20 @@ public class MonthInvestmentCollector implements
                 yearMonthInvestmentMap.put(yearMonth, GetInvestmentsResponse.MonthInvestment.builder()
                                 .yearMonth(yearMonth.toString())
                                 .investmentAmount(0L)
+                                .asOnInvestment(0L)
                                 .asOnValue(0L)
                                 .investments(new ArrayList<>())
                         .build());
             }
             var monthInvestment = yearMonthInvestmentMap.get(yearMonth);
             monthInvestment.setInvestmentAmount(monthInvestment.getInvestmentAmount() + investment.getContribution());
+            monthInvestment.setAsOnInvestment(investmentSummaryQuartet.getValue0().getValue());
             monthInvestment.setAsOnValue(monthInvestment.getAsOnValue() + investment.getValueAsOnMonth());
             monthInvestment.getInvestments().add(GetInvestmentsResponse.MonthInvestment.Investment.builder()
                     .head(investment.getHead())
                     .investmentAmount(investment.getContribution())
                     .asOnValue(investment.getValueAsOnMonth())
+                    .asOnInvestment(Math.toIntExact(categoryInvestmentMap.get(investment.getHead())))
                     .build());
         };
     }
