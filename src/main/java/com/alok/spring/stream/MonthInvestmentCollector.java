@@ -19,7 +19,7 @@ import org.javatuples.Quartet;
 public class MonthInvestmentCollector implements
         Collector<
                 Investment,
-                Quartet<MonthInvestmentCollector.MutableLong, Pair<MonthInvestmentCollector.MutableYearMonth, MonthInvestmentCollector.MutableLong>, Map<String, Long>, Map<YearMonth, GetInvestmentsResponse.MonthInvestment>>,
+                Quartet<MutableLong, Pair<MutableYearMonth, MutableLong>, Map<String, Long>, Map<YearMonth, GetInvestmentsResponse.MonthInvestment>>,
                 Quartet<Long, Long, Map<String, Long>, List<GetInvestmentsResponse.MonthInvestment>>
                 > {
     @Override
@@ -94,22 +94,23 @@ public class MonthInvestmentCollector implements
         return Collections.emptySet();
     }
 
-    @Data
-    public static class MutableLong {
-        private long value;
 
-        public void add(long value) {
-            this.value += value;
-        }
+}
+
+@Data
+class MutableLong {
+    private long value;
+
+    public void add(long value) {
+        this.value += value;
     }
+}
 
 
-    @Data
-    public static class MutableYearMonth {
-        private YearMonth value;
+@Data class MutableYearMonth {
+    private YearMonth value;
 
-        public MutableYearMonth() {
-            value = YearMonth.of(2007, 1);
-        }
+    public MutableYearMonth() {
+        value = YearMonth.of(2007, 1);
     }
 }
