@@ -1,12 +1,16 @@
 package com.alok.spring.service;
 
 import com.alok.spring.config.CacheConfig;
-import com.alok.spring.model.*;
+import com.alok.spring.model.Expense;
+import com.alok.spring.model.IExpenseCategoryMonthSum;
+import com.alok.spring.model.IExpenseMonthSum;
+import com.alok.spring.model.YearMonth;
 import com.alok.spring.repository.ExpenseRepository;
 import com.alok.spring.response.GetExpensesMonthSumByCategoryResponse;
 import com.alok.spring.response.GetExpensesMonthSumResponse;
 import com.alok.spring.response.GetExpensesResponse;
 import com.alok.spring.response.GetExpensesResponseAggByDay;
+import com.alok.spring.stream.CustomCollectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -17,21 +21,18 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class ExpenseService {
 
-    @Autowired
     private ExpenseRepository expenseRepository;
-
     private final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+
+    public ExpenseService(ExpenseRepository expenseRepository) {
+        this.expenseRepository = expenseRepository;
+    }
 
     @Cacheable(value = CacheConfig.CacheName.EXPENSE, key = "#root.methodName")
     public GetExpensesResponse getAllExpenses() {
@@ -96,8 +97,8 @@ public class ExpenseService {
         Collections.sort(expenses, (t1, t2) -> t2.getDate().compareTo(t1.getDate()));
 
         return GetExpensesResponseAggByDay.builder()
-                .expenses(aggregateExpensesByDayX(expenses))
-                .categoryExpenses(aggregateExpensesByCategory(expenses))
+                .expenses(expenses.stream().collect(CustomCollectors.toDayExpenseList()))
+                .categoryExpenses(expenses.stream().collect(CustomCollectors.toCategoryExpenseList()))
                 .lastTransactionDate(lastExpenseDate)
                 .count(expenses.size())
                 .build();
@@ -139,28 +140,79 @@ public class ExpenseService {
                 .build();
     }
 
-    private List<GetExpensesResponseAggByDay.DayExpense> aggregateExpensesByDay(List<Expense> expenses) {
+    private Date strToDate(String dateStr) {
+        try {
+            return df.parse(dateStr);
+        } catch (ParseException e) {
+            return null;
+        }
+    }
+
+    @Cacheable(value = CacheConfig.CacheName.EXPENSE, key = "{ #root.methodName, #category }")
+    public GetExpensesResponse getExpensesForCategory(String category) {
+        log.info("Expenses for Category not available in cache");
+
+        List<Expense> expenses = expenseRepository.findAllForCategory(category);
+        Collections.sort(expenses, (t1, t2) -> t2.getDate().compareTo(t1.getDate()));
+
+        return GetExpensesResponse.builder()
+                .expenses(expenses.stream()
+                        .map(expense -> GetExpensesResponse.Expense.builder()
+                                .id(expense.getId())
+                                .date(expense.getDate())
+                                .head(expense.getHead())
+                                .amount(expense.getAmount())
+                                .category(expense.getCategory())
+                                .comment(expense.getComment())
+                                .build())
+                        .collect(Collectors.toList()))
+                .count(expenses.size())
+                .build();
+    }
+
+    public List<String> getExpenseCategories() {
+        return expenseRepository.findDistinctCategories();
+    }
+
+    public List<YearMonth> getExpenseMonths() {
+        List<YearMonth> yearMonths = expenseRepository.findDistinctYearMonths();
+        Collections.sort(yearMonths);
+
+        return yearMonths;
+    }
+
+    @Transactional
+    public void saveAllExpenses(List<Expense> expenseRecords) {
+        log.info("Delete all the expenses first");
+        expenseRepository.deleteAll();
+
+        log.info("Save all the expenses");
+        expenseRepository.saveAll(expenseRecords);
+    }
+
+    @Deprecated
+    private List<GetExpensesResponseAggByDay.DayExpense> aggregateExpensesByDayX(List<Expense> expenses) {
 
         Map<String, Double> dayExpensesSum = expenses.stream()
                 .collect(Collectors.groupingBy(
-                        expense -> df.format(expense.getDate()),
-                        Collectors.collectingAndThen(
-                                Collectors.summarizingDouble(Expense::getAmount),
-                                DoubleSummaryStatistics::getSum
+                                expense -> df.format(expense.getDate()),
+                                Collectors.collectingAndThen(
+                                        Collectors.summarizingDouble(Expense::getAmount),
+                                        DoubleSummaryStatistics::getSum
+                                )
                         )
-                    )
                 );
 
         Map<String, List<GetExpensesResponseAggByDay.Expense>> dayExpenses = expenses.stream()
                 .collect(Collectors.groupingBy(
-                        expense -> df.format(expense.getDate()),
-                        Collectors.mapping(
-                                expense -> GetExpensesResponseAggByDay.Expense.builder()
-                                        .head(expense.getHead())
-                                        .comment(expense.getComment())
-                                        .amount(expense.getAmount())
-                                        .build(),
-                                Collectors.toList())
+                                expense -> df.format(expense.getDate()),
+                                Collectors.mapping(
+                                        expense -> GetExpensesResponseAggByDay.Expense.builder()
+                                                .head(expense.getHead())
+                                                .comment(expense.getComment())
+                                                .amount(expense.getAmount())
+                                                .build(),
+                                        Collectors.toList())
                         )
                 );
 
@@ -206,75 +258,7 @@ public class ExpenseService {
                 .collect(Collectors.toList());
     }
 
-    private List<GetExpensesResponseAggByDay.DayExpense> aggregateExpensesByDayX(List<Expense> expenses) {
-
-        List<GetExpensesResponseAggByDay.DayExpense> expenseDaysSummary = expenses.stream()
-                .collect(DayExpenseCollector.toDayExpenseList());
-
-        return expenseDaysSummary;
-    }
-
-    static class DayExpenseCollector implements Collector<Expense, Map<Date, GetExpensesResponseAggByDay.DayExpense>, List<GetExpensesResponseAggByDay.DayExpense>> {
-
-        public static DayExpenseCollector toDayExpenseList() {
-            return new DayExpenseCollector();
-        }
-
-
-        @Override
-        public Supplier<Map<Date, GetExpensesResponseAggByDay.DayExpense>> supplier() {
-            return HashMap::new;
-        }
-
-        @Override
-        public BiConsumer<Map<Date, GetExpensesResponseAggByDay.DayExpense>, Expense> accumulator() {
-            return (expenseDayMap, expense) -> {
-                if (!expenseDayMap.containsKey(expense.getDate())) {
-                    expenseDayMap.put(
-                            expense.getDate(),
-                            GetExpensesResponseAggByDay.DayExpense.builder()
-                                    .expenses(new ArrayList<>())
-                                    .amount(0d)
-                                    .date(expense.getDate())
-                                    .build()
-                    );
-                }
-
-                GetExpensesResponseAggByDay.DayExpense dayExpenses = expenseDayMap.get(expense.getDate());
-                dayExpenses.getExpenses().add(GetExpensesResponseAggByDay.Expense.builder()
-                                .amount(expense.getAmount())
-                                .head(expense.getHead())
-                                .comment(expense.getComment())
-                        .build());
-                dayExpenses.setAmount(dayExpenses.getAmount() + expense.getAmount());
-            };
-        }
-
-        @Override
-        public BinaryOperator<Map<Date, GetExpensesResponseAggByDay.DayExpense>> combiner() {
-            return null;
-        }
-
-        @Override
-        public Function<Map<Date, GetExpensesResponseAggByDay.DayExpense>, List<GetExpensesResponseAggByDay.DayExpense>> finisher() {
-
-            return (dayExpensesMap) -> new ArrayList<>(dayExpensesMap.values());
-        }
-
-        @Override
-        public Set<Characteristics> characteristics() {
-            return Set.of(Characteristics.UNORDERED);
-        }
-    }
-
-    private Date strToDate(String dateStr) {
-        try {
-            return df.parse(dateStr);
-        } catch (ParseException e) {
-            return null;
-        }
-    }
-
+    @Deprecated
     private List<GetExpensesResponseAggByDay.CategoryExpense> aggregateExpensesByCategory(List<Expense> expenses) {
 
         Map<String, Double> catExpenses = expenses.stream()
@@ -298,47 +282,5 @@ public class ExpenseService {
                         .build())
                 .sorted()
                 .collect(Collectors.toList());
-    }
-
-    @Cacheable(value = CacheConfig.CacheName.EXPENSE, key = "{ #root.methodName, #category }")
-    public GetExpensesResponse getExpensesForCategory(String category) {
-        log.info("Expenses for Category not available in cache");
-
-        List<Expense> expenses = expenseRepository.findAllForCategory(category);
-        Collections.sort(expenses, (t1, t2) -> t2.getDate().compareTo(t1.getDate()));
-
-        return GetExpensesResponse.builder()
-                .expenses(expenses.stream()
-                        .map(expense -> GetExpensesResponse.Expense.builder()
-                                .id(expense.getId())
-                                .date(expense.getDate())
-                                .head(expense.getHead())
-                                .amount(expense.getAmount())
-                                .category(expense.getCategory())
-                                .comment(expense.getComment())
-                                .build())
-                        .collect(Collectors.toList()))
-                .count(expenses.size())
-                .build();
-    }
-
-    public List<String> getExpenseCategories() {
-        return expenseRepository.findDistinctCategories();
-    }
-
-    public List<YearMonth> getExpenseMonths() {
-        List<YearMonth> yearMonths = expenseRepository.findDistinctYearMonths();
-        Collections.sort(yearMonths);
-
-        return yearMonths;
-    }
-
-    @Transactional
-    public void saveAllExpenses(List<Expense> expenseRecords) {
-        log.info("Delete all the expenses first");
-        expenseRepository.deleteAll();
-
-        log.info("Save all the expenses");
-        expenseRepository.saveAll(expenseRecords);
     }
 }
