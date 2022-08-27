@@ -33,6 +33,7 @@ public class GetExpensesResponseAggByDay {
     public static class CategoryExpense implements Comparable<CategoryExpense> {
         private String category;
         private Double amount;
+        private List<Expense> expenses;
 
         @Override
         public int compareTo(CategoryExpense o) {
@@ -43,6 +44,7 @@ public class GetExpensesResponseAggByDay {
     @Data
     @Builder
     public static class Expense {
+        private LocalDate date;
         private String head;
         private String comment;
         private Double amount;

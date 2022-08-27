@@ -36,6 +36,7 @@ public class DayExpenseCollector implements Collector<Expense, Map<LocalDate, Ge
 
                 GetExpensesResponseAggByDay.DayExpense dayExpenses = expenseDayMap.get(date);
                 dayExpenses.getExpenses().add(GetExpensesResponseAggByDay.Expense.builder()
+                        .date(date)
                         .amount(expense.getAmount())
                         .head(expense.getHead())
                         .comment(expense.getComment())

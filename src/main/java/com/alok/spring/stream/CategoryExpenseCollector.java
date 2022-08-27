@@ -2,6 +2,7 @@ package com.alok.spring.stream;
 
 import com.alok.spring.model.Expense;
 import com.alok.spring.response.GetExpensesResponseAggByDay;
+import com.alok.spring.utils.DateUtils;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -23,12 +24,19 @@ public class CategoryExpenseCollector implements Collector<Expense, Map<String, 
             expenseCategoryMap.putIfAbsent(
                     expense.getCategory(),
                     GetExpensesResponseAggByDay.CategoryExpense.builder()
+                            .expenses(new ArrayList<>())
                             .category(expense.getCategory())
                             .amount(0d)
                             .build()
             );
 
             GetExpensesResponseAggByDay.CategoryExpense categoryExpense = expenseCategoryMap.get(expense.getCategory());
+            categoryExpense.getExpenses().add(GetExpensesResponseAggByDay.Expense.builder()
+                    .date(DateUtils.convertToLocalDateViaInstant(expense.getDate()))
+                    .amount(expense.getAmount())
+                    .head(expense.getHead())
+                    .comment(expense.getComment())
+                    .build());
             categoryExpense.setAmount(categoryExpense.getAmount() + expense.getAmount());
         };
     }
