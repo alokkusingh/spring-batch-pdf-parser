@@ -42,13 +42,13 @@ java -jar target/spring-batch-pdf-parser-0.0.2-SNAPSHOT.jar --file.path.base.dir
    ````
 2. Docker Build, Push & Run
    ````
-   docker build -t alokkusingh/statement-parser:latest -t alokkusingh/statement-parser:2.0.0 --build-arg JAR_FILE=target/spring-batch-pdf-parser-1.0.1-SNAPSHOT.jar .
+   docker build -t alokkusingh/statement-parser:latest -t alokkusingh/statement-parser:2.1.0 --build-arg JAR_FILE=target/spring-batch-pdf-parser-1.0.2-SNAPSHOT.jar .
    ````
    ````
    docker push alokkusingh/statement-parser:latest
    ````
    ````
-   docker push alokkusingh/statement-parser:2.0.0
+   docker push alokkusingh/statement-parser:2.1.0
    ````
    ````
    docker run -d -v /home/alok/data/git/BankStatements:/Users/aloksingh/BankStatements:rw,Z -p 8081:8081 --rm --name statement-parser alokkusingh/statement-parser
