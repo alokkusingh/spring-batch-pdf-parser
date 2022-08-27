@@ -20,15 +20,13 @@ public class CategoryExpenseCollector implements Collector<Expense, Map<String, 
     @Override
     public BiConsumer<Map<String, GetExpensesResponseAggByDay.CategoryExpense>, Expense> accumulator() {
         return (expenseCategoryMap, expense) -> {
-            if (!expenseCategoryMap.containsKey(expense.getDate())) {
-                expenseCategoryMap.put(
-                        expense.getCategory(),
-                        GetExpensesResponseAggByDay.CategoryExpense.builder()
-                                .category(expense.getCategory())
-                                .amount(0d)
-                                .build()
-                );
-            }
+            expenseCategoryMap.putIfAbsent(
+                    expense.getCategory(),
+                    GetExpensesResponseAggByDay.CategoryExpense.builder()
+                            .category(expense.getCategory())
+                            .amount(0d)
+                            .build()
+            );
 
             GetExpensesResponseAggByDay.CategoryExpense categoryExpense = expenseCategoryMap.get(expense.getCategory());
             categoryExpense.setAmount(categoryExpense.getAmount() + expense.getAmount());
