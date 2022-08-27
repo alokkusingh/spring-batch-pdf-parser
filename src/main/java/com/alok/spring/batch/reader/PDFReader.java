@@ -62,8 +62,8 @@ public class PDFReader implements ResourceAwareItemReaderItemStream {
     public void open(ExecutionContext executionContext) throws ItemStreamException {
         log.info("Started Processing File: {}",String.valueOf(resource));
 
-        Optional<List<ProcessedFile>> processedFile = processedFileRepository.findAllByName(resource.getFilename());
-        if (processedFile.isPresent()) {
+        List<ProcessedFile> processedFile = processedFileRepository.findAllByName(resource.getFilename());
+        if (!processedFile.isEmpty()) {
             log.warn("File already processed - skipping!");
             return;
         }
@@ -108,9 +108,9 @@ public class PDFReader implements ResourceAwareItemReaderItemStream {
         log.debug("Finished Processing File: {}",String.valueOf(resource));
         if(pdfreader != null && resource != null) {
             pdfreader.close();
-            Optional<List<ProcessedFile>> processedFile = processedFileRepository.findAllByName(resource.getFilename());
+            List<ProcessedFile> processedFile = processedFileRepository.findAllByName(resource.getFilename());
 
-            if (!processedFile.isPresent()) {
+            if (processedFile.isEmpty()) {
                 processedFileRepository.save(
                         ProcessedFile.builder()
                                 .name(resource.getFilename())

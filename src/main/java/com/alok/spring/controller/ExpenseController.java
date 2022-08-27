@@ -1,6 +1,7 @@
 package com.alok.spring.controller;
 
 import com.alok.spring.annotation.LogExecutionTime;
+import com.alok.spring.model.YearMonth;
 import com.alok.spring.response.*;
 import com.alok.spring.service.JobExecutorOfExpenseService;
 import com.alok.spring.service.ExpenseService;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -80,21 +82,59 @@ public class ExpenseController {
     }
 
     @LogExecutionTime
-    @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<GetExpensesResponse> getAllExpenses() {
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<GetExpensesResponse> getExpenses(
+            @RequestParam(required = false) String yearMonth,
+            @RequestParam(required = false) String category
+    ) {
+        GetExpensesResponse expenses = null;
+        if (yearMonth == null && category == null)
+           expenses = expenseService.getAllExpenses();
+        else if (yearMonth == null && category != null)
+            expenses = expenseService.getExpensesForCategory(category);
+        else if (yearMonth != null) {
+             java.time.YearMonth ym = null;
+            if (yearMonth.equals("current_month"))
+                ym = java.time.YearMonth.now();
+            else {
+                String ymArr[] = yearMonth.split("-");
+                ym = java.time.YearMonth.of(Integer.valueOf(ymArr[0]), Integer.valueOf(ymArr[1]));
+            }
+
+            expenses = expenseService.getExpensesForMonth(
+                    ym,
+                    category
+            );
+        }
 
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(cacheControlMaxAge, TimeUnit.SECONDS).noTransform().mustRevalidate())
-                .body(expenseService.getAllExpenses());
+                .body(expenses);
     }
 
     @LogExecutionTime
-    @GetMapping(value = "/current_month", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<GetExpensesResponse> getCurrentMonthExpenses() {
-        LocalDate currentDate = LocalDate.now();
+    @GetMapping(value = "/categories/names", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<String>> getExpenseCategories() {
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(cacheControlMaxAge, TimeUnit.SECONDS).noTransform().mustRevalidate())
-                .body(expenseService.getCurrentMonthExpenses(currentDate));
+                .body(expenseService.getExpenseCategories());
+    }
+
+    @LogExecutionTime
+    @GetMapping(value = "/months", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<YearMonth>> getExpenseMonths() {
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(cacheControlMaxAge, TimeUnit.SECONDS).noTransform().mustRevalidate())
+                .body(expenseService.getExpenseMonths());
+    }
+    @LogExecutionTime
+    @GetMapping(value = "/monthly/categories/{category}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<GetExpensesMonthSumByCategoryResponse> getMonthlyExpenseForCategory(
+            @PathVariable(value = "category") String category
+    ) {
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(cacheControlMaxAge, TimeUnit.SECONDS).noTransform().mustRevalidate())
+                .body(expenseService.getMonthlyExpenseForCategory(category));
     }
 
     @LogExecutionTime

@@ -1,15 +1,17 @@
 package com.alok.spring.service;
 
 import com.alok.spring.annotation.LogExecutionTime;
+import com.alok.spring.batch.constant.JobConstants;
 import com.alok.spring.config.CacheConfig;
 import com.alok.spring.constant.Bank;
 import com.alok.spring.constant.BatchOf;
 import com.alok.spring.constant.MDCKey;
+import com.alok.spring.exception.UploadTypeNotSupportedException;
 import com.alok.spring.model.Transaction;
-import com.alok.spring.repository.ProcessedFileRepository;
 import com.alok.spring.repository.TransactionRepository;
 import com.alok.spring.constant.UploadType;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.MDC;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -31,119 +33,102 @@ import java.util.List;
 @Service
 public class JobExecutorOfBankService {
 
-    @Autowired
-    private ResourceLoader resourceLoader;
-
-    @Value("${dir.path.hdfc_account.imported}")
-    private String hdfcExportDir;
-
-    @Value("${dir.path.kotak_account.imported}")
-    private String kotakExportDir;
-
-    @Autowired
-    private JobLauncher jobLauncher;
-
-    @Autowired
-    @Qualifier("MissingAccountJob")
-    private Job missingAccountJob;
-
-    @Autowired
-    @Qualifier("CitiBankJob1")
-    private Job citiBankJob1;
-
-    @Autowired
-    @Qualifier("CitiBankJob2")
-    private Job citiBankJob2;
-
-    @Autowired
-    @Qualifier("CitiBankJob3")
-    private Job citiBankJob3;
-
-    @Autowired
-    @Qualifier("KotakBankJob")
-    private Job kotakBankJob;
-
-    @Autowired
-    @Qualifier("KotakBankNoPwdJob")
-    private Job kotakBankNoPwdJob;
-
-    @Autowired
-    @Qualifier("KotakImportedAccountJob")
-    private Job kotakImportedAccountJob;
-
-    @Autowired
-    @Qualifier("KotakImportedAccountJobV2")
-    private Job kotakImportedAccountJobV2;
-
-    @Autowired
-    @Qualifier("HDFCImportedAccountJob")
-    private Job hdfcImportedAccountJob;
-
-    @Autowired
-    private MultiResourceItemReader<Transaction> hdfcImportedItemsReader;
-
-    @Autowired
-    private MultiResourceItemReader<Transaction> kotakImportedItemsReaderV2;
-
-    @Autowired
-    private CacheService cacheService;
-
-    @Autowired
-    FlatFileItemWriter<Transaction> csvWriterForGoogleSheet;
-
-    @Autowired
-    private TransactionRepository transactionRepository;
-
-    @Autowired
-    private ProcessedFileRepository processedFileRepository;
-
-    private String outputFileName;
+    private final ResourceLoader resourceLoader;
+    private final String hdfcExportDir;
+    private final String kotakExportDir;
+    private final JobLauncher jobLauncher;
+    private final Job missingAccountJob;
+    private final Job citiBankJob1;
+    private final Job citiBankJob2;
+    private final Job citiBankJob3;
+    private final Job kotakBankJob;
+    private final Job kotakBankNoPwdJob;
+    private final Job kotakImportedAccountJob;
+    private final Job kotakImportedAccountJobV2;
+    private final Job hdfcImportedAccountJob;
+    private final MultiResourceItemReader<Transaction> hdfcImportedItemsReader;
+    private final MultiResourceItemReader<Transaction> kotakImportedItemsReaderV2;
+    private final CacheService cacheService;
+    private final FlatFileItemWriter<Transaction> csvWriterForGoogleSheet;
+    private final TransactionRepository transactionRepository;
+    private final String outputFileName;
 
     @Autowired
     public JobExecutorOfBankService(
-            @Value("${file.export.google.sheet}")
-                    String outputFileName
+            JobLauncher jobLauncher,
+            ResourceLoader resourceLoader,
+            @Value("${dir.path.hdfc_account.imported}")String hdfcExportDir,
+            @Value("${dir.path.kotak_account.imported}") String kotakExportDir,
+            @Value("${file.export.google.sheet}") String outputFileName,
+            @Qualifier("MissingAccountJob") Job missingAccountJob,
+            @Qualifier("CitiBankJob1") Job citiBankJob1,
+            @Qualifier("CitiBankJob2") Job citiBankJob2,
+            @Qualifier("CitiBankJob3") Job citiBankJob3,
+            @Qualifier("KotakBankJob") Job kotakBankJob,
+            @Qualifier("KotakBankNoPwdJob") Job kotakBankNoPwdJob,
+            @Qualifier("KotakImportedAccountJob") Job kotakImportedAccountJob,
+            @Qualifier("KotakImportedAccountJobV2") Job kotakImportedAccountJobV2,
+            @Qualifier("HDFCImportedAccountJob") Job hdfcImportedAccountJob,
+            MultiResourceItemReader<Transaction> hdfcImportedItemsReader,
+            MultiResourceItemReader<Transaction> kotakImportedItemsReaderV2,
+            CacheService cacheService,
+            FlatFileItemWriter<Transaction> csvWriterForGoogleSheet,
+            TransactionRepository transactionRepository
+
     ) {
+        this.resourceLoader = resourceLoader;
+        this.hdfcExportDir = hdfcExportDir;
+        this.kotakExportDir = kotakExportDir;
+        this.jobLauncher = jobLauncher;
+        this.missingAccountJob = missingAccountJob;
+        this.citiBankJob1 = citiBankJob1;
+        this.citiBankJob2 = citiBankJob2;
+        this.citiBankJob3 = citiBankJob3;
+        this.kotakBankJob = kotakBankJob;
+        this.kotakBankNoPwdJob = kotakBankNoPwdJob;
+        this.kotakImportedAccountJob = kotakImportedAccountJob;
+        this.kotakImportedAccountJobV2 = kotakImportedAccountJobV2;
+        this.hdfcImportedAccountJob = hdfcImportedAccountJob;
+        this.hdfcImportedItemsReader = hdfcImportedItemsReader;
+        this.kotakImportedItemsReaderV2 = kotakImportedItemsReaderV2;
+        this.cacheService = cacheService;
+        this.csvWriterForGoogleSheet = csvWriterForGoogleSheet;
+        this.transactionRepository = transactionRepository;
         // outputFileName was required injection via constructor otherwise it was coming null
         // during csvWriterForGoogleSheet bean creation
         this.outputFileName = outputFileName;
     }
 
-    public void executeBatchJob(UploadType uploadType, final String fileName) throws Exception {
+    public void executeBatchJob(@NotNull UploadType uploadType, final String fileName) throws Exception {
 
-        //log.info("Delete all the transactions first");
         log.info("Starting a Bank job execution");
-        //transactionRepository.deleteAll();
-
-        // No need to process all file - only new file process - so below line to be commented
-        //processedFileRepository.deleteAllByType("BANK");
 
         // Only for below jobs file upload supported - others jobs will be executed at startup only
-
         // Job - Kotak Exported V2
-        if (uploadType == UploadType.KotakExportedStatement) {
-            MDC.put(MDCKey.BANK.name(), Bank.KOTAK.name());
-            kotakImportedItemsReaderV2.setResources(new Resource[]{
-                    resourceLoader.getResource("file:" + kotakExportDir + "/" + fileName)
-            });
-            jobLauncher.run(kotakImportedAccountJobV2, new JobParametersBuilder()
-                    .addString("JobID", String.valueOf(System.currentTimeMillis()))
-                    .addString("batchOf", BatchOf.KOTAK_BANK.name())
-                    .toJobParameters());
-            MDC.remove(MDCKey.BANK.name());
-        }
-
-        // Job - HDFC Exported
-        if (uploadType == UploadType.HDFCExportedStatement) {
-            MDC.put(MDCKey.BANK.name(), Bank.HDFC.name());
-            hdfcImportedItemsReader.setResources(new Resource[]{
-                    resourceLoader.getResource("file:" + hdfcExportDir + "/" + fileName)
-            });
-            jobLauncher.run(hdfcImportedAccountJob, new JobParametersBuilder()
-                    .addString("JobID", String.valueOf(System.currentTimeMillis()))
-                    .addString("batchOf", BatchOf.HDFC_BANK.name())
-                    .toJobParameters());
-            MDC.remove(MDCKey.BANK.name());
+        switch(uploadType) {
+            case KotakExportedStatement -> {
+                MDC.put(MDCKey.BANK.name(), Bank.KOTAK.name());
+                kotakImportedItemsReaderV2.setResources(new Resource[]{
+                        resourceLoader.getResource("file:" + kotakExportDir + "/" + fileName)
+                });
+                jobLauncher.run(kotakImportedAccountJobV2, new JobParametersBuilder()
+                        .addString(JobConstants.JOB_ID, String.valueOf(System.currentTimeMillis()))
+                        .addString("batchOf", BatchOf.KOTAK_BANK.name())
+                        .toJobParameters());
+                MDC.remove(MDCKey.BANK.name());
+            }
+            case HDFCExportedStatement -> {
+                MDC.put(MDCKey.BANK.name(), Bank.HDFC.name());
+                hdfcImportedItemsReader.setResources(new Resource[]{
+                        resourceLoader.getResource("file:" + hdfcExportDir + "/" + fileName)
+                });
+                jobLauncher.run(hdfcImportedAccountJob, new JobParametersBuilder()
+                        .addString(JobConstants.JOB_ID, String.valueOf(System.currentTimeMillis()))
+                        .addString(JobConstants.BATCH_OF, BatchOf.HDFC_BANK.name())
+                        .toJobParameters());
+                MDC.remove(MDCKey.BANK.name());
+            }
+            default -> throw new UploadTypeNotSupportedException(String.format("Upload Type %s not supported", uploadType.name()));
         }
 
         log.debug("Completed job execution");
@@ -160,64 +145,64 @@ public class JobExecutorOfBankService {
 
         MDC.put(MDCKey.BANK.name(), Bank.AXIS.name());
         jobLauncher.run(missingAccountJob, new JobParametersBuilder()
-                .addString("JobID", String.valueOf(System.currentTimeMillis()))
-                .addString("batchOf", BatchOf.AXIS_BANK.name())
+                .addString(JobConstants.JOB_ID, String.valueOf(System.currentTimeMillis()))
+                .addString(JobConstants.BATCH_OF, BatchOf.AXIS_BANK.name())
                 .toJobParameters());
         MDC.remove(MDCKey.BANK.name());
 
         MDC.put(MDCKey.BANK.name(), Bank.CITI.name());
         jobLauncher.run(citiBankJob1, new JobParametersBuilder()
-                .addString("JobID", String.valueOf(System.currentTimeMillis()))
-                .addString("batchOf", BatchOf.CITI_BANK.name())
+                .addString(JobConstants.JOB_ID, String.valueOf(System.currentTimeMillis()))
+                .addString(JobConstants.BATCH_OF, BatchOf.CITI_BANK.name())
                 .toJobParameters());
         MDC.remove(MDCKey.BANK.name());
 
         MDC.put(MDCKey.BANK.name(), Bank.CITI.name());
         jobLauncher.run(citiBankJob2, new JobParametersBuilder()
-                .addString("JobID", String.valueOf(System.currentTimeMillis()))
-                .addString("batchOf", BatchOf.CITI_BANK.name())
+                .addString(JobConstants.JOB_ID, String.valueOf(System.currentTimeMillis()))
+                .addString(JobConstants.BATCH_OF, BatchOf.CITI_BANK.name())
                 .toJobParameters());
         MDC.remove(MDCKey.BANK.name());
 
         MDC.put(MDCKey.BANK.name(), Bank.CITI.name());
         jobLauncher.run(citiBankJob3, new JobParametersBuilder()
-                .addString("JobID", String.valueOf(System.currentTimeMillis()))
-                .addString("batchOf", BatchOf.CITI_BANK.name())
+                .addString(JobConstants.JOB_ID, String.valueOf(System.currentTimeMillis()))
+                .addString(JobConstants.BATCH_OF, BatchOf.CITI_BANK.name())
                 .toJobParameters());
         MDC.remove(MDCKey.BANK.name());
 
         MDC.put(MDCKey.BANK.name(), Bank.KOTAK.name());
         jobLauncher.run(kotakBankJob, new JobParametersBuilder()
-                .addString("JobID", String.valueOf(System.currentTimeMillis()))
-                .addString("batchOf", BatchOf.KOTAK_BANK.name())
+                .addString(JobConstants.JOB_ID, String.valueOf(System.currentTimeMillis()))
+                .addString(JobConstants.BATCH_OF, BatchOf.KOTAK_BANK.name())
                 .toJobParameters());
         MDC.remove(MDCKey.BANK.name());
 
         MDC.put(MDCKey.BANK.name(), Bank.KOTAK.name());
         jobLauncher.run(kotakBankNoPwdJob, new JobParametersBuilder()
-                .addString("JobID", String.valueOf(System.currentTimeMillis()))
-                .addString("batchOf", BatchOf.KOTAK_BANK.name())
+                .addString(JobConstants.JOB_ID, String.valueOf(System.currentTimeMillis()))
+                .addString(JobConstants.BATCH_OF, BatchOf.KOTAK_BANK.name())
                 .toJobParameters());
         MDC.remove(MDCKey.BANK.name());
 
         MDC.put(MDCKey.BANK.name(), Bank.KOTAK.name());
         jobLauncher.run(kotakImportedAccountJob, new JobParametersBuilder()
-                .addString("JobID", String.valueOf(System.currentTimeMillis()))
-                .addString("batchOf", BatchOf.KOTAK_BANK.name())
+                .addString(JobConstants.JOB_ID, String.valueOf(System.currentTimeMillis()))
+                .addString(JobConstants.BATCH_OF, BatchOf.KOTAK_BANK.name())
                 .toJobParameters());
         MDC.remove(MDCKey.BANK.name());
 
         MDC.put(MDCKey.BANK.name(), Bank.KOTAK.name());
         jobLauncher.run(kotakImportedAccountJobV2, new JobParametersBuilder()
-                .addString("JobID", String.valueOf(System.currentTimeMillis()))
-                .addString("batchOf", BatchOf.KOTAK_BANK.name())
+                .addString(JobConstants.JOB_ID, String.valueOf(System.currentTimeMillis()))
+                .addString(JobConstants.BATCH_OF, BatchOf.KOTAK_BANK.name())
                 .toJobParameters());
         MDC.remove(MDCKey.BANK.name());
 
         MDC.put(MDCKey.BANK.name(), Bank.HDFC.name());
         jobLauncher.run(hdfcImportedAccountJob, new JobParametersBuilder()
-                .addString("JobID", String.valueOf(System.currentTimeMillis()))
-                .addString("batchOf", BatchOf.HDFC_BANK.name())
+                .addString(JobConstants.JOB_ID, String.valueOf(System.currentTimeMillis()))
+                .addString(JobConstants.BATCH_OF, BatchOf.HDFC_BANK.name())
                 .toJobParameters());
         MDC.remove(MDCKey.BANK.name());
 

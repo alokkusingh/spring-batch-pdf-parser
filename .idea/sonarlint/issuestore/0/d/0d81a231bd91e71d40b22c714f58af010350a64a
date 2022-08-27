@@ -1,0 +1,6 @@
+
+|
+java:S1450("fRemove the "processedFileRepository" field and declare it as a local variable in the relevant methods.(²”Ó–
+P	java:S125W"<This block of commented-out lines of code should be removed.(Ïç„
+Q
+java:S1068(";Remove this unused "processedFileRepository" private field.(²”Ó–

@@ -1,5 +1,6 @@
 package com.alok.spring.batch.processor;
 
+import com.alok.spring.constant.InvestmentType;
 import com.alok.spring.model.Investment;
 import com.alok.spring.model.RawInvestment;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,7 @@ public class DefaultInvestmentProcessor implements ItemProcessor<RawInvestment, 
         monthInvestments.add(Investment.builder()
                 .year(record.getYear())
                 .month(record.getMonth())
-                .head("PF")
+                .head(InvestmentType.PF.name())
                 .contribution(record.getPfContribution())
                 .valueAsOnMonth(record.getPfValueAsOnMonth())
                 .build());
@@ -27,7 +28,7 @@ public class DefaultInvestmentProcessor implements ItemProcessor<RawInvestment, 
         monthInvestments.add(Investment.builder()
                 .year(record.getYear())
                 .month(record.getMonth())
-                .head("NPS")
+                .head(InvestmentType.NPS.name())
                 .contribution(record.getNpsContribution())
                 .valueAsOnMonth(record.getNpsValueAsOnMonth())
                 .build());
@@ -35,7 +36,7 @@ public class DefaultInvestmentProcessor implements ItemProcessor<RawInvestment, 
         monthInvestments.add(Investment.builder()
                 .year(record.getYear())
                 .month(record.getMonth())
-                .head("LIC")
+                .head(InvestmentType.LIC.name())
                 .contribution(record.getLicContribution())
                 .valueAsOnMonth(record.getLicValueAsOnMonth())
                 .build());
@@ -43,7 +44,7 @@ public class DefaultInvestmentProcessor implements ItemProcessor<RawInvestment, 
         monthInvestments.add(Investment.builder()
                 .year(record.getYear())
                 .month(record.getMonth())
-                .head("SHARE")
+                .head(InvestmentType.SHARE.name())
                 .contribution(record.getShareContribution())
                 .valueAsOnMonth(record.getShareValueAsOnMonth())
                 .build());

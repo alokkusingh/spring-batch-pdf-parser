@@ -14,16 +14,14 @@ import org.springframework.core.io.Resource;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class CSVReader<T> extends FlatFileItemReader<T> {
-
     private Resource resource;
     private String transactionType;
-    private ProcessedFileRepository processedFileRepository;
+    private final ProcessedFileRepository processedFileRepository;
 
     public CSVReader(ProcessedFileRepository processedFileRepository, LineMapper<T> lineMapper) {
         this.processedFileRepository = processedFileRepository;
@@ -33,12 +31,11 @@ public class CSVReader<T> extends FlatFileItemReader<T> {
     public void setTransactionType(String transactionType) {
         this.transactionType = transactionType;
     }
-
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
-        log.info("Started Processing File: {}", String.valueOf(resource));
-        Optional<List<ProcessedFile>> processedFile = processedFileRepository.findAllByName(resource.getFilename());
-        if (processedFile.isPresent()) {
+        log.info("Started Processing File: {}", resource);
+        List<ProcessedFile> processedFile = processedFileRepository.findAllByName(resource.getFilename());
+        if (!processedFile.isEmpty()) {
             log.warn("File already processed - skipping!");
             return;
         }
@@ -47,8 +44,8 @@ public class CSVReader<T> extends FlatFileItemReader<T> {
 
     @Override
     protected T doRead() throws Exception {
-        Optional<List<ProcessedFile>> processedFile = processedFileRepository.findAllByName(resource.getFilename());
-        if (processedFile.isPresent()) {
+        List<ProcessedFile> processedFile = processedFileRepository.findAllByName(resource.getFilename());
+        if (!processedFile.isEmpty()) {
             return null;
         }
 
@@ -65,9 +62,9 @@ public class CSVReader<T> extends FlatFileItemReader<T> {
     public void close() throws ItemStreamException {
         super.close();
         if (resource != null) {
-            log.debug("Finished Processing File: {}", String.valueOf(resource));
-            Optional<List<ProcessedFile>> processedFile = processedFileRepository.findAllByName(resource.getFilename());
-            if (!processedFile.isPresent()) {
+            log.debug("Finished Processing File: {}", resource);
+            List<ProcessedFile> processedFile = processedFileRepository.findAllByName(resource.getFilename());
+            if (processedFile.isEmpty()) {
                 processedFileRepository.save(
                         ProcessedFile.builder()
                                 .name(resource.getFilename())
