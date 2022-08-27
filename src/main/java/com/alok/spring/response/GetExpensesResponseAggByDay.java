@@ -1,10 +1,8 @@
 package com.alok.spring.response;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -20,7 +18,7 @@ public class GetExpensesResponseAggByDay {
     @Data
     @Builder
     public static class DayExpense implements Comparable<DayExpense> {
-        private Date date;
+        private LocalDate date;
         private Double amount;
         private List<Expense> expenses;
 

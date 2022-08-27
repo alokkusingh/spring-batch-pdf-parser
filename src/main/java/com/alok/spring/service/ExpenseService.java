@@ -11,8 +11,8 @@ import com.alok.spring.response.GetExpensesMonthSumResponse;
 import com.alok.spring.response.GetExpensesResponse;
 import com.alok.spring.response.GetExpensesResponseAggByDay;
 import com.alok.spring.stream.CustomCollectors;
+import com.alok.spring.utils.DateUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -249,7 +249,7 @@ public class ExpenseService {
 
         return dayExpensesSum.entrySet().stream()
                 .map(entry -> GetExpensesResponseAggByDay.DayExpense.builder()
-                        .date(strToDate(entry.getKey()))
+                        .date(DateUtils.strToDate(entry.getKey()))
                         .amount(entry.getValue())
                         .expenses(dayExpenses.get(entry.getKey()))
                         .build()
