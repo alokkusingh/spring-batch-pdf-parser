@@ -3,9 +3,11 @@ package com.alok.spring.service;
 import com.alok.spring.model.Investment;
 import com.alok.spring.repository.InvestmentRepository;
 import com.alok.spring.response.GetInvestmentsResponse;
+import com.alok.spring.stream.CustomCollectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -26,7 +28,41 @@ public class InvestmentService {
 
     private final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
+
     public GetInvestmentsResponse getAllInvestments() {
+        log.info("All Investments not available in cache");
+
+        List<Investment> investments = investmentRepository.findAll();
+
+        LocalDateTime now = LocalDateTime.now();
+        Short currentYear = Short.valueOf(DateTimeFormatter.ofPattern("yyyy").format(now));
+        Short currentMonth = Short.valueOf(DateTimeFormatter.ofPattern("MM").format(now));
+
+        return investments.stream()
+                .filter(investment -> {
+                    if (currentYear < investment.getYear())
+                        return false;
+                    if (currentYear > investment.getYear())
+                        return true;
+                    if (currentMonth < investment.getMonth())
+                        return false;
+                    return true;
+                })
+                .collect(Collectors.collectingAndThen(
+                        CustomCollectors.toMonthInvestmentList(),
+                        monthInvestmentSummary -> {
+                           return GetInvestmentsResponse.builder()
+                                   .investmentAmount(monthInvestmentSummary.getValue0())
+                                   .asOnValue(monthInvestmentSummary.getValue1())
+                                   .monthInvestments(monthInvestmentSummary.getValue3())
+                                   .investmentsByType(monthInvestmentSummary.getValue2())
+                                   .build();
+                        }
+                ));
+    }
+
+    @Deprecated
+    public GetInvestmentsResponse getAllInvestmentsX() {
         log.info("All Investments not available in cache");
 
         List<Investment> investments = investmentRepository.findAll();
@@ -53,7 +89,7 @@ public class InvestmentService {
                                         list -> list.stream()
                                                 .map(investment -> GetInvestmentsResponse.MonthInvestment.Investment.builder()
                                                         .head(investment.getHead())
-                                                        .amount(investment.getContribution())
+                                                        .investmentAmount(investment.getContribution())
                                                         .asOnValue(investment.getValueAsOnMonth())
                                                         .build()
                                                 )
@@ -62,7 +98,7 @@ public class InvestmentService {
                                                                 Collectors.toList(),
                                                                 investmentList -> {
                                                                     Long totalInvestments = investmentList.stream()
-                                                                            .map(GetInvestmentsResponse.MonthInvestment.Investment::getAmount)
+                                                                            .map(GetInvestmentsResponse.MonthInvestment.Investment::getInvestmentAmount)
                                                                             .map(Integer::longValue)
                                                                             .reduce(0L, (sum, curr) -> sum + (curr == null?0L:curr));
 
@@ -72,9 +108,9 @@ public class InvestmentService {
                                                                             .reduce(0L, (sum, curr) -> sum + (curr == null?0L:curr));
 
                                                                     return GetInvestmentsResponse.MonthInvestment.builder()
-                                                                            .totalInvestments(totalInvestments)
-                                                                            .totalValues(totalAsOnValue)
-                                                                            .monthInvestments(investmentList)
+                                                                            .investmentAmount(totalInvestments)
+                                                                            .asOnValue(totalAsOnValue)
+                                                                            .investments(investmentList)
                                                                             .build();
                                                                 }
 
@@ -91,17 +127,26 @@ public class InvestmentService {
         monthInvestmentsMap.entrySet().forEach(
             entry -> {
                 entry.getValue().setYearMonth(entry.getKey());
-                totalInvestments.updateAndGet(v -> v + entry.getValue().getTotalInvestments());
-                totalValues.updateAndGet(v -> v + entry.getValue().getTotalValues());
+                totalInvestments.updateAndGet(v -> v + entry.getValue().getInvestmentAmount());
+                totalValues.updateAndGet(v -> v + entry.getValue().getAsOnValue());
                 monthInvestments.add(entry.getValue());
             }
         );
         Collections.sort(monthInvestments);
 
         return GetInvestmentsResponse.builder()
-                .totalValues(totalValues.get())
-                .investments(monthInvestments)
-                .totalInvestments(totalInvestments.get())
+                .asOnValue(totalValues.get())
+                .monthInvestments(monthInvestments)
+                .investmentAmount(totalInvestments.get())
                 .build();
+    }
+
+    @Transactional
+    public void saveAllInvestments(List<Investment> investmentRecords) {
+        log.info("Delete all the investments first");
+        investmentRepository.deleteAll();
+
+        log.info("Save all the investments");
+        investmentRepository.saveAll(investmentRecords);
     }
 }

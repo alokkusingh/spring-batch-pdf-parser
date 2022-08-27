@@ -1,12 +1,13 @@
 package com.alok.spring.batch.utils;
 
-import com.alok.spring.constant.Bank;
 import com.alok.spring.constant.Company;
 import com.alok.spring.constant.UploadType;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 public class Utility {
@@ -22,6 +23,9 @@ public class Utility {
         );
         categoryStringMap.put(
                 "Fuel", Arrays.asList("fuel", "petrol", "patrol", "engine oil", "diesel")
+        );
+        categoryStringMap.put(
+                "Automotive", Arrays.asList("car service", "byke service", "puncture", "car lights", "scottie", "byke")
         );
         categoryStringMap.put(
                 "Milk", Arrays.asList("milk", "doodh")
@@ -54,7 +58,8 @@ public class Utility {
                         "hat", "bag", "shirt", "shoe", "dress", "towel", "bedsheet", "pillow", "jeans",
                         "kurti", "belt", "tailor", "decathlon", "saree", "cloth", "sandal", "shopping",
                         "underwear", "trousers", "central", "kurti", "myntra", "juttis", "blanket",
-                        "socks", "sleepers", "jacket", "bed sheet", "track pant", "frock")
+                        "socks", "sleepers", "jacket", "bed sheet", "track pant", "frock", "sari"
+                )
         );
         categoryStringMap.put(
                 "Grocery", Arrays.asList("grossary", "veg", "bazar", "groffer", "grofer", "chicken",
@@ -63,7 +68,8 @@ public class Utility {
                         "biscuit", "deodorant", "jamun", "mango", "retail", "finger", "grossary",
                         "tissue", "ladoo", "fruits", "shampoo", "fruit", "sugar", "groceries",
                         "grocerie", "grocery", "coconut", "sanitizer", "sanitiser", "puja samagri",
-                        "nariyal", "pediasure", "pickle")
+                        "nariyal", "pediasure", "pickle", "gobhi", "sabzi"
+                )
         );
         categoryStringMap.put(
                 "Education", Arrays.asList("book", "pen", "exam", "xerox", "copy", "tution", "unacedmy",
@@ -73,29 +79,34 @@ public class Utility {
                 "Medical", Arrays.asList("medical", "medicine", "test", "doctor", "colombia", "scan",
                         "annama", "hospital", "physiotherapy", "consultation", "Physiothreapy",
                         "Physiotherepist", "ice pack", "resistance", "physical", "protein", "glucometer",
-                        "nursing", "consulting", "consultancy", "consultation", "vaccine", "injection")
+                        "nursing", "consulting", "consultancy", "consultation", "vaccine", "injection",
+                        "therepist"
+                )
         );
         categoryStringMap.put(
                 "Grooming", Arrays.asList("grooming", "parlor", "facial", "Manicure", "hair", "pedicure",
                         "cream", "kaya", "lotion", "urban clap", "saloon", "makeup", "trimmer", "parlour",
-                        "cosmetics", "cosmetic", "facepack", "make up", "face pack")
+                        "cosmetics", "cosmetic", "facepack", "make up", "face pack", "face wash")
         );
         categoryStringMap.put(
-                "Appliances", Arrays.asList("appliances", "Oven", "borosil", "phone", "urban ladder",
-                        "room heater", "mixer", "watch", "steriliser")
-        );
-        categoryStringMap.put(
-                "Gift", Arrays.asList("bablu", "gift")
+                "Gift", Arrays.asList("bablu", "gift", "rakhi", "donation")
         );
         categoryStringMap.put(
                 "Entertainment", Arrays.asList("entertainment", "movie", "cinema", "pvr", "inox",
                         "theatre", "firestick")
         );
         categoryStringMap.put(
-                "Baby Care", Arrays.asList("baby", "firstcry", "toy", "diaper")
+                "Baby Care", Arrays.asList("baby", "firstcry", "toy", "diaper", "diapers", "wipe")
         );
         categoryStringMap.put(
-                "Baby Care", Arrays.asList("urban ladder", "chair", "table", "sofa", "furniture")
+                "Furniture", Arrays.asList("urban ladder", "chair", "table", "sofa", "furniture")
+        );
+        categoryStringMap.put(
+                "Appliances", Arrays.asList("appliances", "Oven", "borosil",
+                        "room heater", "mixer", "watch", "steriliser")
+        );
+        categoryStringMap.put(
+                "Electronics", Arrays.asList("mobile", "laptop", "iphone", "macbook", "smart watch")
         );
         categoryStringMap.put(
                 "Other", Arrays.asList("warmer")

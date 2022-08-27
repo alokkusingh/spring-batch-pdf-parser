@@ -11,13 +11,11 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="spring-batch" target="1.8" />
-      <module name="spring-batch-pdf-parser" target="1.8" />
+      <module name="spring-batch-pdf-parser" target="17" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="spring-batch" options="-parameters" />
       <module name="spring-batch-pdf-parser" options="-parameters" />
     </option>
   </component>
