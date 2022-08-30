@@ -2,9 +2,7 @@ package com.alok.spring.service;
 
 import com.alok.spring.batch.utils.Utility;
 import com.alok.spring.constant.InvestmentType;
-import com.alok.spring.model.Expense;
-import com.alok.spring.model.Investment;
-import com.alok.spring.model.Tax;
+import com.alok.spring.model.*;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -18,6 +16,8 @@ import java.io.*;
 import java.security.GeneralSecurityException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -29,10 +29,13 @@ public class GoogleSheetService {
     private String expenseSheetRange;
     private String investmentSheetRange;
     private Sheets sheetsService;
+    private String odionSheetId;
+    private String odionTransactionsSheetRange;
     private TaxService taxService;
     private ExpenseService expenseService;
     private InvestmentService investmentService;
     private CacheService cacheService;
+    private OdionService odionService;
 
     private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
 
@@ -42,29 +45,37 @@ public class GoogleSheetService {
             @Value("${range.tax-sheet}") String taxSheetRange,
             @Value("${range.expense-sheet}") String expenseSheetRange,
             @Value("${range.investment-sheet}") String investmentSheetRange,
+            @Value("${sheet.id.odion}") String odionSheetId,
+            @Value("${range.odion.transaction}") String odionTransactionsSheetRange,
             TaxService taxService,
             ExpenseService expenseService,
             InvestmentService investmentService,
-            CacheService cacheService
+            CacheService cacheService,
+            OdionService odionService
     ) throws IOException, GeneralSecurityException {
         this.serviceAccountKeyFile = serviceAccountKeyFile;
         this.expenseSheetId = expenseSheetId;
         this.taxSheetRange = taxSheetRange;
         this.expenseSheetRange = expenseSheetRange;
         this.investmentSheetRange = investmentSheetRange;
+        this.odionSheetId = odionSheetId;
+        this.odionTransactionsSheetRange = odionTransactionsSheetRange;
         this.taxService = taxService;
         this.expenseService = expenseService;
         this.investmentService = investmentService;
         this.cacheService = cacheService;
+        this.odionService = odionService;
 
         InputStream inputStream = new FileInputStream(serviceAccountKeyFile); // put your service account's key.json file in asset folder.
 
         GoogleCredential googleCredential = GoogleCredential.fromStream(inputStream)
                 .createScoped(Collections.singleton(SheetsScopes.SPREADSHEETS_READONLY));
 
-        sheetsService = new Sheets.Builder(GoogleNetHttpTransport.newTrustedTransport(),
+        sheetsService = new Sheets.Builder(
+                GoogleNetHttpTransport.newTrustedTransport(),
                 JacksonFactory.getDefaultInstance(),
-                googleCredential)
+                googleCredential
+        )
                 .setApplicationName("Home Stack")
                 .build();
     }
@@ -153,6 +164,29 @@ public class GoogleSheetService {
 
         investmentService.saveAllInvestments(investmentRecords);
         cacheService.evictAllCaches();
+    }
+
+    public void refreshOdionTransactionsData() throws IOException {
+        ValueRange response = sheetsService.spreadsheets().values()
+                .get(odionSheetId, odionTransactionsSheetRange)
+                .execute();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        List<OdionTransaction> odionTransactionRecords = Optional.ofNullable(response.getValues()).orElse(Collections.emptyList()).stream()
+                .filter(row -> row.size() == 5)
+                .filter(row -> row.get(2) != "")
+                .filter(row -> row.get(3) != "")
+                .map(row -> OdionTransaction.builder()
+                        .date(LocalDate.parse((String)row.get(0), formatter))
+                        .particular((String)row.get(1))
+                        .debitAccount(row.get(2) == "" ? OdionTransaction.Account.OPENING_BALANCE : OdionTransaction.Account.valueOfOrDefault((String)row.get(2)))
+                        .creditAccount(OdionTransaction.Account.valueOfOrDefault((String)row.get(3)))
+                        .amount(Double.parseDouble((String) row.get(4)))
+                        .build()
+                )
+                .toList();
+
+        odionService.saveAllTransactions(odionTransactionRecords);
     }
 
     private Date parseToDate(String strDate) {

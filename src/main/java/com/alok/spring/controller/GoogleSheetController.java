@@ -69,4 +69,21 @@ public class GoogleSheetController {
                 .cacheControl(CacheControl.maxAge(REFRESH_CASH_CONTROL, TimeUnit.SECONDS).noTransform().mustRevalidate())
                 .body("Refresh submitted");
     }
+
+    @GetMapping("/refresh/odion/transactions")
+    public ResponseEntity<String> refreshOdionTransactions() {
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                googleSheetService.refreshOdionTransactionsData();
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        });
+
+        return ResponseEntity.accepted()
+                .cacheControl(CacheControl.maxAge(REFRESH_CASH_CONTROL, TimeUnit.SECONDS).noTransform().mustRevalidate())
+                .body("Refresh submitted");
+    }
 }
