@@ -14,4 +14,8 @@ public class CustomCollectors {
         return new MonthInvestmentCollector();
     }
 
+    public static OdionAccountsBalanceCollector toOdionAccountsBalanceCollector() {
+        return new OdionAccountsBalanceCollector();
+    }
+
 }
