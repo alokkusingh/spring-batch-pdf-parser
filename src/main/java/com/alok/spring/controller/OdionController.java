@@ -1,6 +1,8 @@
 package com.alok.spring.controller;
 
 import com.alok.spring.annotation.LogExecutionTime;
+import com.alok.spring.model.OdionTransaction;
+import com.alok.spring.response.GetOdionAccountTransactionsResponse;
 import com.alok.spring.response.GetOdionAccountsBalanceResponse;
 import com.alok.spring.response.GetOdionTransactionsResponse;
 import com.alok.spring.service.OdionService;
@@ -10,6 +12,7 @@ import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,6 +41,17 @@ public class OdionController {
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(cacheControlMaxAge, TimeUnit.SECONDS).noTransform().mustRevalidate())
                 .body(odionService.getAllTransactions());
+    }
+
+    @LogExecutionTime
+    @GetMapping(value = "/transactions/{account}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<GetOdionAccountTransactionsResponse> getAllTransactions(
+            @PathVariable(value = "account") OdionTransaction.Account account
+    ) {
+
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(cacheControlMaxAge, TimeUnit.SECONDS).noTransform().mustRevalidate())
+                .body(odionService.getAllTransactions(account));
     }
 
     @LogExecutionTime

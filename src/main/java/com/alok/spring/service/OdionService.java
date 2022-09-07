@@ -2,6 +2,7 @@ package com.alok.spring.service;
 
 import com.alok.spring.model.OdionTransaction;
 import com.alok.spring.repository.OdionTransactionRepository;
+import com.alok.spring.response.GetOdionAccountTransactionsResponse;
 import com.alok.spring.response.GetOdionAccountsBalanceResponse;
 import com.alok.spring.response.GetOdionTransactionsResponse;
 import com.alok.spring.stream.CustomCollectors;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collector;
 
 @Slf4j
 @Service
@@ -31,6 +33,36 @@ public class OdionService {
                 .transactions(odionTransactionRepository.findAll().stream()
                         .filter(transaction -> transaction.getAmount() > 0)
                         .toList())
+                .build();
+    }
+
+    public GetOdionAccountTransactionsResponse getAllTransactions(OdionTransaction.Account account) {
+        log.info("Get all Odion Account Transaction not in cache");
+
+
+        return GetOdionAccountTransactionsResponse.builder()
+                .transactions(
+                        odionTransactionRepository.findTransactionsForAccount(account).stream()
+                                .collect(Collector.<OdionTransaction, List<GetOdionAccountTransactionsResponse.AccountTransaction>, List<GetOdionAccountTransactionsResponse.AccountTransaction>>of(
+                                        ArrayList::new,
+                                        (accountTransactions, transaction) -> {
+                                            accountTransactions.add(
+                                                    GetOdionAccountTransactionsResponse.AccountTransaction.builder()
+                                                            .id(transaction.getId())
+                                                            .date(transaction.getDate())
+                                                            .particular(
+                                                                    transaction.getParticular() +
+                                                                            (transaction.getDebitAccount() == account?  " to " + transaction.getCreditAccount().toString() :  " from " + transaction.getDebitAccount().toString())
+                                                            )
+                                                            .debit(transaction.getDebitAccount() == account? transaction.getAmount() : 0)
+                                                            .credit(transaction.getCreditAccount() == account? transaction.getAmount() : 0)
+                                                            .build()
+                                            );
+                                        },
+                                        (accountTransactionsPart1, accountTransactionsPart2) -> null,
+                                        accountTransactions -> accountTransactions
+                                ))
+                )
                 .build();
     }
 
