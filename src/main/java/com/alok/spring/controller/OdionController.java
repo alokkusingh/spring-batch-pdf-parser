@@ -4,6 +4,7 @@ import com.alok.spring.annotation.LogExecutionTime;
 import com.alok.spring.model.OdionTransaction;
 import com.alok.spring.response.GetOdionAccountTransactionsResponse;
 import com.alok.spring.response.GetOdionAccountsBalanceResponse;
+import com.alok.spring.response.GetOdionMonthlyAccountTransactionResponse;
 import com.alok.spring.response.GetOdionTransactionsResponse;
 import com.alok.spring.service.OdionService;
 import lombok.extern.slf4j.Slf4j;
@@ -61,5 +62,14 @@ public class OdionController {
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(cacheControlMaxAge, TimeUnit.SECONDS).noTransform().mustRevalidate())
                 .body(odionService.getAllAccountBalance());
+    }
+
+    @LogExecutionTime
+    @GetMapping(value = "/monthly/transaction", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<GetOdionMonthlyAccountTransactionResponse> getMonthlyAccountTransaction() {
+
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(cacheControlMaxAge, TimeUnit.SECONDS).noTransform().mustRevalidate())
+                .body(odionService.getMonthlyAccountTransaction());
     }
 }

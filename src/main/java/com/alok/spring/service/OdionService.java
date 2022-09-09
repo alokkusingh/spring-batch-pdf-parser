@@ -4,6 +4,7 @@ import com.alok.spring.model.OdionTransaction;
 import com.alok.spring.repository.OdionTransactionRepository;
 import com.alok.spring.response.GetOdionAccountTransactionsResponse;
 import com.alok.spring.response.GetOdionAccountsBalanceResponse;
+import com.alok.spring.response.GetOdionMonthlyAccountTransactionResponse;
 import com.alok.spring.response.GetOdionTransactionsResponse;
 import com.alok.spring.stream.CustomCollectors;
 import lombok.extern.slf4j.Slf4j;
@@ -85,6 +86,17 @@ public class OdionService {
         return GetOdionAccountsBalanceResponse.builder()
             .accountBalances(accountBalances)
             .build();
+    }
+
+    public GetOdionMonthlyAccountTransactionResponse getMonthlyAccountTransaction() {
+        log.info("Get monthly Odion Account transaction not in cache");
+
+        return GetOdionMonthlyAccountTransactionResponse.builder()
+                .accountMonthTransaction(odionTransactionRepository.findAll().stream()
+                                .filter(transaction -> transaction.getAmount() > 0)
+                                .collect(CustomCollectors.toOdionAccountsMonthlyTransactionCollector())
+                        )
+                .build();
     }
 
     @Transactional
