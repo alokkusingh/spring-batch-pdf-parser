@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collector;
@@ -93,6 +94,7 @@ public class OdionService {
 
         return GetOdionMonthlyAccountTransactionResponse.builder()
                 .accountMonthTransaction(odionTransactionRepository.findAll().stream()
+                                .sorted(Comparator.comparing(OdionTransaction::getDate).reversed())
                                 .filter(transaction -> transaction.getAmount() > 0)
                                 .collect(CustomCollectors.toOdionAccountsMonthlyTransactionCollector())
                         )
