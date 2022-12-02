@@ -6,7 +6,7 @@ import org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor;
 import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -19,7 +19,7 @@ public class CsvWriterForGoogleSheet extends FlatFileItemWriter<Transaction> {
         // during csvWriterForGoogleSheet bean creation
         this.outputFileName = outputFileName;
 
-        Resource csvFile = new FileSystemResource(outputFileName);
+        WritableResource csvFile = new FileSystemResource(outputFileName);
         this.setResource(csvFile);
         this.setShouldDeleteIfExists(true);
         this.setHeaderCallback(writer -> writer.write("Srl. No.,Date,Head,Debit,Credit,Comment"));

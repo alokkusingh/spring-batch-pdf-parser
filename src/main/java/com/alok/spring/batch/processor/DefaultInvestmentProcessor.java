@@ -18,32 +18,32 @@ public class DefaultInvestmentProcessor implements ItemProcessor<RawInvestment, 
     public List<Investment> process(RawInvestment record) {
         List<Investment> monthInvestments = new ArrayList<>(4);
         monthInvestments.add(Investment.builder()
-                .year(record.getYear())
-                .month(record.getMonth())
+                .yearx(record.getYear())
+                .monthx(record.getMonth())
                 .head(InvestmentType.PF.name())
                 .contribution(record.getPfContribution())
                 .valueAsOnMonth(record.getPfValueAsOnMonth())
                 .build());
 
         monthInvestments.add(Investment.builder()
-                .year(record.getYear())
-                .month(record.getMonth())
+                .yearx(record.getYear())
+                .monthx(record.getMonth())
                 .head(InvestmentType.NPS.name())
                 .contribution(record.getNpsContribution())
                 .valueAsOnMonth(record.getNpsValueAsOnMonth())
                 .build());
 
         monthInvestments.add(Investment.builder()
-                .year(record.getYear())
-                .month(record.getMonth())
+                .yearx(record.getYear())
+                .monthx(record.getMonth())
                 .head(InvestmentType.LIC.name())
                 .contribution(record.getLicContribution())
                 .valueAsOnMonth(record.getLicValueAsOnMonth())
                 .build());
 
         monthInvestments.add(Investment.builder()
-                .year(record.getYear())
-                .month(record.getMonth())
+                .yearx(record.getYear())
+                .monthx(record.getMonth())
                 .head(InvestmentType.SHARE.name())
                 .contribution(record.getShareContribution())
                 .valueAsOnMonth(record.getShareValueAsOnMonth())

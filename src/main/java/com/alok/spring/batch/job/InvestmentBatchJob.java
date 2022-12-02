@@ -4,12 +4,17 @@ import com.alok.spring.batch.processor.FileArchiveTasklet;
 import com.alok.spring.batch.reader.CSVReader;
 import com.alok.spring.model.Investment;
 import com.alok.spring.model.RawInvestment;
+import com.alok.spring.model.RawTransaction;
+import com.alok.spring.model.Transaction;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -23,6 +28,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import java.util.List;
 
@@ -35,15 +41,19 @@ public class InvestmentBatchJob {
     @Value("${fields.name.investment:#{null}}")
     private String[] fieldNames;
 
+    private static final String JOB_NAME = "Investment-ETL-Load";
+    private static final String PROCESSOR_TASK_NAME = "Investment-ETL-file-load";
+    private static final String ARCHIVE_TASK_NAME = "Investment-ETL-file-archive";
+
     @Bean("InvestmentJob")
-    public Job investmentJob(JobBuilderFactory jobBuilderFactory,
-                          StepBuilderFactory stepBuilderFactory,
-                          ItemReader<RawInvestment> investmentItemsReader,
-                          ItemProcessor<RawInvestment, List<Investment>> defaultInvestmentProcessor,
-                          ItemWriter<List<Investment>> investmentDbWriter
+    public Job investmentJob(JobRepository jobRepository,
+                             PlatformTransactionManager transactionManager,
+                             ItemReader<RawInvestment> investmentItemsReader,
+                             ItemProcessor<RawInvestment, List<Investment>> defaultInvestmentProcessor,
+                             ItemWriter<List<Investment>> investmentDbWriter
     ) {
-        Step step1 = stepBuilderFactory.get("Investment-ETL-file-load")
-                .<RawInvestment,List<Investment>>chunk(100)
+        Step step1 = new StepBuilder(PROCESSOR_TASK_NAME, jobRepository)
+                .<RawInvestment, List<Investment>>chunk(100, transactionManager)
                 .reader(investmentItemsReader)
                 .processor(defaultInvestmentProcessor)
                 .writer(investmentDbWriter)
@@ -51,11 +61,11 @@ public class InvestmentBatchJob {
 
         FileArchiveTasklet archiveTask = new FileArchiveTasklet();
         archiveTask.setResources(resources);
-        Step step2 = stepBuilderFactory.get("Investment-ETL-file-archive")
-                .tasklet(archiveTask)
+        Step step2 = new StepBuilder(ARCHIVE_TASK_NAME, jobRepository)
+                .tasklet(archiveTask, transactionManager)
                 .build();
 
-        return jobBuilderFactory.get("Investment-ETL-Load")
+        return new JobBuilder(JOB_NAME, jobRepository)
                 .incrementer(new RunIdIncrementer())
                 .start(step1)
                 .next(step2)

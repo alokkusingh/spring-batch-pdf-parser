@@ -13,7 +13,10 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -24,6 +27,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.io.Resource;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import java.text.SimpleDateFormat;
 
@@ -38,31 +42,34 @@ public class KotakAccountStatementBatchJob {
 
     private ProcessedFileRepository processedFileRepository;
 
+    private static final String JOB_NAME = "KotakAccount-ETL-Job1";
+    private static final String PROCESSOR_TASK_NAME = "KotakAccount-ETL-Job1-file-load";
+    private static final String ARCHIVE_TASK_NAME = "KotakAccount-ETL-Job1-file-archive";
+
     @Bean("KotakBankJob")
-    public Job kotakBankJob(JobBuilderFactory jobBuilderFactory,
-                           StepBuilderFactory stepBuilderFactory,
-                           ItemReader<RawTransaction> kotakItemsReader,
-                           ItemProcessor<RawTransaction, Transaction> kotakAccountProcessor,
-                           ItemWriter<Transaction> bankAccountDbWriter,
+    public Job kotakBankJob(JobRepository jobRepository,
+                            PlatformTransactionManager transactionManager,
+                            ItemReader<RawTransaction> kotakItemsReader,
+                            ItemProcessor<RawTransaction, Transaction> kotakAccountProcessor,
+                            ItemWriter<Transaction> bankAccountDbWriter,
                             ProcessedFileRepository processedFileRepository
     ) {
         this.processedFileRepository = processedFileRepository;
 
-        Step step1 = stepBuilderFactory.get("KotakAccount-ETL-Job1-file-load")
-                .<RawTransaction,Transaction>chunk(1000)
+        Step step1 = new StepBuilder(PROCESSOR_TASK_NAME, jobRepository)
+                .<RawTransaction,Transaction>chunk(100, transactionManager)
                 .reader(kotakItemsReader)
                 .processor(kotakAccountProcessor)
                 .writer(bankAccountDbWriter)
                 .build();
 
-
         FileArchiveTasklet archiveTask = new FileArchiveTasklet();
         archiveTask.setResources(resources);
-        Step step2 = stepBuilderFactory.get("KotakAccount-ETL-Job1-file-archive")
-                .tasklet(archiveTask)
+        Step step2 = new StepBuilder(ARCHIVE_TASK_NAME, jobRepository)
+                .tasklet(archiveTask, transactionManager)
                 .build();
 
-        return jobBuilderFactory.get("KotakAccount-ETL-Job1")
+        return new JobBuilder(JOB_NAME, jobRepository)
                 .incrementer(new RunIdIncrementer())
                 .start(step1)
                 .next(step2)

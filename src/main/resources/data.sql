@@ -3,4 +3,4 @@
 -- delete from processed_file;
 -- delete from tax;
 -- delete from investment;
-select sysdate from dual;
+select count(1) from processed_file;

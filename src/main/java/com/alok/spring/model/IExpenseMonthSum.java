@@ -2,7 +2,7 @@ package com.alok.spring.model;
 
 public interface IExpenseMonthSum {
 
-    Integer getYear();
-    Integer getMonth();
+    Integer getYearx();
+    Integer getMonthx();
     Double getSum();
 }
