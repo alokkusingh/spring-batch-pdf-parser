@@ -111,7 +111,14 @@ public class ExpenseService {
         List<IExpenseCategoryMonthSum> expenseCategorySums = expenseRepository.findCategorySumGroupByMonth();
 
         return GetExpensesMonthSumByCategoryResponse.builder()
-                .expenseCategorySums(expenseCategorySums)
+                .expenseCategorySums(expenseCategorySums.stream().map(
+                        expMetricSum -> GetExpensesMonthSumByCategoryResponse.ExpenseCategoryMonthSum.builder()
+                                .year(expMetricSum.getYearx())
+                                .month(expMetricSum.getMonthx())
+                                .category(expMetricSum.getCategory())
+                                .sum(expMetricSum.getSum())
+                                .build()
+                ).toList())
                 .count(expenseCategorySums.size())
                 .build();
     }
@@ -123,7 +130,17 @@ public class ExpenseService {
         List<IExpenseCategoryMonthSum> expenseCategorySums = expenseRepository.findMonthlyExpenseForCategory(category);
 
         return GetExpensesMonthSumByCategoryResponse.builder()
-                .expenseCategorySums(expenseCategorySums)
+                .expenseCategorySums(
+                        expenseCategorySums.stream().map(
+                                expMetricSum -> GetExpensesMonthSumByCategoryResponse.ExpenseCategoryMonthSum.builder()
+                                        .year(expMetricSum.getYearx())
+                                        .month(expMetricSum.getMonthx())
+                                        .category(expMetricSum.getCategory())
+                                        .sum(expMetricSum.getSum())
+                                        .build()
+                        ).toList()
+
+                )
                 .count(expenseCategorySums.size())
                 .build();
     }

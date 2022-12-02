@@ -10,6 +10,16 @@ import java.util.List;
 @Builder
 public class GetExpensesMonthSumByCategoryResponse {
 
-    private List<IExpenseCategoryMonthSum> expenseCategorySums;
+    private List<ExpenseCategoryMonthSum> expenseCategorySums;
     private Integer count;
+
+    @Data
+    @Builder
+    public static class ExpenseCategoryMonthSum {
+        Integer year;
+        Integer month;
+        String category;
+        Double sum;
+
+    }
 }
