@@ -30,7 +30,7 @@ public class MonthInvestmentCollector implements
     @Override
     public BiConsumer<Quartet<MutableLong, Pair<MutableYearMonth, MutableLong>, Map<String, Long>, Map<YearMonth, GetInvestmentsResponse.MonthInvestment>>, Investment> accumulator() {
         return (investmentSummaryQuartet, investment) -> {
-            var yearMonth = YearMonth.of(investment.getYear(), investment.getMonth());
+            var yearMonth = YearMonth.of(investment.getYearx(), investment.getMonthx());
 
             // Aggregate for total summary
             investmentSummaryQuartet.getValue0().add(investment.getContribution());

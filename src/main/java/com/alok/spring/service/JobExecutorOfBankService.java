@@ -16,6 +16,7 @@ import org.slf4j.MDC;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.MultiResourceItemReader;
@@ -221,7 +222,7 @@ public class JobExecutorOfBankService {
         Collections.sort(records, (t1, t2) -> t2.getDate().compareTo(t1.getDate()));
         csvWriterForGoogleSheet.open(new ExecutionContext());
         log.info("Writing to file for Google Sheets, file {}", outputFileName);
-        csvWriterForGoogleSheet.write(records);
+        csvWriterForGoogleSheet.write(new Chunk<>(records));
         csvWriterForGoogleSheet.close();
 
         log.info("Completed writing csv report");

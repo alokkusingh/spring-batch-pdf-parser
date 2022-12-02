@@ -14,24 +14,24 @@ import java.util.Optional;
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 
     //@Query("SELECT e FROM Expense e WHERE to_char(e.date, 'YYYYMM') = to_char(sysdate, 'YYYYMM')")
-    @Query("SELECT e FROM Expense e WHERE e.year = ?1 and e.month = ?2")
-    List<Expense> findAllForMonth(Integer year, Integer month);
+    @Query("SELECT e FROM Expense e WHERE e.yearx = ?1 and e.monthx = ?2")
+    List<Expense> findAllForMonth(Integer yearx, Integer monthx);
 
-    @Query("SELECT e FROM Expense e WHERE e.year = ?1 and e.month = ?2 and e.category = ?3")
-    List<Expense> findAllForMonthAndCategory(Integer year, Integer month, String category);
+    @Query("SELECT e FROM Expense e WHERE e.yearx = ?1 and e.monthx = ?2 and e.category = ?3")
+    List<Expense> findAllForMonthAndCategory(Integer yearx, Integer monthx, String category);
 
     //@Query(value = "select new com.alok.spring.batch.model.ExpenseCategorySum(to_char(e.date, 'YYYYMM') month, e.category, SUM(e.amount) sum) from " +
     //        "Expense e group by month, e.category order by month desc, sum desc")
-    @Query(value = "select year, month, e.category, SUM(e.amount) sum from " +
-            "expense e group by year, month, e.category order by year desc, month desc, sum desc", nativeQuery = true)
+    @Query(value = "select yearx, monthx, e.category, SUM(e.amount) sum from " +
+            "expense e group by yearx, monthx, e.category order by yearx desc, monthx desc, sum desc", nativeQuery = true)
     List<IExpenseCategoryMonthSum> findCategorySumGroupByMonth();
 
-    @Query(value = "select year, month, e.category, SUM(e.amount) sum from " +
-            "expense e WHERE e.category = ?1 group by year, month, e.category order by year desc, month desc, sum desc", nativeQuery = true)
+    @Query(value = "select yearx, monthx, e.category, SUM(e.amount) sum from " +
+            "expense e WHERE e.category = ?1 group by yearx, monthx, e.category order by yearx desc, monthx desc, sum desc", nativeQuery = true)
     List<IExpenseCategoryMonthSum> findMonthlyExpenseForCategory(String category);
 
-    @Query(value = "select year, month, SUM(e.amount) sum from " +
-            "expense e group by year, month order by year desc, month desc, sum desc", nativeQuery = true)
+    @Query(value = "select yearx, monthx, SUM(e.amount) sum from " +
+            "expense e group by yearx, monthx order by yearx desc, monthx desc, sum desc", nativeQuery = true)
     List<IExpenseMonthSum> findSumGroupByMonth();
 
     @Query(value = "SELECT MAX(DATE) FROM expense", nativeQuery = true)
@@ -43,7 +43,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     @Query("SELECT DISTINCT category from Expense")
     List<String> findDistinctCategories();
 
-    @Query("SELECT DISTINCT new com.alok.spring.model.YearMonth(year, month) from Expense")
+    @Query("SELECT DISTINCT new com.alok.spring.model.YearMonth(yearx, monthx) from Expense")
     List<YearMonth> findDistinctYearMonths();
 
 }

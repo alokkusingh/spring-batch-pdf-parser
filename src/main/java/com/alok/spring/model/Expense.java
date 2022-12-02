@@ -1,6 +1,12 @@
 package com.alok.spring.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.TemporalType;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.Transient;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,8 +31,8 @@ public class Expense implements Comparable<Expense> {
     private Double amount;
     private String comment;
     private String category;
-    private Integer month;
-    private Integer year;
+    private Integer monthx;
+    private Integer yearx;
 
     @Override
     public int compareTo(Expense o) {

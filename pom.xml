@@ -98,7 +98,7 @@
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>RELEASE</version>
+            <version>23.0.0</version>
             <scope>compile</scope>
         </dependency>
 
@@ -120,8 +120,6 @@
 			<artifactId>mqtt-proxy</artifactId>
 			<version>1.0.3</version>
 		</dependency>
-
-
 	</dependencies>
 
 	<build>
@@ -130,7 +128,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
-        </plugins>
+		</plugins>
 	</build>
 
 	<!--

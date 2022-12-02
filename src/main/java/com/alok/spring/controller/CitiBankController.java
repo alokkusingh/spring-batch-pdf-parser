@@ -31,8 +31,8 @@ public class CitiBankController {
     @LogExecutionTime
     @GetMapping("/load")
     public BatchStatus load() throws JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
-        Map<String, JobParameter> parameters = new HashMap<>();
-        parameters.put("time", new JobParameter(System.currentTimeMillis()));
+        Map<String, JobParameter<?>> parameters = new HashMap<>();
+        parameters.put("time", new JobParameter<>(System.currentTimeMillis(), Long.class));
         JobParameters jobParameters = new JobParameters(parameters);
 
         JobExecution jobExecution = jobLauncher.run(job, jobParameters);

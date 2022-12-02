@@ -18,8 +18,8 @@ public class Investment {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private Short year;
-    private Short month;
+    private Short yearx;
+    private Short monthx;
     private String head;
     private Integer contribution;
     private Integer valueAsOnMonth;

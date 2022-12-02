@@ -40,11 +40,11 @@ public class InvestmentService {
 
         return investments.stream()
                 .filter(investment -> {
-                    if (currentYear < investment.getYear())
+                    if (currentYear < investment.getYearx())
                         return false;
-                    if (currentYear > investment.getYear())
+                    if (currentYear > investment.getYearx())
                         return true;
-                    if (currentMonth < investment.getMonth())
+                    if (currentMonth < investment.getMonthx())
                         return false;
                     return true;
                 })
@@ -73,17 +73,17 @@ public class InvestmentService {
 
         Map<String, GetInvestmentsResponse.MonthInvestment> monthInvestmentsMap = investments.stream()
                 .filter(investment -> {
-                    if (currentYear < investment.getYear())
+                    if (currentYear < investment.getYearx())
                         return false;
-                    if (currentYear > investment.getYear())
+                    if (currentYear > investment.getYearx())
                         return true;
-                    if (currentMonth < investment.getMonth())
+                    if (currentMonth < investment.getMonthx())
                         return false;
                     return true;
                 })
                 .collect(
                         Collectors.groupingBy(
-                                investment -> String.format("%d-%02d", investment.getYear(), investment.getMonth()),
+                                investment -> String.format("%d-%02d", investment.getYearx(), investment.getMonthx()),
                                 Collectors.collectingAndThen(
                                         Collectors.toList(),
                                         list -> list.stream()

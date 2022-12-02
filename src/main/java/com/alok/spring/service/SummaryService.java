@@ -2,7 +2,6 @@ package com.alok.spring.service;
 
 import com.alok.spring.config.CacheConfig;
 import com.alok.spring.model.IExpenseMonthSum;
-import com.alok.spring.model.IInvestmentMonthSum;
 import com.alok.spring.model.Investment;
 import com.alok.spring.model.Transaction;
 import com.alok.spring.repository.ExpenseRepository;
@@ -52,12 +51,12 @@ public class SummaryService {
                     Integer.valueOf(String.format("%d%02d", year, month)) ,
                     new IExpenseMonthSum() {
                         @Override
-                        public Integer getYear() {
+                        public Integer getYearx() {
                             return finalYear;
                         }
 
                         @Override
-                        public Integer getMonth() {
+                        public Integer getMonthx() {
                             return finalMonth;
                         }
 
@@ -71,7 +70,7 @@ public class SummaryService {
         }
         for (IExpenseMonthSum expenseMonthSum: expenseSums) {
             expenseMonthSumMap.put(
-                    Integer.valueOf(String.format("%d%02d", expenseMonthSum.getYear(), expenseMonthSum.getMonth())),
+                    Integer.valueOf(String.format("%d%02d", expenseMonthSum.getYearx(), expenseMonthSum.getMonthx())),
                     expenseMonthSum
             );
         }
@@ -121,7 +120,7 @@ public class SummaryService {
         Map<String, Long> investmentMonthly = investments.stream()
                 .collect(
                         Collectors.groupingBy(
-                                investment -> String.format("%d-%02d", investment.getYear(), investment.getMonth()),
+                                investment -> String.format("%d-%02d", investment.getYearx(), investment.getMonthx()),
                                 Collectors.collectingAndThen(
                                         Collectors.summarizingInt(Investment::getContribution),
                                         iss -> iss.getSum()
@@ -133,19 +132,19 @@ public class SummaryService {
         List<GetMonthlySummaryResponse.MonthlySummary> monthSummaryRecord = expenseMonthSumMap.values().stream().
                 map(
                         expenseMonthRecord -> GetMonthlySummaryResponse.MonthlySummary.builder()
-                                .year(expenseMonthRecord.getYear())
-                                .month(expenseMonthRecord.getMonth())
+                                .year(expenseMonthRecord.getYearx())
+                                .month(expenseMonthRecord.getMonthx())
                                 .expenseAmount(expenseMonthRecord.getSum())
                                 .incomeAmount(
-                                        monthlySalary.get(String.format("%d-%02d", expenseMonthRecord.getYear(), expenseMonthRecord.getMonth())))
+                                        monthlySalary.get(String.format("%d-%02d", expenseMonthRecord.getYearx(), expenseMonthRecord.getMonthx())))
                                 .transferAmount(
                                         subtract(
-                                                familyTransferMonthly.get(String.format("%d-%02d", expenseMonthRecord.getYear(), expenseMonthRecord.getMonth())),
-                                                familyReceivedMonthly.get(String.format("%d-%02d", expenseMonthRecord.getYear(), expenseMonthRecord.getMonth()))
+                                                familyTransferMonthly.get(String.format("%d-%02d", expenseMonthRecord.getYearx(), expenseMonthRecord.getMonthx())),
+                                                familyReceivedMonthly.get(String.format("%d-%02d", expenseMonthRecord.getYearx(), expenseMonthRecord.getMonthx()))
                                         )
                                 )
                                 .investmentAmount(
-                                        investmentMonthly.get(String.format("%d-%02d", expenseMonthRecord.getYear(), expenseMonthRecord.getMonth()))
+                                        investmentMonthly.get(String.format("%d-%02d", expenseMonthRecord.getYearx(), expenseMonthRecord.getMonthx()))
                                 )
                                 .build()
                 )
