@@ -7,8 +7,8 @@ RUN mkdir -p /home/alok
 RUN chown -R alok /opt
 RUN chown -R alok /home/alok
 USER alok
-COPY resources/keystore.jks /home/alok/keystore.jks
-COPY resources/truststore.jks /home/alok/trustore.jks
+COPY src/main/resources/keystore.jks /home/alok/keystore.jks
+COPY src/main/resources/truststore.jks /home/alok/trustore.jks
 COPY ${JAR_FILE} /opt/app.jar
 EXPOSE 8081
 WORKDIR /opt
