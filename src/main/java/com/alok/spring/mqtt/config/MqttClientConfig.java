@@ -21,8 +21,8 @@ public class MqttClientConfig {
     private IotProperties iotProperties;
     private ServerProperties serverProperties;
 
-    @Autowired
-    private MqttClientService mqttClientService;
+    //@Autowired
+    //private MqttClientService mqttClientService;
 
     public MqttClientConfig(IotProperties iotProperties, ServerProperties serverProperties) {
         this.iotProperties = iotProperties;
