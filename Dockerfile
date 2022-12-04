@@ -10,4 +10,4 @@ USER alok
 COPY ${JAR_FILE} /opt/app.jar
 EXPOSE 8081
 WORKDIR /opt
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/urandom","-Dspring.profiles.active=prod","-jar","/opt/app.jar"]
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/urandom","-Dspring.profiles.active=prod,mqtt","-jar","/opt/app.jar"]
