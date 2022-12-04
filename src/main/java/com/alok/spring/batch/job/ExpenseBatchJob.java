@@ -1,14 +1,15 @@
 package com.alok.spring.batch.job;
 
-import com.alok.spring.model.Expense;
 import com.alok.spring.batch.processor.FileArchiveTasklet;
 import com.alok.spring.batch.reader.CSVReader;
+import com.alok.spring.model.Expense;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @EnableBatchProcessing
@@ -32,28 +34,31 @@ public class ExpenseBatchJob {
     @Value("${fields.name.expense:#{null}}")
     private String[] fieldNames;
 
+    private static final String JOB_NAME = "Expense-ETL-Load";
+    private static final String PROCESSOR_TASK_NAME = "Expense-ETL-file-load";
+    private static final String ARCHIVE_TASK_NAME = "Expense-ETL-file-archive";
+
     @Bean("ExpenseJob")
-    public Job expenseJob(JobBuilderFactory jobBuilderFactory,
-                          StepBuilderFactory stepBuilderFactory,
+    public Job expenseJob(JobRepository jobRepository,
+                          PlatformTransactionManager transactionManager,
                           ItemReader<Expense> expenseItemsReader,
                           ItemProcessor<Expense, Expense> defaultExpenseProcessor,
                           ItemWriter<Expense> bankAccountDbWriter
     ) {
-        Step step1 = stepBuilderFactory.get("Expense-ETL-file-load")
-                .<Expense,Expense>chunk(100)
+        Step step1 = new StepBuilder(PROCESSOR_TASK_NAME, jobRepository)
+                .<Expense, Expense>chunk(100, transactionManager)
                 .reader(expenseItemsReader)
                 .processor(defaultExpenseProcessor)
                 .writer(bankAccountDbWriter)
                 .build();
 
-
         FileArchiveTasklet archiveTask = new FileArchiveTasklet();
         archiveTask.setResources(resources);
-        Step step2 = stepBuilderFactory.get("Expense-ETL-file-archive")
-                .tasklet(archiveTask)
+        Step step2 = new StepBuilder(ARCHIVE_TASK_NAME, jobRepository)
+                .tasklet(archiveTask, transactionManager)
                 .build();
 
-        return jobBuilderFactory.get("Expense-ETL-Load")
+        return new JobBuilder(JOB_NAME, jobRepository)
                 .incrementer(new RunIdIncrementer())
                 .start(step1)
                 .next(step2)

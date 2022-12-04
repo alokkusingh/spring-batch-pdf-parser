@@ -1,15 +1,14 @@
 package com.alok.spring.batch.processor;
 
+import com.alok.spring.batch.utils.DefaultFieldExtractor;
+import com.alok.spring.batch.utils.Utility;
 import com.alok.spring.constant.MDCKey;
 import com.alok.spring.model.RawTransaction;
 import com.alok.spring.model.Transaction;
-import com.alok.spring.batch.utils.DefaultFieldExtractor;
-import com.alok.spring.batch.utils.Utility;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
@@ -20,14 +19,17 @@ import java.util.Date;
 @Slf4j
 public class BankAccountProcessor implements ItemProcessor<RawTransaction, Transaction> {
 
-    @Autowired
-    private DefaultFieldExtractor salaryAmountExtractor;
+   @Autowired
+   private DefaultFieldExtractor salaryAmountExtractor;
 
     @Autowired
-    private DefaultFieldExtractor fundTransferAmountExtractor;
+    private DefaultFieldExtractor transferredFundAmountExtractor;
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("ddMMMyy");
     int dateFiledLength = 7;
+
+    public BankAccountProcessor() {
+    }
 
     public void setDateFiledLength(int dateFiledLength) {
         this.dateFiledLength = dateFiledLength;
@@ -67,7 +69,7 @@ public class BankAccountProcessor implements ItemProcessor<RawTransaction, Trans
     }
 
     protected void processFamilyTransaction(Transaction transaction) {
-        String amount = fundTransferAmountExtractor.getField(transaction.getDescription().replaceAll(",", ""));
+        String amount = transferredFundAmountExtractor.getField(transaction.getDescription().replaceAll(",", ""));
         try {
             transaction.setCredit(Integer.valueOf(amount));
         } catch (NumberFormatException nfe) {
@@ -79,7 +81,7 @@ public class BankAccountProcessor implements ItemProcessor<RawTransaction, Trans
     }
 
     protected void processFamilyTransactionReversal(Transaction transaction) {
-        String amount = fundTransferAmountExtractor.getField(transaction.getDescription().replaceAll(",", ""));
+        String amount = transferredFundAmountExtractor.getField(transaction.getDescription().replaceAll(",", ""));
         try {
             transaction.setDebit(Integer.valueOf(amount));
         } catch (NumberFormatException nfe) {
@@ -111,43 +113,6 @@ public class BankAccountProcessor implements ItemProcessor<RawTransaction, Trans
     private Date extractDate(RawTransaction rawTransaction) throws ParseException {
         String dateString = rawTransaction.getLines().get(0).substring(0,dateFiledLength);
         return simpleDateFormat.parse(dateString);
-    }
-
-    @Bean
-    public DefaultFieldExtractor salaryAmountExtractor() {
-        DefaultFieldExtractor fieldExtractor = new DefaultFieldExtractor();
-        fieldExtractor.setStringPatterns(
-                new String[] {
-                        // replace comma from pattern to emtpty
-                        "(?<=EVOLVING  SYSTEMS)\\d+",
-                        "(?<=EVOLVING  SYSTEMS )\\d+",
-                        "(?<=EVOLVING SYSTEMS )\\d+",
-                        "(?<=EVOLVING  SYSTEMS  NETWORKS  INDIA  PVT LTD )\\d+",
-                        "(?<=EVOLVING  SYSTEMS  NETWORKS  I  PVT  LTD)\\d+",
-                        "(?<=EVOLING  SYSTEMS  NETWORKS  INDIA  PVT LTD )\\d+",
-                        "(?<=NEFT  INWARD)\\d+",
-                        "(?<=TRF  FROM EVOLVING )\\d+",
-                        "(?<=NEFTINW-[0-9]{10,13} )\\d+",
-                }
-        );
-        return fieldExtractor;
-    }
-
-    @Bean
-    public DefaultFieldExtractor fundTransferAmountExtractor() {
-       DefaultFieldExtractor fieldExtractor = new DefaultFieldExtractor();
-       fieldExtractor.setStringPatterns(
-               new String[] {
-                       "(?<=TO)\\d+",
-                       "(?<=OUTWARD  ORG)\\d+",
-                       "(?<=IMPS-[0-9]{10,15} )\\d+",
-                       "(?<=UPI-[0-9]{10,15} )\\d+",
-                       "(?<=EBPP-[0-9]{10,15} )\\d+",
-                       "(?<=OUTWARD  REV)\\d+",
-               }
-       );
-
-       return fieldExtractor;
     }
 }
 

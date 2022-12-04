@@ -21,8 +21,8 @@ public class OdionAccountsMonthlyTransactionCollector implements Collector<Odion
     @Override
     public BiConsumer<Map<OdionTransaction.Account, Map<YearMonth, Double>>, OdionTransaction> accumulator() {
         return (monthAccountTransactionMap, transaction) -> {
-            monthAccountTransactionMap.putIfAbsent(transaction.getDebitAccount(), new HashMap<>());
-            monthAccountTransactionMap.putIfAbsent(transaction.getCreditAccount(), new HashMap<>());
+            monthAccountTransactionMap.putIfAbsent(transaction.getDebitAccount(), new LinkedHashMap<>());
+            monthAccountTransactionMap.putIfAbsent(transaction.getCreditAccount(), new LinkedHashMap<>());
 
             monthAccountTransactionMap.get(transaction.getCreditAccount()).compute(
                     YearMonth.of(transaction.getDate().minusDays(1).getYear(), transaction.getDate().minusDays(1).getMonth()),

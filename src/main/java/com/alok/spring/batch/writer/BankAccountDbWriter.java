@@ -3,6 +3,7 @@ package com.alok.spring.batch.writer;
 import com.alok.spring.model.Transaction;
 import com.alok.spring.repository.TransactionRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,7 +18,7 @@ public class BankAccountDbWriter implements ItemWriter<Transaction> {
     TransactionRepository transactionRepository;
 
     @Override
-    public void write(List<? extends Transaction> records) throws Exception {
+    public void write(Chunk<? extends Transaction> chunk) throws Exception {
        /* records.stream()
                 .sorted()
                 .filter(Transaction::isSalary)
@@ -25,7 +26,6 @@ public class BankAccountDbWriter implements ItemWriter<Transaction> {
                 record -> log.debug("Parsed record: {}", record )
         );*/
 
-        transactionRepository.saveAll(records);
-
+        transactionRepository.saveAll(chunk.getItems());
     }
 }

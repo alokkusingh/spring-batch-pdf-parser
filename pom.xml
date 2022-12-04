@@ -6,14 +6,14 @@
 	<parent>
        	<groupId>org.springframework.boot</groupId>
        	<artifactId>spring-boot-starter-parent</artifactId>
-       	<version>2.5.7</version>
+       	<version>3.0.0</version>
        	<relativePath/> <!-- lookup parent from repository -->
     </parent>
 	<groupId>com.alok.spring</groupId>
 	<artifactId>spring-batch-pdf-parser</artifactId>
-	<version>1.0.2-SNAPSHOT</version>
+	<version>1.0.3-SNAPSHOT</version>
 	<name>spring-batch-pdf-parser</name>
-	<description>PDF Batch parser project for Spring Boot</description>
+	<description>Home Service</description>
 
 	<properties>
 		<maven.test.skip>true</maven.test.skip>
@@ -98,7 +98,7 @@
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>RELEASE</version>
+            <version>23.0.0</version>
             <scope>compile</scope>
         </dependency>
 
@@ -120,8 +120,6 @@
 			<artifactId>mqtt-proxy</artifactId>
 			<version>1.0.3</version>
 		</dependency>
-
-
 	</dependencies>
 
 	<build>
@@ -130,7 +128,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
-        </plugins>
+		</plugins>
 	</build>
 
 	<!--

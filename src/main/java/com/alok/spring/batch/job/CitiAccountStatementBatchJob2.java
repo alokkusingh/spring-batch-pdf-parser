@@ -12,7 +12,10 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -23,6 +26,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.io.Resource;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @EnableBatchProcessing
@@ -35,37 +39,39 @@ public class CitiAccountStatementBatchJob2 {
 
     private ProcessedFileRepository processedFileRepository;
 
+    private static final String JOB_NAME = "CitiAccount-ETL-Job2";
+    private static final String PROCESSOR_TASK_NAME = "CitiAccount-ETL-Job2-file-load";
+    private static final String ARCHIVE_TASK_NAME = "CitiAccount-ETL-Job2-file-archive";
+
     @Bean("CitiBankJob2")
-    public Job citiBankJob1(JobBuilderFactory jobBuilderFactory,
-                           StepBuilderFactory stepBuilderFactory,
-                           ItemReader<RawTransaction> citiItemsReader2,
-                           ItemProcessor<RawTransaction, Transaction> citiBankAccountProcessor,
-                           ItemWriter<Transaction> bankAccountDbWriter,
+    public Job citiBankJob1(JobRepository jobRepository,
+                            PlatformTransactionManager transactionManager,
+                            ItemReader<RawTransaction> citiItemsReader2,
+                            ItemProcessor<RawTransaction, Transaction> citiBankAccountProcessor,
+                            ItemWriter<Transaction> bankAccountDbWriter,
                             ProcessedFileRepository processedFileRepository
     ) {
         this.processedFileRepository = processedFileRepository;
-        Step step1 = stepBuilderFactory.get("CitiAccount-ETL-Job2-file-load")
-                .<RawTransaction,Transaction>chunk(1000)
+
+        Step step1 = new StepBuilder(PROCESSOR_TASK_NAME, jobRepository)
+                .<RawTransaction,Transaction>chunk(100, transactionManager)
                 .reader(citiItemsReader2)
                 .processor(citiBankAccountProcessor)
                 .writer(bankAccountDbWriter)
                 .build();
 
-
         FileArchiveTasklet archiveTask = new FileArchiveTasklet();
         archiveTask.setResources(resources);
-        Step step2 = stepBuilderFactory.get("CitiAccount-ETL-Job2-file-archive")
-                .tasklet(archiveTask)
+        Step step2 = new StepBuilder(ARCHIVE_TASK_NAME, jobRepository)
+                .tasklet(archiveTask, transactionManager)
                 .build();
 
-        return jobBuilderFactory.get("CitiAccount-ETL-Job2")
+        return new JobBuilder(JOB_NAME, jobRepository)
                 .incrementer(new RunIdIncrementer())
                 .start(step1)
                 .next(step2)
                 .build();
     }
-
-
 
     @Bean
     public MultiResourceItemReader<RawTransaction> citiItemsReader2(PDFReader citiItemReader2) {
