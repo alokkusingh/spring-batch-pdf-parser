@@ -27,8 +27,6 @@ public class MqttClientConfig {
     public MqttClientConfig(IotProperties iotProperties, ServerProperties serverProperties) {
         this.iotProperties = iotProperties;
         this.serverProperties = serverProperties;
-        System.out.println("iotProperties: " + iotProperties.getSecure().getKeystorePassword());
-        System.out.println("serverProperties: " + serverProperties);
     }
 
 
