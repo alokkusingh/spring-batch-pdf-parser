@@ -12,4 +12,6 @@ COPY src/main/resources/truststore.jks /home/alok/trustore.jks
 COPY ${JAR_FILE} /opt/app.jar
 EXPOSE 8081
 WORKDIR /opt
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/urandom","-Dspring.profiles.active=prod,mqtt","-jar","/opt/app.jar"]
+# Removed sprint porfiles from here, isnted it will be set using configMap in Kueberenetes
+#ENTRYPOINT ["java","-Djava.security.egd=file:/dev/urandom","-Dspring.profiles.active=prod,mqtt","-jar","/opt/app.jar"]
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/urandom","-jar","/opt/app.jar"]
