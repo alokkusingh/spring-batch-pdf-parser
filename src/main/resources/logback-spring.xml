@@ -13,7 +13,8 @@
         <file>${LOGS}/spring-batch.log</file>
         <encoder
                 class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <Pattern>%magenta(%d) %highlight(%-5level) [%blue(%t)] %yellow(%C{1}.%M:%L):%msg%n%throwable
+            <Pattern>
+                %magenta(%d) %highlight(%-5level) [%blue(%t)] %yellow(%C{1}.%M:%L):%msg%n%throwable
             </Pattern>
         </encoder>
         <rollingPolicy

@@ -30,6 +30,8 @@ public class OdionTransaction {
         SBI_MAX_GAIN("SBI Max Gain"),
         INTEREST("Interest"),
         MISC("Misc"),
+        ADARSH("Adarsh"),
+        INTEREST_ADARSH("Interest_Adarsh"),
         OPENING_BALANCE("Opening Balance");
 
         private String name;
