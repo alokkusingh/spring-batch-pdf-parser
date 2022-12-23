@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.Arrays;
 
-@EnableCaching
-@Configuration
+//@EnableCaching
+//@Configuration
 public class CacheConfig {
 
     public interface CacheName {
@@ -19,7 +19,7 @@ public class CacheConfig {
         String SUMMARY = "summary";
     }
 
-    @Bean
+    //@Bean
     public CacheManager cacheManager() {
         SimpleCacheManager cacheManager = new SimpleCacheManager();
         cacheManager.setCaches(Arrays.asList(

@@ -2,17 +2,28 @@ package com.alok.spring.service;
 
 import com.alok.spring.batch.utils.Utility;
 import com.alok.spring.constant.InvestmentType;
-import com.alok.spring.model.*;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.alok.spring.model.Expense;
+import com.alok.spring.model.Investment;
+import com.alok.spring.model.OdionTransaction;
+import com.alok.spring.model.Tax;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.HttpRequestInitializer;
+import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.ValueRange;
+import com.google.auth.http.HttpCredentialsAdapter;
+import com.google.auth.oauth2.GoogleCredentials;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -20,6 +31,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+@Slf4j
 @Service
 public class GoogleSheetService {
 
@@ -66,27 +78,77 @@ public class GoogleSheetService {
         this.cacheService = cacheService;
         this.odionService = odionService;
 
-        InputStream inputStream = new FileInputStream(serviceAccountKeyFile); // put your service account's key.json file in asset folder.
+//        InputStream inputStream = new FileInputStream(serviceAccountKeyFile); // put your service account's key.json file in asset folder.
+//
+//
+//        GoogleCredentials googleCredentials = GoogleCredentials.fromStream(inputStream)
+//                .createScoped(Collections.singleton(SheetsScopes.SPREADSHEETS_READONLY));
+//
+//        HttpRequestInitializer requestInitializer = new HttpCredentialsAdapter(googleCredentials);
+//
+//        sheetsService = new Sheets.Builder(
+//                GoogleNetHttpTransport.newTrustedTransport(),
+//                GsonFactory.getDefaultInstance(),
+//                requestInitializer
+//        )
+//                .setApplicationName("Home Stack")
+//                .build();
+    }
 
-        GoogleCredential googleCredential = GoogleCredential.fromStream(inputStream)
-                .createScoped(Collections.singleton(SheetsScopes.SPREADSHEETS_READONLY));
+    private void initSheetService() {
+        if (sheetsService == null) {
+            log.info("Google Sheet Service Initialized!");
+            InputStream inputStream = null; // put your service account's key.json file in asset folder.
+            try {
+                inputStream = new FileInputStream(serviceAccountKeyFile);
+                //byte[] bytes = inputStream.readAllBytes();
+                //log.info("Content: {}", new String(bytes));
+            } catch (FileNotFoundException e) {
+                log.error("Google Sheet initialization failed with error: " + e.getMessage());
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                log.error("Google Sheet initialization stream read failed: " + e.getMessage());
+                throw new RuntimeException(e);
+            }
 
-        sheetsService = new Sheets.Builder(
-                GoogleNetHttpTransport.newTrustedTransport(),
-                JacksonFactory.getDefaultInstance(),
-                googleCredential
-        )
-                .setApplicationName("Home Stack")
-                .build();
+
+            GoogleCredentials googleCredentials = null;
+            try {
+                googleCredentials = GoogleCredentials.fromStream(inputStream)
+                        .createScoped(Collections.singleton(SheetsScopes.SPREADSHEETS_READONLY));
+            } catch (IOException e) {
+                log.error("Google Sheet initialization failed with error: " + e.getMessage());
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+
+            HttpRequestInitializer requestInitializer = new HttpCredentialsAdapter(googleCredentials);
+
+            try {
+                sheetsService = new Sheets.Builder(
+                        GoogleNetHttpTransport.newTrustedTransport(),
+                        //GsonFactory.getDefaultInstance(),
+                        JacksonFactory.getDefaultInstance(),
+                        requestInitializer
+                )
+                        .setApplicationName("Home Stack")
+                        .build();
+            } catch (GeneralSecurityException | IOException | RuntimeException e) {
+                log.error("Google Sheet initialization failed with error: " + e.getMessage());
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public void refreshTaxData() throws IOException {
-
+        initSheetService();
         ValueRange response = sheetsService.spreadsheets().values()
                 .get(expenseSheetId, taxSheetRange)
                 .execute();
 
-        List<Tax> taxRecords = Optional.ofNullable(response.getValues()).orElse(Collections.emptyList()).stream()
+        List<Tax> records = Optional.ofNullable(response.getValues()).orElse(Collections.emptyList()).stream()
                 .map(row -> Tax.builder()
                         .financialYear((String) row.get(0))
                         .paidAmount(row.size() < 2? 0: Integer.parseInt((String) row.get(1)))
@@ -95,98 +157,106 @@ public class GoogleSheetService {
                 )
                 .toList();
 
-        taxService.saveAllTaxes(taxRecords);
+        log.info("Number of transactions: {}", records.size());
+        taxService.saveAllTaxes(records);
         cacheService.evictAllCaches();
     }
 
     public void refreshExpenseData() throws IOException {
+        initSheetService();
         ValueRange response = sheetsService.spreadsheets().values()
                 .get(expenseSheetId, expenseSheetRange)
                 .execute();
 
-        List<Expense> expenseRecords = Optional.ofNullable(response.getValues()).orElse(Collections.emptyList()).stream()
-                .filter(row -> row.get(2) != null && row.get(2) != "")
+        List<Expense> records = Optional.ofNullable(response.getValues()).orElse(Collections.emptyList()).stream()
+                .filter(row -> row.get(2) != null && ((String) row.get(2)).length() != 0)
                 .map(row -> Expense.builder()
                         .date(parseToDate((String) row.get(0)))
                         .head((String) row.get(1))
                         .amount(Double.parseDouble((String) row.get(2)))
                         .comment(row.get(3) == null? "": (String) row.get(3))
-                        .yearx(Integer.parseInt((String) row.get(4)))
-                        .monthx(Integer.parseInt((String) row.get(5)))
+                        .yearx(row.get(4) == null? 0:Integer.parseInt((String) row.get(4)))
+                        .monthx(row.get(5) == null? 0:Integer.parseInt((String) row.get(5)))
                         .category(Utility.getExpenseCategory((String) row.get(1), row.get(3) == null? "": (String) row.get(3)))
                         .build()
                 )
                 .toList();
 
-        expenseService.saveAllExpenses(expenseRecords);
+        log.info("Number of transactions: {}", records.size());
+
+        expenseService.saveAllExpenses(records);
         cacheService.evictAllCaches();
     }
 
     public void refreshInvestmentData() throws IOException {
+        initSheetService();
         ValueRange response = sheetsService.spreadsheets().values()
                 .get(expenseSheetId, investmentSheetRange)
                 .execute();
 
-        List<Investment> investmentRecords = Optional.ofNullable(response.getValues()).orElse(Collections.emptyList()).stream()
+        List<Investment> records = Optional.ofNullable(response.getValues()).orElse(Collections.emptyList()).stream()
                 .map(row -> List.of(
                                 Investment.builder()
                                         .yearx(Short.parseShort((String) row.get(0)))
                                         .monthx(Short.parseShort((String) row.get(1)))
                                         .head(InvestmentType.PF.name())
-                                        .contribution(row.get(2) == "" ? 0 : Integer.parseInt((String) row.get(2)))
-                                        .valueAsOnMonth(row.get(4) == "" ? 0 : Integer.parseInt((String) row.get(4)))
+                                        .contribution(((String) row.get(2)).length() != 0 ? 0 : Integer.parseInt((String) row.get(2)))
+                                        .valueAsOnMonth(((String) row.get(4)).length() != 0 ? 0 : Integer.parseInt((String) row.get(4)))
                                         .build(),
                                 Investment.builder()
                                         .yearx(Short.parseShort((String) row.get(0)))
                                         .monthx(Short.parseShort((String) row.get(1)))
                                         .head(InvestmentType.LIC.name())
-                                        .contribution(row.get(5) == "" ? 0 : Integer.parseInt((String) row.get(5)))
-                                        .valueAsOnMonth(row.get(7) == "" ? 0 : Integer.parseInt((String) row.get(7)))
+                                        .contribution(((String) row.get(5)).length() != 0 ? 0 : Integer.parseInt((String) row.get(5)))
+                                        .valueAsOnMonth(((String) row.get(7)).length() != 0 ? 0 : Integer.parseInt((String) row.get(7)))
                                         .build(),
                                 Investment.builder()
                                         .yearx(Short.parseShort((String) row.get(0)))
                                         .monthx(Short.parseShort((String) row.get(1)))
                                         .head(InvestmentType.NPS.name())
-                                        .contribution(row.get(8) == "" ? 0 : Integer.parseInt((String) row.get(8)))
-                                        .valueAsOnMonth(row.get(10) == "" ? 0 : Integer.parseInt((String) row.get(10)))
+                                        .contribution(((String) row.get(8)).length() != 0 ? 0 : Integer.parseInt((String) row.get(8)))
+                                        .valueAsOnMonth(((String) row.get(10)).length() != 0 ? 0 : Integer.parseInt((String) row.get(10)))
                                         .build(),
                                 Investment.builder()
                                         .yearx(Short.parseShort((String) row.get(0)))
                                         .monthx(Short.parseShort((String) row.get(1)))
                                         .head(InvestmentType.SHARE.name())
-                                        .contribution(row.get(11) == "" ? 0 : Integer.parseInt((String) row.get(11)))
-                                        .valueAsOnMonth(row.get(13) == "" ? 0 : Integer.parseInt((String) row.get(13)))
+                                        .contribution(((String) row.get(11)).length() != 0 ? 0 : Integer.parseInt((String) row.get(11)))
+                                        .valueAsOnMonth(((String) row.get(13)).length() != 0 ? 0 : Integer.parseInt((String) row.get(13)))
                                         .build()
                         )
                 )
                 .flatMap(Collection::stream)
                 .toList();
 
-        investmentService.saveAllInvestments(investmentRecords);
+        log.info("Number of transactions: {}", records.size());
+        investmentService.saveAllInvestments(records);
         cacheService.evictAllCaches();
     }
 
     public void refreshOdionTransactionsData() throws IOException {
+        initSheetService();
         ValueRange response = sheetsService.spreadsheets().values()
                 .get(odionSheetId, odionTransactionsSheetRange)
                 .execute();
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        List<OdionTransaction> odionTransactionRecords = Optional.ofNullable(response.getValues()).orElse(Collections.emptyList()).stream()
+        List<OdionTransaction> records = Optional.ofNullable(response.getValues()).orElse(Collections.emptyList()).stream()
                 .filter(row -> row.size() == 5)
-                .filter(row -> row.get(2) != "")
-                .filter(row -> row.get(3) != "")
+                .filter(row -> ((String) row.get(2)).length() != 0)
+                .filter(row -> ((String) row.get(3)).length() != 0)
                 .map(row -> OdionTransaction.builder()
                         .date(LocalDate.parse((String)row.get(0), formatter))
                         .particular((String)row.get(1))
-                        .debitAccount(row.get(2) == "" ? OdionTransaction.Account.OPENING_BALANCE : OdionTransaction.Account.valueOfOrDefault((String)row.get(2)))
+                        .debitAccount(((String) row.get(2)).length() != 0 ? OdionTransaction.Account.OPENING_BALANCE : OdionTransaction.Account.valueOfOrDefault((String)row.get(2)))
                         .creditAccount(OdionTransaction.Account.valueOfOrDefault((String)row.get(3)))
                         .amount(Double.parseDouble((String) row.get(4)))
                         .build()
                 )
                 .toList();
 
-        odionService.saveAllTransactions(odionTransactionRecords);
+        log.info("Number of transactions: {}", records.size());
+        odionService.saveAllTransactions(records);
     }
 
     private Date parseToDate(String strDate) {

@@ -1,6 +1,7 @@
 package com.alok.spring.controller;
 
 import com.alok.spring.service.GoogleSheetService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @RestController
 @RequestMapping("/gsheet")
 public class GoogleSheetController {
@@ -28,7 +30,9 @@ public class GoogleSheetController {
         CompletableFuture.runAsync(() -> {
             try {
                 googleSheetService.refreshTaxData();
-            } catch (IOException e) {
+            } catch (IOException |RuntimeException e) {
+                log.error("Google Sheet refresh failed with error: " + e.getMessage());
+                e.printStackTrace();
                 throw new RuntimeException(e);
             }
         });
@@ -44,7 +48,9 @@ public class GoogleSheetController {
         CompletableFuture.runAsync(() -> {
             try {
                 googleSheetService.refreshExpenseData();
-            } catch (IOException e) {
+            } catch (IOException |RuntimeException e) {
+                log.error("Google Sheet refresh failed with error: " + e.getMessage());
+                e.printStackTrace();
                 throw new RuntimeException(e);
             }
         });
@@ -60,7 +66,9 @@ public class GoogleSheetController {
         CompletableFuture.runAsync(() -> {
             try {
                 googleSheetService.refreshInvestmentData();
-            } catch (IOException e) {
+            } catch (IOException |RuntimeException e) {
+                log.error("Google Sheet refresh failed with error: " + e.getMessage());
+                e.printStackTrace();
                 throw new RuntimeException(e);
             }
         });
@@ -76,7 +84,8 @@ public class GoogleSheetController {
         CompletableFuture.runAsync(() -> {
             try {
                 googleSheetService.refreshOdionTransactionsData();
-            } catch (Exception e) {
+            } catch (IOException |RuntimeException e) {
+                log.error("Google Sheet refresh failed with error: " + e.getMessage());
                 e.printStackTrace();
                 throw new RuntimeException(e);
             }
